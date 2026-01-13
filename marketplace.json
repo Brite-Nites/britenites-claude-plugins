@@ -1,0 +1,26 @@
+{
+  "name": "britenites-plugins",
+  "owner": {
+    "name": "Britenites",
+    "email": "marketingadmin@britenites.com"
+  },
+  "metadata": {
+    "description": "Official Claude Code plugins for the Britenites organization",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "britenites-core",
+      "source": "./plugins/britenites-core",
+      "description": "Baseline tools for Britenites org",
+      "version": "1.0.0",
+      "author": {
+        "name": "Britenites"
+      },
+      "repository": "git@github.com:brite-nites/britenites-claude-plugins.git",
+      "category": "utilities",
+      "keywords": ["britenites", "core", "baseline"]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "britenites-core",
+  "version": "1.0.0",
+  "description": "Baseline tools for Britenites org",
+  "author": {
+    "name": "Britenites"
+  },
+  "repository": "git@github.com:brite-nites/britenites-claude-plugins.git",
+  "license": "MIT",
+  "skills": "./skills/"
+}
