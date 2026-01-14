@@ -1,0 +1,17 @@
+{
+  "name": "britenites-claude-plugins",
+  "owner": {
+    "name": "Britenites"
+  },
+  "metadata": {
+    "description": "Claude Code plugins for the Britenites organization",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "britenites",
+      "source": "./plugins/britenites",
+      "description": "Baseline tools for Britenites org"
+    }
+  ]
+}
