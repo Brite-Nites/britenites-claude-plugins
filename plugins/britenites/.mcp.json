@@ -6,7 +6,7 @@
     },
     "linear-server": {
       "type": "http",
-      "url": "https://mcp.linear.dev/mcp"
+      "url": "https://mcp.linear.app/mcp"
     }
   }
 }
