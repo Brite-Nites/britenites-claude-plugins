@@ -29,6 +29,39 @@ Or manually add to your `.claude/settings.json`:
 |---------|-------------|
 | `/britenites:project-start` | Start a new project with a guided interview for non-technical users |
 
+## Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `vercel-react-best-practices` | React and Next.js performance optimization (45 rules) |
+
+### React Best Practices Skill
+
+This skill provides 45 performance optimization rules for React and Next.js, sourced from [Vercel Engineering](https://github.com/vercel-labs/agent-skills) (MIT license).
+
+**Automatic usage:** Claude automatically applies these rules when you're working on React/Next.js code—writing components, reviewing code, refactoring, or optimizing performance. No action required.
+
+**Manual invocation:** You can also explicitly load the rules into context:
+
+```
+/britenites:vercel-react-best-practices
+```
+
+**Rule categories (by priority):**
+
+| Priority | Category | Impact |
+|----------|----------|--------|
+| 1 | Eliminating Waterfalls | CRITICAL |
+| 2 | Bundle Size Optimization | CRITICAL |
+| 3 | Server-Side Performance | HIGH |
+| 4 | Client-Side Data Fetching | MEDIUM-HIGH |
+| 5 | Re-render Optimization | MEDIUM |
+| 6 | Rendering Performance | MEDIUM |
+| 7 | JavaScript Performance | LOW-MEDIUM |
+| 8 | Advanced Patterns | LOW |
+
+To add custom rules, edit `plugins/britenites/skills/react-best-practices/AGENTS.md` directly.
+
 ## Usage
 
 After installation, invoke commands using the slash menu or by typing the command directly:
