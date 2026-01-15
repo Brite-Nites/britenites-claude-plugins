@@ -1,9 +1,10 @@
 {
   "name": "britenites",
   "description": "Baseline tools for Britenites org",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": {
     "name": "Britenites"
   },
-  "mcpServers": "./.mcp.json"
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/"
 }
