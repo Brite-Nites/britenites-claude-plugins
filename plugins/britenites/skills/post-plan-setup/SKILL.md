@@ -1,5 +1,6 @@
 ---
 name: post-plan-setup
+user-invocable: true
 description: >
   Runs the full post-plan workflow: refine plan → create Linear issues →
   setup CLAUDE.md. Use after /plan-project produces a v1 plan. Pauses
