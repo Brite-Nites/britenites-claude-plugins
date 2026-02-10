@@ -24,9 +24,46 @@ You are creating Linear issues from a refined project plan.
 - If no argument provided, look for `docs/project-plan-refined.md`
 
 ### Process
+
+#### Step 0: Linear Project Setup
+
+Before creating any issues, you must determine the target team and project.
+
+1. **Detect team**:
+   - Call `list_teams` to get all teams in the workspace
+   - If exactly 1 team exists, auto-select it and inform the user:
+     "I'll create issues in team '[name]'."
+   - If multiple teams exist, ask the user to pick one using
+     AskUserQuestion with the team names as options
+   - If 0 teams exist, stop and tell the user to create a team
+     in Linear first
+
+2. **Find or create project**:
+   - Extract the project name from the plan file heading (the
+     `# [Project Name]` at the top of the refined plan)
+   - Search for existing projects in the selected team using
+     `list_projects` with that name as a query
+   - **Exact match found**: Ask the user — "I found an existing
+     project called '[name]'. Should I add issues there, or
+     create a new project?"
+   - **Multiple partial matches**: Show the matches and ask the
+     user to pick one or create a new project
+   - **No match found**: Tell the user — "I'll create a new
+     Linear project called '[name]'. Want a different name?"
+     Wait for confirmation, then create the project using
+     `create_project`
+
+3. **Confirm and proceed**: Summarize the setup —
+   "Creating issues in team '[team]', project '[project]'."
+   Then continue to issue creation below.
+
+#### Step 1: Create Issues
+
 1. **Read the refined plan** and parse all tasks
 
 2. **For each task, create a Linear issue** with:
+   - **Team**: The team selected in Step 0
+   - **Project**: The project confirmed/created in Step 0
    - **Title**: From the task title
    - **Description**: Combine the Context, Steps, and Validation
      sections into a well-structured issue body. Format it so that
