@@ -222,6 +222,44 @@ Apply these as baseline (adjust based on their preferences):
 
 ---
 
+## Final Step: Write the Project Plan
+
+After creating the CLAUDE.md, you MUST also write a standalone project plan file to `docs/project-plan-v1.md`. This file is consumed by downstream skills (`/post-plan-setup`, `/refine-plan`, `/create-issues`).
+
+The plan file should contain:
+
+```
+# [Project Name] — V1 Project Plan
+
+## Overview
+[2-3 sentence summary of what's being built and why]
+
+## Target Users
+[Who uses this and what they need]
+
+## Features
+[Bulleted list of all features discussed, grouped by area.
+Mark each as must-have or nice-to-have.]
+
+## Architecture & Technical Decisions
+[Tech stack, major architectural choices, and reasoning.
+For non-technical users, document the decisions you made
+on their behalf and why.]
+
+## Constraints
+[Timeline, budget, integrations, accessibility, scale, etc.]
+
+## Success Criteria
+[How the user will know the project is "done"]
+
+## Open Questions
+[Anything unresolved or ambiguous from the interview]
+```
+
+Create the `docs/` directory if it doesn't exist. This plan file is separate from CLAUDE.md — the CLAUDE.md guides agent behavior, the plan file captures what to build.
+
+---
+
 ## Begin Now
 
 Start the interview by asking about their technical background. Be warm and conversational. Let their answer guide which path to follow.
