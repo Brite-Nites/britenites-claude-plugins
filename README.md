@@ -524,3 +524,7 @@ To add a new plugin to the bundle, create the plugin directory and add it to the
 ## License
 
 MIT
+
+## Issue Tracking
+
+Issues for this project are tracked in [Brite Claude Code Plugin](https://linear.app/brite-nites/project/brite-claude-code-plugin-402b57908532).
