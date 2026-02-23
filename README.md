@@ -1,10 +1,17 @@
 # Britenites Claude Plugins
 
-Claude Code plugin bundle for the Britenites organization. Provides custom commands, skills, and integrations that extend Claude Code's functionality.
+Claude Code plugin bundle for the Britenites organization. Provides custom commands, skills, and MCP integrations that extend Claude Code's functionality.
 
-## Installation
+**Current version:** 1.2.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
-Add this plugin bundle to your Claude Code configuration:
+## Prerequisites
+
+- [Claude Code](https://claude.ai/code) CLI installed
+- Node.js 18+ (for MCP servers)
+
+## Quick Start
+
+Install the plugin bundle:
 
 ```bash
 claude plugins add https://github.com/Brite-Nites/britenites-claude-plugins
@@ -23,52 +30,48 @@ Or manually add to your `.claude/settings.json`:
 }
 ```
 
+Verify installation by typing `/britenites:` in Claude Code — you should see the available commands in the slash menu.
+
 ## Available Commands
 
 | Command | Description |
 |---------|-------------|
-| `/britenites:project-start` | Start a new project with a guided interview for non-technical users |
+| `/britenites:project-start` | Start a new project with a guided interview |
+| `/britenites:tech-stack` | Display the Britenites technology stack for tech decisions |
+| `/britenites:code-review` | Standardized code review for Britenites projects |
+| `/britenites:onboarding-checklist` | Guide for setting up a new dev environment |
 
-## Available Skills
+## Skill Coverage Matrix
 
-| Skill | Description |
-|-------|-------------|
-| `vercel-react-best-practices` | React and Next.js performance optimization (45 rules) |
+Skills activate automatically when Claude detects relevant context. No manual invocation needed.
 
-### React Best Practices Skill
+| Skill | Domain | Trigger |
+|-------|--------|---------|
+| `react-best-practices` | React / Next.js | Writing, reviewing, or optimizing React components |
+| `frontend-design` | Frontend UI | Building web components, pages, landing pages, dashboards |
+| `ui-ux-pro-max` | UI/UX Design | Design tasks across 50 styles, 9 frameworks, 21 palettes |
+| `web-design-guidelines` | Design Review | Reviewing UI code for best practices and accessibility |
+| `agent-browser` | Browser Automation | Navigating websites, filling forms, taking screenshots |
+| `find-skills` | Skill Discovery | Looking for new skills or capabilities to install |
 
-This skill provides 45 performance optimization rules for React and Next.js, sourced from [Vercel Engineering](https://github.com/vercel-labs/agent-skills) (MIT license).
+### Manually Invoking Skills
 
-**Automatic usage:** Claude automatically applies these rules when you're working on React/Next.js code—writing components, reviewing code, refactoring, or optimizing performance. No action required.
-
-**Manual invocation:** You can also explicitly load the rules into context:
-
-```
-/britenites:vercel-react-best-practices
-```
-
-**Rule categories (by priority):**
-
-| Priority | Category | Impact |
-|----------|----------|--------|
-| 1 | Eliminating Waterfalls | CRITICAL |
-| 2 | Bundle Size Optimization | CRITICAL |
-| 3 | Server-Side Performance | HIGH |
-| 4 | Client-Side Data Fetching | MEDIUM-HIGH |
-| 5 | Re-render Optimization | MEDIUM |
-| 6 | Rendering Performance | MEDIUM |
-| 7 | JavaScript Performance | LOW-MEDIUM |
-| 8 | Advanced Patterns | LOW |
-
-To add custom rules, edit `plugins/britenites/skills/react-best-practices/AGENTS.md` directly.
-
-## Usage
-
-After installation, invoke commands using the slash menu or by typing the command directly:
+Some skills can also be invoked directly:
 
 ```
-/britenites:project-start
+/britenites:react-best-practices
 ```
+
+## MCP Servers
+
+The plugin configures two MCP servers automatically:
+
+| Server | Transport | Purpose |
+|--------|-----------|---------|
+| `sequential-thinking` | stdio | Structured reasoning via `@modelcontextprotocol/server-sequential-thinking` |
+| `linear-server` | HTTP | Linear project management integration |
+
+The Linear MCP server provides tools for managing issues, projects, milestones, and documentation directly from Claude Code.
 
 ---
 
@@ -89,7 +92,6 @@ plugins/
     hooks/                  # Event handlers
     styles/                 # Output style overrides
     .mcp.json               # MCP server configurations
-    .lsp.json               # Language server configurations
 ```
 
 ### Plugin Manifest (plugin.json)
@@ -160,7 +162,7 @@ The user specified: $ARGUMENTS
 
 ## Adding Skills
 
-Skills are model-invoked capabilities that Claude uses automatically based on context. Unlike commands, users don't invoke skills directly—Claude decides when to use them.
+Skills are model-invoked capabilities that Claude uses automatically based on context. Unlike commands, users don't invoke skills directly — Claude decides when to use them.
 
 ### File Structure
 
@@ -208,31 +210,6 @@ Detailed instructions for how Claude should perform this skill.
 | `context: fork` | Run in isolated sub-agent |
 | `agent` | Agent type when using `context: fork` |
 | `user-invocable` | Show in slash menu (default: `true`) |
-
-### Example: PDF Processor Skill
-
-`skills/pdf-processor/SKILL.md`:
-
-```markdown
----
-name: pdf-processor
-description: Process and extract information from PDF documents
-allowed-tools: Read, Write, Bash
-user-invocable: false
----
-
-# PDF Processing
-
-When the user needs to work with PDF files, use this skill to:
-
-1. Extract text content from PDFs
-2. Parse structured data from PDF tables
-3. Convert PDFs to other formats
-
-## Tools
-- Use `pdftotext` for text extraction
-- Use `pdfimages` for image extraction
-```
 
 ---
 
@@ -431,57 +408,6 @@ keep-coding-instructions: true
 
 Respond concisely. Use bullet points. Avoid lengthy explanations.
 Maximum 3 sentences per response unless more detail is explicitly requested.
-```
-
----
-
-## Complete Plugin Example
-
-Here's a fully-featured plugin structure:
-
-```
-plugins/
-  britenites/
-    .claude-plugin/
-      plugin.json
-    commands/
-      project-start.md
-      deploy.md
-      status.md
-    skills/
-      code-review/
-        SKILL.md
-      security-scan/
-        SKILL.md
-    agents/
-      security-reviewer.md
-    hooks/
-      hooks.json
-    styles/
-      concise.md
-    scripts/
-      format.sh
-      validate.js
-    .mcp.json
-```
-
-With `plugin.json`:
-
-```json
-{
-  "name": "britenites",
-  "description": "Baseline tools for Britenites org",
-  "version": "1.0.0",
-  "author": {
-    "name": "Britenites"
-  },
-  "commands": "./commands/",
-  "skills": "./skills/",
-  "agents": "./agents/",
-  "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json",
-  "outputStyles": "./styles/"
-}
 ```
 
 ---

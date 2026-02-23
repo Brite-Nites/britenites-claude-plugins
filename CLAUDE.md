@@ -15,6 +15,9 @@ plugins/
     .claude-plugin/plugin.json     # Plugin metadata (name, version, author)
     commands/
       *.md                         # Command definitions (markdown format)
+    skills/
+      */SKILL.md                   # Skill definitions (auto-invoked by Claude)
+    .mcp.json                      # MCP server configurations
 ```
 
 ## How the Plugin System Works
@@ -37,6 +40,30 @@ description: Short description of what this command does
 
 Command instructions for Claude go here...
 ```
+
+## SKILL.md Frontmatter Standard
+
+All skills must follow this frontmatter schema:
+
+```yaml
+---
+name: skill-name              # Required. Must match the directory name.
+description: When to use...   # Required. Unquoted. Describes trigger conditions.
+user-invocable: true           # Required. Explicit true or false.
+allowed-tools: Tool(pattern)   # Optional. Only when skill needs specific tool permissions.
+license: MIT                   # Optional. SPDX identifier for third-party content.
+metadata:                      # Optional. Only for skills from external sources.
+  author: source-org
+  version: "1.0.0"
+---
+```
+
+Rules:
+- `name` must match the skill's directory name exactly (e.g., `skills/react-best-practices/` → `name: react-best-practices`)
+- `description` must not be quoted — use plain YAML string
+- `user-invocable` must always be explicit, never rely on defaults
+- `license` is only needed when the skill contains third-party content
+- `metadata` is only needed for skills ported from external sources (e.g., Vercel)
 
 ## Adding New Plugins
 
