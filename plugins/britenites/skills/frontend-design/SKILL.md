@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
+description: Build and implement distinctive frontend interfaces with production-grade code. Use when the user asks to code, build, create, or implement web components, pages, layouts, dashboards, or applications. This is the implementation skill — it writes actual HTML/CSS/JS/React code with bold aesthetic choices. Do NOT use for design system planning, palette selection, or style exploration — use ui-ux-pro-max for those.
 user-invocable: true
 ---
 

@@ -10,6 +10,7 @@ This is a **Claude Code Plugin Bundle** for the Britenites organization. It prov
 
 ```
 .claude-plugin/marketplace.json    # Plugin registry - defines available plugins
+.github/workflows/                 # CI/CD validation
 plugins/
   britenites/
     .claude-plugin/plugin.json     # Plugin metadata (name, version, author)
@@ -17,6 +18,9 @@ plugins/
       *.md                         # Command definitions (markdown format)
     skills/
       */SKILL.md                   # Skill definitions (auto-invoked by Claude)
+      _shared/                     # Shared utilities referenced by skills
+    hooks/
+      hooks.json                   # PreToolUse, PostToolUse, SessionStart hooks
     .mcp.json                      # MCP server configurations
 ```
 
@@ -65,6 +69,25 @@ Rules:
 - `license` is only needed when the skill contains third-party content
 - `metadata` is only needed for skills ported from external sources (e.g., Vercel)
 
+## Hooks
+
+The plugin includes hooks in `plugins/britenites/hooks/hooks.json`:
+
+- **PreToolUse (Bash)**: Security scan — checks commands for destructive operations, piped downloads, credential exposure
+- **PreToolUse (Write/Edit)**: Security scan — checks file content for hardcoded secrets, injection patterns
+- **PostToolUse (Write/Edit)**: Auto-linter — runs ESLint (JS/TS) or Ruff (Python) if available
+- **SessionStart**: Team context — reminds Claude of Britenites conventions
+
+## Skill Routing
+
+Design skills are differentiated by intent:
+
+| Skill | Triggers on | Purpose |
+|-------|-------------|---------|
+| `frontend-design` | "build", "create", "implement" UI | Write production code |
+| `ui-ux-pro-max` | "choose palette", "design system", "plan visual direction" | Design planning |
+| `web-design-guidelines` | "review", "audit", "check" existing UI | Compliance review |
+
 ## Adding New Plugins
 
 1. Create a new directory under `plugins/` with `.claude-plugin/plugin.json`
@@ -73,3 +96,11 @@ Rules:
 ## No Build Process
 
 This repository has no dependencies, build steps, or tests. Changes are version-controlled with Git and distributed directly.
+
+## CI/CD
+
+A GitHub Actions workflow (`.github/workflows/validate-plugin.yml`) runs on push/PR to main and validates:
+- JSON validity of marketplace.json, plugin.json, and hooks.json
+- Required fields in plugin.json
+- Frontmatter in all commands and SKILL.md files
+- Skill name-to-directory matching

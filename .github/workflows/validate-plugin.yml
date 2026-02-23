@@ -1,0 +1,145 @@
+name: Validate Plugin Structure
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate marketplace.json
+        run: |
+          echo "Checking marketplace.json is valid JSON..."
+          python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
+          echo "marketplace.json is valid"
+
+      - name: Validate plugin.json
+        run: |
+          echo "Checking plugin.json is valid JSON..."
+          python3 -m json.tool plugins/britenites/.claude-plugin/plugin.json > /dev/null
+
+          echo "Checking required fields..."
+          python3 -c "
+          import json, sys
+          with open('plugins/britenites/.claude-plugin/plugin.json') as f:
+              data = json.load(f)
+          required = ['name', 'description', 'version', 'author']
+          missing = [k for k in required if k not in data]
+          if missing:
+              print(f'Missing required fields: {missing}', file=sys.stderr)
+              sys.exit(1)
+          print(f'plugin.json valid: {data[\"name\"]} v{data[\"version\"]}')
+          "
+
+      - name: Validate referenced directories exist
+        run: |
+          echo "Checking plugin directories..."
+          plugin_root="plugins/britenites"
+
+          for dir in commands skills agents; do
+            if [ -d "$plugin_root/$dir" ]; then
+              count=$(ls "$plugin_root/$dir" | wc -l | tr -d ' ')
+              echo "  $dir/ exists ($count entries)"
+            else
+              echo "  WARNING: $dir/ not found"
+            fi
+          done
+
+      - name: Validate commands have frontmatter
+        run: |
+          echo "Checking command frontmatter..."
+          errors=0
+          for file in plugins/britenites/commands/*.md; do
+            [ -f "$file" ] || continue
+            if ! head -1 "$file" | grep -q '^---'; then
+              echo "  FAIL: $file missing YAML frontmatter"
+              errors=$((errors + 1))
+            else
+              desc=$(sed -n '/^---$/,/^---$/p' "$file" | grep 'description:')
+              if [ -z "$desc" ]; then
+                echo "  FAIL: $file missing description in frontmatter"
+                errors=$((errors + 1))
+              else
+                echo "  OK: $(basename "$file")"
+              fi
+            fi
+          done
+          [ $errors -eq 0 ] || exit 1
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          echo "Checking skill frontmatter..."
+          errors=0
+          for file in plugins/britenites/skills/*/SKILL.md; do
+            [ -f "$file" ] || continue
+            dirname=$(basename "$(dirname "$file")")
+
+            if ! head -1 "$file" | grep -q '^---'; then
+              echo "  FAIL: $file missing YAML frontmatter"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            frontmatter=$(sed -n '1,/^---$/p' "$file" | tail -n +2)
+
+            name_val=$(echo "$frontmatter" | grep '^name:' | sed 's/name: *//')
+            if [ -z "$name_val" ]; then
+              echo "  FAIL: $dirname/SKILL.md missing 'name' field"
+              errors=$((errors + 1))
+            elif [ "$name_val" != "$dirname" ]; then
+              echo "  FAIL: $dirname/SKILL.md name '$name_val' does not match directory '$dirname'"
+              errors=$((errors + 1))
+            fi
+
+            if ! echo "$frontmatter" | grep -q '^description:'; then
+              echo "  FAIL: $dirname/SKILL.md missing 'description' field"
+              errors=$((errors + 1))
+            fi
+
+            if ! echo "$frontmatter" | grep -q '^user-invocable:'; then
+              echo "  FAIL: $dirname/SKILL.md missing 'user-invocable' field"
+              errors=$((errors + 1))
+            fi
+
+            echo "  OK: $dirname"
+          done
+          [ $errors -eq 0 ] || exit 1
+
+      - name: Validate hooks.json
+        run: |
+          hooks_file="plugins/britenites/hooks/hooks.json"
+          if [ -f "$hooks_file" ]; then
+            echo "Checking hooks.json is valid JSON..."
+            python3 -m json.tool "$hooks_file" > /dev/null
+            echo "hooks.json is valid"
+            python3 -c "
+          import json
+          with open('plugins/britenites/hooks/hooks.json') as f:
+              data = json.load(f)
+          hooks = data.get('hooks', {})
+          for event, handlers in hooks.items():
+              for handler in handlers:
+                  for hook in handler.get('hooks', []):
+                      htype = hook.get('type', 'unknown')
+                      print(f'  {event}: {htype} hook')
+          "
+          else
+            echo "No hooks.json found (optional)"
+          fi
+
+      - name: Summary
+        run: |
+          echo ""
+          echo "=== Plugin Validation Summary ==="
+          commands=$(ls plugins/britenites/commands/*.md 2>/dev/null | wc -l | tr -d ' ')
+          skills=$(ls -d plugins/britenites/skills/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
+          agents=$(ls plugins/britenites/agents/*.md 2>/dev/null | wc -l | tr -d ' ')
+          echo "Commands: $commands"
+          echo "Skills:   $skills"
+          echo "Agents:   $agents"
+          echo "All checks passed"

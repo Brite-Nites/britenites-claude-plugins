@@ -37,17 +37,12 @@ Work through each section. Only report issues you actually find — skip section
 
 ### 3. Frontend Checklist (React / Next.js / TypeScript)
 
-Only apply if reviewing frontend code:
+Only apply if reviewing frontend code. Defer to the **react-best-practices** skill for the full 45-rule audit (waterfalls, bundle size, re-renders, server components, etc.). In this review, focus on:
 
-- Components follow React best practices (proper use of hooks, memoization only when measured)
 - Server vs. client component boundaries are correct (Next.js App Router)
-- No unnecessary `"use client"` directives
-- Data fetching avoids waterfalls (parallel where possible)
-- Bundle size impact considered (no large library imports for small tasks)
 - Tailwind CSS used for styling (not CSS modules or styled-components)
-- Accessibility basics: semantic HTML, alt text, keyboard navigation, ARIA where needed
 - TypeScript types are meaningful (no excessive `any`)
-- Zod schemas validate external data
+- Zod schemas validate external data at system boundaries
 
 ### 4. Backend Checklist (FastAPI / Python)
 

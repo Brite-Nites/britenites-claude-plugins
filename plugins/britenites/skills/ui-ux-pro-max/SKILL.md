@@ -1,6 +1,6 @@
 ---
 name: ui-ux-pro-max
-description: UI/UX design intelligence covering 50 styles, 21 palettes, 50 font pairings, 20 charts, and 9 stacks. Use for planning, building, designing, reviewing, or optimizing UI/UX code across websites, dashboards, e-commerce, SaaS, and mobile apps. Covers glassmorphism, minimalism, brutalism, neumorphism, bento grid, and more.
+description: Design system generation and UI/UX planning intelligence. Use when the user needs to choose a color palette, select fonts, generate a design system, plan a visual direction, or explore UI styles before implementation. Covers 50+ styles, 97 palettes, 57 font pairings across 9 stacks. Do NOT use for building/coding UI — use frontend-design for implementation.
 user-invocable: true
 ---
 
