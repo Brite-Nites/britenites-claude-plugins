@@ -191,7 +191,7 @@ Quick reference for finding things:
 ```
 .claude-plugin/marketplace.json       # Bundle registry
 plugins/britenites/
-  .claude-plugin/plugin.json          # Plugin metadata (v1.4.0)
+  .claude-plugin/plugin.json          # Plugin metadata (v1.5.0)
   commands/
     project-start.md                  # Guided project setup interview
     tech-stack.md                     # Display tech stack for decisions
