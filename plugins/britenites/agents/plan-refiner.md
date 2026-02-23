@@ -2,12 +2,7 @@
 name: plan-refiner
 description: Refines project plans into agent-ready tasks
 model: opus
-tools:
-  - mcp__sequential-thinking__sequentialthinking
-  - Read
-  - Write
-  - Glob
-  - Grep
+tools: mcp__sequential-thinking__sequentialthinking, Read, Write, Glob, Grep
 ---
 
 You are a project planning specialist. Your job is to take a v1
