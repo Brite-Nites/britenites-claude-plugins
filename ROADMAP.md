@@ -1,49 +1,140 @@
 # Roadmap
 
-Development plan for the Britenites Claude Plugins bundle, organized into four milestones.
+The vision, current state, and development plan for the Britenites Claude Plugins bundle.
 
-For detailed issue tracking, see the [Linear project](https://linear.app/brite-nites/project/brite-claude-code-plugin-941dbf85).
+For detailed issue tracking, see the [Linear project](https://linear.app/brite-nites/project/brite-claude-code-plugin-402b57908532).
 
-## Milestone 1: Foundation & Quick Wins
+## Vision
 
-**Target:** Feb 23, 2026 | **Status:** In Progress
+Britenites Claude Plugins aims to be a **full project lifecycle platform** — a single plugin bundle that supports every phase of software development, from initial idea to long-term maintenance.
 
-Stabilize infrastructure, resolve blockers, ship easy wins.
+```mermaid
+flowchart LR
+    I["Ideate"] --> P["Plan"]
+    P --> S["Setup"]
+    S --> Im["Implement"]
+    Im --> R["Review"]
+    R --> D["Deploy"]
+    D --> M["Maintain"]
+```
 
-- Fix plugin.json configuration
-- Audit and standardize SKILL.md frontmatter across all skills
-- Create CHANGELOG, ROADMAP, and improved README
-- Investigate sub-agent execution behavior
-- New commands: code-review, onboarding-checklist
+**7 phases. One plugin. Every developer workflow covered.**
 
-## Milestone 2: Command Library & Workflows
+## Current Coverage (v1.4.0)
 
-**Target:** Mar 9, 2026 | **Status:** Planned
+| Phase | Coverage | Components |
+|-------|----------|------------|
+| **Ideate** | None | — |
+| **Plan** | Partial | `/project-start` command, `/tech-stack` command |
+| **Setup** | Strong | `post-plan-setup` orchestrator, `refine-plan`, `create-issues`, `setup-claude-md` skills, `/onboarding-checklist` command |
+| **Implement** | Partial | `frontend-design`, `ui-ux-pro-max`, `react-best-practices`, `agent-browser` skills |
+| **Review** | Partial | `/code-review` command, `web-design-guidelines` skill |
+| **Deploy** | None | — |
+| **Maintain** | None | — |
 
-Build commands for daily Britenites workflows.
+**Also available:** `find-skills` (skill discovery), `sequential-thinking` MCP (structured reasoning), `linear-server` MCP (issue management), security hooks, auto-linter hook.
 
-- Workflow commands for common development tasks
-- Integration commands for team tooling
-- Command patterns and best practices documentation
+## Competitive Context
 
-## Milestone 3: Skill Coverage Expansion
+The Claude Code plugin ecosystem is growing (9,000+ plugins in early 2026). Britenites differentiates on five axes:
 
-**Target:** Mar 23, 2026 | **Status:** Planned
+1. **Lifecycle breadth** — Most plugins are single-purpose. We cover multiple phases with a coordinated toolset.
+2. **Agent-ready architecture** — Skills produce structured output designed for AI agents, not just human readers.
+3. **Orchestrated workflows** — The post-plan pipeline chains multiple skills with human checkpoints.
+4. **Opinionated but extensible** — Strong defaults (tech stack, code review checklists) that teams can override.
+5. **Internal-first quality** — Built for daily use by our team, not for marketplace downloads.
 
-Expand skills beyond frontend/design to cover the full tech stack.
+## Development Phases
 
-- Backend skills (FastAPI, Python, database patterns)
-- Data and analytics skills
-- Infrastructure and deployment skills
-- CLAUDE.md best practices skill
+### Phase 1: Foundation (Complete)
 
-## Milestone 4: Automation, Agents & Polish
+**v1.0.0 – v1.4.0** | Shipped Feb 2026
 
-**Target:** Apr 6, 2026 | **Status:** Planned
+What was built:
+- Plugin bundle infrastructure (marketplace, plugin.json, CI validation)
+- 4 commands: `project-start`, `tech-stack`, `code-review`, `onboarding-checklist`
+- 10 skills across design, frontend, planning, and workflow automation
+- 4 agents for post-plan orchestration
+- Hook system: security (PreToolUse), linting (PostToolUse), context (SessionStart)
+- MCP integrations: sequential-thinking, linear-server
+- Shared utilities: validation-pattern, output-formats
+- Documentation: README, CHANGELOG, ROADMAP, CLAUDE.md
 
-Hooks, agents, output styles, CI/CD, and project polish.
+### Phase 2: Documentation & Command Library
 
-- Event-driven hooks for automated workflows
-- Specialized sub-agents for delegated tasks
-- Output style customization
-- CI/CD integration and quality gates
+**Target:** Mar 9, 2026
+
+Documentation:
+- ARCHITECTURE.md — system diagrams and design decisions
+- CONTRIBUTING.md — internal contributor guide
+- Getting started and troubleshooting guides
+
+New commands:
+- `deploy` — production deployment workflow
+- `db-migrate` — database migration runner with safety checks
+- `pr-create` — standardized PR creation with template
+- `sprint-status` — pull sprint status from Linear
+
+### Phase 3: Ideation Phase Tools
+
+**Target:** Mar 23, 2026
+
+Fill the empty "Ideate" phase:
+- `brainstorm` skill — structured ideation with diverge/converge framework
+- `competitive-analysis` skill — research competitors and synthesize findings
+- `user-research` command — user interview guide and synthesis template
+- `problem-definition` skill — problem statement and hypothesis generation
+
+### Phase 4: Expand Implementation Phase
+
+**Target:** Apr 6, 2026
+
+Broaden beyond frontend/design:
+- `fastapi-patterns` skill — FastAPI best practices and patterns
+- `database-design` skill — schema design, normalization, migration patterns
+- `api-design` skill — REST/GraphQL API design guidelines
+- `docker-compose` skill — container configuration for local dev
+- `testing-strategy` skill — test pyramid, coverage targets, framework selection
+
+### Phase 5: Deploy Phase Tools
+
+**Target:** Apr 20, 2026
+
+Fill the empty "Deploy" phase:
+- `deploy` skill — deployment workflow with pre-flight checks
+- `ci-cd-setup` skill — GitHub Actions / CI pipeline configuration
+- `environment-config` skill — environment variable management and secrets
+- `release-notes` command — generate release notes from changelog and PRs
+
+### Phase 6: Maintain & Monitor Phase
+
+**Target:** May 4, 2026
+
+Fill the empty "Maintain" phase:
+- `dependency-audit` skill — check for outdated/vulnerable dependencies
+- `performance-monitor` skill — performance regression detection
+- `incident-response` skill — incident triage and communication templates
+- `tech-debt-tracker` skill — identify and categorize technical debt
+- `log-analysis` skill — structured log analysis and alerting patterns
+
+### Phase 7: Automation & Polish
+
+**Target:** May 18, 2026
+
+Platform maturity:
+- Resolve `context: fork` — when upstream bugs ([#16803](https://github.com/anthropics/claude-code/issues/16803), [#17283](https://github.com/anthropics/claude-code/issues/17283)) are fixed, validate agent isolation works
+- Output styles — configurable response formatting (concise, verbose, educational)
+- Agent handoff protocol — standardized protocol for multi-agent collaboration
+- Plugin metrics — track which commands/skills are used and how often
+- Cross-skill context sharing — skills that build on each other's output
+
+## Long-Term Vision
+
+Once all 7 lifecycle phases have coverage:
+
+- **Full lifecycle coverage** — A developer can go from "I have an idea" to "it's in production and monitored" without leaving Claude Code
+- **Agent collaboration** — Multiple agents working on different parts of a project simultaneously, coordinated by orchestrator skills
+- **Cross-project learning** — Skills that learn patterns from one project and apply them to the next (via CLAUDE.md generation and shared conventions)
+- **Team-specific customization** — Override any skill's behavior with team-specific conventions without forking the plugin
+
+The plugin grows with the team. Every workflow friction point becomes a candidate for a new command or skill.

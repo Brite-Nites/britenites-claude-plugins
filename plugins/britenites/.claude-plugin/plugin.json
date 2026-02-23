@@ -1,12 +1,26 @@
 {
   "name": "britenites",
   "description": "Baseline tools for Britenites org",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "author": {
     "name": "Britenites"
   },
+  "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
+  "repository": "https://github.com/brite-nites/britenites-claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "design-system",
+    "code-review",
+    "hooks",
+    "react",
+    "ui-ux",
+    "project-planning"
+  ],
   "agents": "./agents/",
   "commands": "./commands/",
+  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
   "skills": "./skills/"
 }

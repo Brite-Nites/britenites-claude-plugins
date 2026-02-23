@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-02-23
+
+### Added
+- ARCHITECTURE.md with Mermaid diagrams, runtime flow, skill routing, hook execution, agent delegation, design decisions
+- CONTRIBUTING.md with quick reference, frontmatter standard, branch/commit conventions, CI checks
+- docs/getting-started.md for plugin development setup
+- docs/troubleshooting.md for common issues and solutions
+
+### Changed
+- ROADMAP.md rewritten with 7-phase lifecycle vision, coverage map, competitive context, and detailed development phases
+- README.md updated: version 1.4.0 → 1.5.0, added Vision section, post-plan skills in matrix, Documentation table, current plugin.json example, simplified Contributing
+
 ## [1.3.0] - 2026-02-23
 
 ### Added
@@ -56,7 +68,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.3.0...v1.5.0
 [1.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.0.0...v1.1.0

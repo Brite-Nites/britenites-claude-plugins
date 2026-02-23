@@ -2,7 +2,23 @@
 
 Claude Code plugin bundle for the Britenites organization. Provides custom commands, skills, and MCP integrations that extend Claude Code's functionality.
 
-**Current version:** 1.2.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 1.5.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+
+## Vision
+
+A full project lifecycle platform — one plugin bundle that supports every phase of development:
+
+```mermaid
+flowchart LR
+    I["Ideate"] --> P["Plan"]
+    P --> S["Setup"]
+    S --> Im["Implement"]
+    Im --> R["Review"]
+    R --> D["Deploy"]
+    D --> M["Maintain"]
+```
+
+Today, Britenites covers **Plan**, **Setup**, **Implement**, and **Review** with 10 skills, 4 commands, and 4 agents. See the [Roadmap](ROADMAP.md) for what's coming next.
 
 ## Prerequisites
 
@@ -53,6 +69,10 @@ Skills activate automatically when Claude detects relevant context. No manual in
 | `web-design-guidelines` | Design Review | Reviewing UI code for best practices and accessibility |
 | `agent-browser` | Browser Automation | Navigating websites, filling forms, taking screenshots |
 | `find-skills` | Skill Discovery | Looking for new skills or capabilities to install |
+| `post-plan-setup` | Project Workflow | After `/plan-project` produces a v1 plan (orchestrates 3 phases) |
+| `refine-plan` | Plan Refinement | Decomposes v1 plans into agent-ready tasks (internal) |
+| `create-issues` | Issue Creation | Creates Linear issues from refined plans (internal) |
+| `setup-claude-md` | CLAUDE.md Gen | Generates best-practices CLAUDE.md for a project (internal) |
 
 ### Manually Invoking Skills
 
@@ -102,15 +122,17 @@ Each plugin requires `.claude-plugin/plugin.json`:
 {
   "name": "britenites",
   "description": "Baseline tools for Britenites org",
-  "version": "1.0.0",
-  "author": {
-    "name": "Britenites"
-  },
-  "commands": "./commands/",
-  "skills": "./skills/",
+  "version": "1.5.0",
+  "author": { "name": "Britenites" },
+  "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
+  "repository": "https://github.com/brite-nites/britenites-claude-plugins",
+  "license": "MIT",
+  "keywords": ["claude-code", "plugin", "design-system", "code-review", "hooks", "react", "ui-ux", "project-planning"],
   "agents": "./agents/",
+  "commands": "./commands/",
   "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/"
 }
 ```
 
@@ -440,12 +462,25 @@ To add a new plugin to the bundle, create the plugin directory and add it to the
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System diagrams, runtime flow, skill routing, design decisions |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to add commands, skills, agents, hooks; branch and PR conventions |
+| [docs/getting-started.md](docs/getting-started.md) | Developer setup for working on this repo |
+| [docs/troubleshooting.md](docs/troubleshooting.md) | Common issues and solutions |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+| [ROADMAP.md](ROADMAP.md) | Development plan and lifecycle vision |
+| [CLAUDE.md](CLAUDE.md) | Instructions for Claude Code when working in this repo |
+
 ## Contributing
 
-1. Create a new branch for your changes
-2. Add or modify plugin components
-3. Test locally by pointing Claude Code to your local directory
-4. Submit a pull request
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor guide, including:
+- Step-by-step instructions for adding commands, skills, agents, and hooks
+- SKILL.md frontmatter standard
+- Branch naming and commit message conventions
+- CI checks and local testing
 
 ## License
 
