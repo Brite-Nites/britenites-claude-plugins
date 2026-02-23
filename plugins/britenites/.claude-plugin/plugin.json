@@ -5,6 +5,7 @@
   "author": {
     "name": "Britenites"
   },
+  "agents": "./agents/",
   "commands": "./commands/",
   "mcpServers": "./.mcp.json",
   "skills": "./skills/"

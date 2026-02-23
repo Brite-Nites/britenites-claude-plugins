@@ -1,10 +1,7 @@
 ---
 name: post-plan-setup
+description: Runs the full post-plan workflow. Refine plan, create Linear issues, setup CLAUDE.md. Use after /plan-project produces a v1 plan. Pauses between phases for optional review.
 user-invocable: true
-description: >
-  Runs the full post-plan workflow: refine plan → create Linear issues →
-  setup CLAUDE.md. Use after /plan-project produces a v1 plan. Pauses
-  between phases for optional review.
 allowed-tools:
   - mcp__sequential-thinking__sequentialthinking
   - mcp__linear__*

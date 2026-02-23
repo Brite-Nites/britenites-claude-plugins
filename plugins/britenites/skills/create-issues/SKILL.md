@@ -1,9 +1,7 @@
 ---
 name: create-issues
-description: >
-  Creates Linear issues from a refined project plan. Validates issues
-  were created correctly with sufficient context for agent execution.
-  Use after /refine-plan.
+description: Creates Linear issues from a refined project plan. Validates issues were created correctly with sufficient context for agent execution. Use after /refine-plan.
+user-invocable: false
 allowed-tools:
   - mcp__sequential-thinking__sequentialthinking
   - mcp__linear__*

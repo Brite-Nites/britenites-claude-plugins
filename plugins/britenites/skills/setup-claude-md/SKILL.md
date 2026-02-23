@@ -1,9 +1,7 @@
 ---
 name: setup-claude-md
-description: >
-  Generates a best-practices CLAUDE.md file for the project. Analyzes
-  the codebase and applies Claude Code best practices for optimal
-  agent performance. Use at project setup or after /create-issues.
+description: Generates a best-practices CLAUDE.md file for the project. Analyzes the codebase and applies Claude Code best practices for optimal agent performance. Use at project setup or after /create-issues.
+user-invocable: false
 allowed-tools:
   - mcp__sequential-thinking__sequentialthinking
   - Read
