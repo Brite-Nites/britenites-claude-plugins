@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-02-23
+
+### Added
+
+- Post-plan workflow: `refine-plan`, `create-issues`, `setup-claude-md`, `post-plan-setup` skills
+- 4 custom agents: `plan-refiner`, `issue-creator`, `claude-md-generator`, `post-plan-orchestrator`
+- Shared validation/retry pattern for skills (`skills/_shared/validation-pattern.md`)
+- `/code-review` command with frontend, backend, and data engineering checklists
+- `/onboarding-checklist` command for new developer environment setup
+- CHANGELOG.md, ROADMAP.md documentation
+- SKILL.md frontmatter standard documented in CLAUDE.md
+- Skill coverage matrix and MCP server docs in README
+
+### Changed
+
+- Standardized frontmatter across all 10 skills (explicit `user-invocable`, plain string descriptions)
+- Renamed `vercel-react-best-practices` skill to `react-best-practices` to match directory name
+- Improved README with prerequisites, quick start, and verification steps
+- Registered `commands` and `agents` directories in plugin.json
+
 ## [1.2.0] - 2026-01-27
 
 ### Added
@@ -36,7 +56,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/releases/tag/v1.0.0
