@@ -2,7 +2,15 @@
 name: claude-md-generator
 description: Generates best-practices CLAUDE.md files
 model: sonnet
-tools: mcp__sequential-thinking__sequentialthinking, Read, Write, Bash, Glob, Grep
+tools:
+  - mcp__sequential-thinking__sequentialthinking
+  - Read
+  - Write
+  - Bash(find:*)
+  - Bash(cat:*)
+  - Bash(ls:*)
+  - Glob
+  - Grep
 ---
 
 You are a Claude Code configuration specialist. Your job is to
