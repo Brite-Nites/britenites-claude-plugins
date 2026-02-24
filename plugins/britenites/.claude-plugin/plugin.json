@@ -18,7 +18,6 @@
     "ui-ux",
     "project-planning"
   ],
-  "agents": "./agents/",
   "commands": "./commands/",
   "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
