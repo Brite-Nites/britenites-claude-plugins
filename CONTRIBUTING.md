@@ -109,7 +109,7 @@ The GitHub Actions workflow (`validate-plugin.yml`) validates on every push/PR t
 | Check | What it validates |
 |-------|-------------------|
 | JSON validity | `marketplace.json`, `plugin.json`, `hooks.json` parse correctly |
-| Required fields | `plugin.json` has `name`, `description`, `version`, `author` |
+| Required fields | `plugin.json` has `name`, `description`, `author` |
 | Directory existence | `commands/`, `skills/`, `agents/` exist |
 | Command frontmatter | Every `commands/*.md` has `---` block with `description` |
 | Skill frontmatter | Every `skills/*/SKILL.md` has `name`, `description`, `user-invocable` |
@@ -118,23 +118,36 @@ The GitHub Actions workflow (`validate-plugin.yml`) validates on every push/PR t
 
 ## Testing Changes Locally
 
-There is no test suite — validation is manual:
+### Automated validation
 
-1. Edit the markdown/JSON files
-2. Restart your Claude Code session (or start a new one)
-3. Verify the change works:
-   - **Commands**: Type `/britenites:` and check the slash menu
-   - **Skills**: Describe a relevant task and verify the skill activates
-   - **Hooks**: Check that SessionStart fires on new session; edit a file to trigger PostToolUse linter
-   - **Agents**: Invoke the parent skill and verify agent delegation
-
-To validate JSON files locally:
+Run the validation script (requires `python3`):
 
 ```bash
-python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
-python3 -m json.tool plugins/britenites/.claude-plugin/plugin.json > /dev/null
-python3 -m json.tool plugins/britenites/hooks/hooks.json > /dev/null
+./scripts/validate.sh
 ```
+
+This mirrors all CI checks plus additional ones: marketplace field validation, path resolution, `allowed-tools` format, `argument-hint` nesting, agent frontmatter, and cross-reference integrity.
+
+To run validation automatically before every push:
+
+```bash
+./scripts/setup-hooks.sh
+```
+
+### Manual testing checklist
+
+After `./scripts/validate.sh` passes, test interactively:
+
+```bash
+claude --plugin-dir ./plugins/britenites
+```
+
+1. Type `/britenites:` — confirm 4 commands appear
+2. Say "review my UI" — should trigger `web-design-guidelines` skill
+3. Say "build a login form" — should trigger `frontend-design` skill
+4. New session check — SessionStart hook fires ("Loading Britenites context...")
+5. Edit a `.ts` file — PostToolUse linter hook fires
+6. Run `claude plugin validate .` from repo root for official CLI validation
 
 ## Versioning
 
@@ -146,7 +159,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 When bumping a version:
 
-1. Update `version` in `plugins/britenites/.claude-plugin/plugin.json`
+1. Update `version` in `.claude-plugin/marketplace.json` (under the plugin's entry)
 2. Add an entry to `CHANGELOG.md` under `[Unreleased]` or a new version heading
 3. Follow [Keep a Changelog](https://keepachangelog.com/) format
 
