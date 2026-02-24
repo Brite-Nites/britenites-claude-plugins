@@ -1,0 +1,37 @@
+# Team Auto-Install
+
+Add the Britenites plugin marketplace to any project repo so team members get auto-prompted to install it when they trust the project.
+
+## Setup
+
+Add this to your project's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    "https://github.com/brite-nites/britenites-claude-plugins"
+  ]
+}
+```
+
+Commit this file to the repo. When a team member opens Claude Code in the project and trusts it, they'll be prompted to install the Britenites plugin if they don't already have it.
+
+## What Team Members Get
+
+After installing, the plugin provides:
+
+| Type | Count | Highlights |
+|------|-------|-----------|
+| Commands | 7 | `session-start`, `review`, `ship`, `code-review`, `project-start`, `tech-stack`, `onboarding-checklist` |
+| Agents | 7 | `code-reviewer`, `security-reviewer`, `typescript-reviewer`, `claude-md-generator`, `issue-creator`, `plan-refiner`, `post-plan-orchestrator` |
+| Skills | 10+ | Design, React, Prisma, SEO, accessibility |
+| Hooks | 4 | Bash security, write security, auto-lint, session context |
+| MCP Servers | 2 | Linear, sequential-thinking |
+
+## Avoiding Duplicates
+
+If a team member already has Linear or sequential-thinking configured standalone, the plugin versions take precedence. To avoid duplicates:
+
+- Remove `linear` from `~/.claude/mcp-settings.json` if present
+- Disable the standalone `sequential-thinking` plugin in `~/.claude/settings.json` if present
+- Keep `context7` and `bigquery` standalone (the plugin doesn't bundle these)

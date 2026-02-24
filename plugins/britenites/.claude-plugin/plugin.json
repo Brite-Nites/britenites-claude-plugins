@@ -7,6 +7,7 @@
   "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
   "repository": "https://github.com/brite-nites/britenites-claude-plugins",
   "license": "MIT",
+  "version": "2.0.0",
   "keywords": [
     "claude-code",
     "plugin",
@@ -15,10 +16,11 @@
     "hooks",
     "react",
     "ui-ux",
-    "project-planning"
+    "project-planning",
+    "session-workflow",
+    "review-agents"
   ],
   "commands": "./commands/",
-  "agents": "./agents/",
   "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
   "skills": "./skills/"

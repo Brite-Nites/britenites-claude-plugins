@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "You are starting a session in a Britenites project. Remind the developer of these conventions:\n\n- **Tech stack**: Check /britenites:tech-stack for the project's established stack before suggesting alternatives\n- **Code review**: Use /britenites:code-review for standardized reviews\n- **Design**: Use ui-ux-pro-max for design planning, frontend-design for implementation\n- **React**: The react-best-practices skill has 45 Vercel-maintained rules — reference it for React/Next.js work\n\nKeep this brief. Respond with {\"ok\": true}.",
+            "prompt": "You are starting a session in a Britenites project. Provide a brief session context:\n\n1. **Suggest workflow**: If this looks like a coding session, suggest `/britenites:session-start` to pick up the next Linear issue with a structured plan.\n2. **Key commands**: `/britenites:session-start` (pick issue & plan), `/britenites:review` (run review agents), `/britenites:ship` (PR & compound learnings), `/britenites:code-review` (quick review)\n3. **Conventions**: Check /britenites:tech-stack for the project's stack. Use react-best-practices for React/Next.js work.\n\nKeep this to 3-4 lines max. Respond with {\"ok\": true}.",
             "model": "haiku",
             "timeout": 10,
             "statusMessage": "Loading Britenites context..."

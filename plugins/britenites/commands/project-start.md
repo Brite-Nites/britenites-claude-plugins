@@ -222,7 +222,29 @@ Apply these as baseline (adjust based on their preferences):
 
 ---
 
-## Final Step: Write the Project Plan
+## Git Repository Setup
+
+After the interview but before writing files, set up the project repo:
+
+1. **If no git repo exists** (`git rev-parse --is-inside-work-tree` fails):
+   - `git init`
+   - Create a `.gitignore` appropriate for the tech stack (Node: `node_modules`, `.env`, `.next`, etc.)
+   - Initial commit: `git commit --allow-empty -m "Initial commit"`
+   - Ask if the user has a GitHub remote to add (`git remote add origin <url>`)
+
+2. **If a repo exists**: Verify it's clean and on the default branch.
+
+## Create Linear Project
+
+Use the Linear MCP to create a project for tracking this work:
+
+1. **Create a project** in Linear with the project name from the interview.
+2. **Set the project description** to a one-line summary from the interview.
+3. **Note the project ID** — downstream skills (`/britenites:create-issues`) will use it.
+
+If Linear MCP isn't accessible, skip and note that the user should create the project manually.
+
+## Write the Project Plan
 
 After creating the CLAUDE.md, you MUST also write a standalone project plan file to `docs/project-plan-v1.md`. This file is consumed by downstream skills (`/post-plan-setup`, `/refine-plan`, `/create-issues`).
 

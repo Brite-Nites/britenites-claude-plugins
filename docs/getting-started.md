@@ -56,10 +56,13 @@ Add to `~/.claude/settings.json`:
    ```
 
 2. **Check commands**: Type `/britenites:` — you should see:
-   - `project-start`
-   - `tech-stack`
-   - `code-review`
-   - `onboarding-checklist`
+   - `session-start` — pick a Linear issue and plan the work
+   - `review` — run review agents and fix P1s
+   - `ship` — create PR, update Linear, compound learnings
+   - `project-start` — guided project inception interview
+   - `code-review` — quick or deep code review
+   - `tech-stack` — display established tech stack
+   - `onboarding-checklist` — new dev setup guide
 
 3. **Check SessionStart hook**: On session start, you should see "Loading Britenites context..." as a status message.
 
@@ -107,10 +110,10 @@ python3 -m json.tool plugins/britenites/hooks/hooks.json > /dev/null
 .claude-plugin/marketplace.json    # Plugin registry
 plugins/britenites/
   .claude-plugin/plugin.json       # Plugin metadata (name, version, author)
-  commands/*.md                    # 4 slash commands
+  commands/*.md                    # 7 slash commands
   skills/*/SKILL.md                # 10 skills (6 user-invocable, 4 internal)
   skills/_shared/                  # Shared validation + output format templates
-  agents/*.md                      # 4 specialized agents
+  agents/*.md                      # 7 specialized agents
   hooks/hooks.json                 # Security, lint, and session hooks
   .mcp.json                        # MCP server configurations
 ```

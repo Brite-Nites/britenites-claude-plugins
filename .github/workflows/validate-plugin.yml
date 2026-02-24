@@ -112,6 +112,40 @@ jobs:
           done
           [ $errors -eq 0 ] || exit 1
 
+      - name: Validate agent frontmatter
+        run: |
+          echo "Checking agent frontmatter..."
+          errors=0
+          for file in plugins/britenites/agents/*.md; do
+            [ -f "$file" ] || continue
+            basename=$(basename "$file" .md)
+
+            if ! head -1 "$file" | grep -q '^---'; then
+              echo "  FAIL: $file missing YAML frontmatter"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            frontmatter=$(sed -n '1,/^---$/p' "$file" | tail -n +2)
+
+            name_val=$(echo "$frontmatter" | grep '^name:' | sed 's/name: *//')
+            if [ -z "$name_val" ]; then
+              echo "  FAIL: $basename.md missing 'name' field"
+              errors=$((errors + 1))
+            elif [ "$name_val" != "$basename" ]; then
+              echo "  FAIL: $basename.md name '$name_val' does not match filename '$basename'"
+              errors=$((errors + 1))
+            fi
+
+            if ! echo "$frontmatter" | grep -q '^description:'; then
+              echo "  FAIL: $basename.md missing 'description' field"
+              errors=$((errors + 1))
+            fi
+
+            echo "  OK: $basename"
+          done
+          [ $errors -eq 0 ] || exit 1
+
       - name: Validate hooks.json
         run: |
           hooks_file="plugins/britenites/hooks/hooks.json"
