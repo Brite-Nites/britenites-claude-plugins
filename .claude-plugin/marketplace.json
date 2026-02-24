@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "britenites",
-      "source": "./plugins/britenites",
+      "source": "./britenites",
       "description": "Baseline tools for Britenites org"
     }
   ]
