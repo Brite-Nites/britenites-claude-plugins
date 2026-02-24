@@ -1,0 +1,16 @@
+# Audit artifacts
+AUDIT.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Claude Code local settings
+.claude/settings.local.json
