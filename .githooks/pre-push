@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "Running plugin validation before push..."
+"$(git rev-parse --show-toplevel)/scripts/validate.sh"
