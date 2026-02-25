@@ -78,7 +78,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 feat: add /deploy command for production deployments
 fix: correct hook matcher for Write|Edit tools
 docs: add ARCHITECTURE.md with system diagrams
-chore: bump version to 1.5.0
+chore: bump version to 2.0.0
 refactor: extract shared validation to _shared/
 ```
 
@@ -142,7 +142,7 @@ After `./scripts/validate.sh` passes, test interactively:
 claude --plugin-dir ./plugins/britenites
 ```
 
-1. Type `/britenites:` — confirm 4 commands appear
+1. Type `/britenites:` — confirm 7 commands appear
 2. Say "review my UI" — should trigger `web-design-guidelines` skill
 3. Say "build a login form" — should trigger `frontend-design` skill
 4. New session check — SessionStart hook fires ("Loading Britenites context...")

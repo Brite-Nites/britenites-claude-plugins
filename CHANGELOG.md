@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-02-24
+
+### Added
+- 3 new commands: `session-start` (pick a Linear issue and plan work), `review` (run review agents in parallel, fix P1s), `ship` (create PR, update Linear, compound learnings)
+- 3 new agents: `code-reviewer` (P1/P2/P3 code quality), `security-reviewer` (OWASP Top 10, secrets exposure), `typescript-reviewer` (type safety, React/Next.js patterns)
+- Two-layer hook security: regex command hooks (deterministic, first) + haiku prompt hooks (fallback, second) for both Bash and Write/Edit
+- `agents` directory declaration in plugin.json for explicit agent discovery
+- Plugin-namespaced MCP tool references in agents and skills
+
+### Changed
+- Hook architecture from single-layer prompt hooks to two-layer regex+prompt
+- `pluginRoot` removed from marketplace.json (was causing double-pathing)
+- `hooks` field removed from plugin.json (Claude Code auto-loads hooks.json)
+- MCP tool names updated to plugin-namespaced format (`mcp__plugin_britenites_*`)
+
+### Fixed
+- Plugin source path resolution in marketplace.json
+- Agent discoverability via explicit plugin.json declaration
+
 ## [1.5.0] - 2026-02-23
 
 ### Added
@@ -68,7 +87,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.3.0...v1.5.0
 [1.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.1.0...v1.2.0

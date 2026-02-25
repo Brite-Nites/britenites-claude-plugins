@@ -20,6 +20,7 @@
     "session-workflow",
     "review-agents"
   ],
+  "agents": "./agents/",
   "commands": "./commands/",
   "mcpServers": "./.mcp.json",
   "skills": "./skills/"

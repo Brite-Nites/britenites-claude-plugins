@@ -2,7 +2,7 @@
 
 Claude Code plugin bundle for the Britenites organization. Provides custom commands, skills, and MCP integrations that extend Claude Code's functionality.
 
-**Current version:** 1.5.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 2.0.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
 ## Vision
 
@@ -18,7 +18,7 @@ flowchart LR
     D --> M["Maintain"]
 ```
 
-Today, Britenites covers **Plan**, **Setup**, **Implement**, and **Review** with 10 skills, 4 commands, and 4 agents. See the [Roadmap](ROADMAP.md) for what's coming next.
+Today, Britenites covers **Plan**, **Setup**, **Implement**, and **Review** with 10 skills, 7 commands, and 7 agents. See the [Roadmap](ROADMAP.md) for what's coming next.
 
 ## Prerequisites
 
@@ -52,6 +52,9 @@ Verify installation by typing `/britenites:` in Claude Code — you should see t
 
 | Command | Description |
 |---------|-------------|
+| `/britenites:session-start` | Start a work session — pick a Linear issue, create an execution plan |
+| `/britenites:review` | Run review agents in parallel, fix P1s, report findings |
+| `/britenites:ship` | Create PR, update Linear, compound learnings, suggest next issue |
 | `/britenites:project-start` | Start a new project with a guided interview |
 | `/britenites:tech-stack` | Display the Britenites technology stack for tech decisions |
 | `/britenites:code-review` | Standardized code review for Britenites projects |
@@ -122,15 +125,14 @@ Each plugin requires `.claude-plugin/plugin.json`:
 {
   "name": "britenites",
   "description": "Baseline tools for Britenites org",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "author": { "name": "Britenites" },
   "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
   "repository": "https://github.com/brite-nites/britenites-claude-plugins",
   "license": "MIT",
-  "keywords": ["claude-code", "plugin", "design-system", "code-review", "hooks", "react", "ui-ux", "project-planning"],
+  "keywords": ["claude-code", "plugin", "design-system", "code-review", "hooks", "react", "ui-ux", "project-planning", "session-workflow", "review-agents"],
   "agents": "./agents/",
   "commands": "./commands/",
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
   "skills": "./skills/"
 }
@@ -445,14 +447,14 @@ The root `marketplace.json` registers plugins for distribution:
     "name": "Britenites"
   },
   "metadata": {
-    "description": "Claude Code plugins for the Britenites organization",
-    "pluginRoot": "./plugins"
+    "description": "Claude Code plugins for the Britenites organization"
   },
   "plugins": [
     {
       "name": "britenites",
       "source": "./plugins/britenites",
-      "description": "Baseline tools for Britenites org"
+      "description": "Baseline tools for Britenites org",
+      "version": "2.0.0"
     }
   ]
 }

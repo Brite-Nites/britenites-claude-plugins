@@ -7,9 +7,9 @@ How the Britenites Claude Plugins bundle is structured, how it executes, and why
 ```mermaid
 graph TD
     MP["marketplace.json<br/>(plugin registry)"] --> PJ["plugin.json<br/>(metadata + paths)"]
-    PJ --> CMD["commands/<br/>4 slash commands"]
+    PJ --> CMD["commands/<br/>7 slash commands"]
     PJ --> SKL["skills/<br/>10 auto-invoked skills"]
-    PJ --> AGT["agents/<br/>4 specialized agents"]
+    PJ --> AGT["agents/<br/>7 specialized agents"]
     PJ --> HK["hooks/hooks.json<br/>3 event hooks"]
     PJ --> MCP[".mcp.json<br/>2 MCP servers"]
     SKL --> SH["_shared/<br/>validation + output formats"]
@@ -22,10 +22,10 @@ The plugin is a **single-plugin bundle**: one marketplace, one plugin. This keep
 When a user installs the bundle, Claude Code:
 
 1. Reads `.claude-plugin/marketplace.json` to discover available plugins
-2. Follows `pluginRoot: "./plugins"` to find plugin directories
+2. Follows the `source` path (e.g., `./plugins/britenites`) to find the plugin directory
 3. Reads `plugins/britenites/.claude-plugin/plugin.json` for metadata and component paths
 4. Loads commands from `./commands/`, skills from `./skills/`, agents from `./agents/`
-5. Registers hooks from `./hooks/hooks.json`
+5. Registers hooks from `./hooks/hooks.json` (auto-discovered, not declared in plugin.json)
 6. Configures MCP servers from `./.mcp.json`
 
 All paths in `plugin.json` are relative to the plugin root (`plugins/britenites/`).
@@ -124,18 +124,50 @@ flowchart LR
 
 **Known limitation:** Sub-skills declare `context: fork` for isolated agent execution, but this feature has upstream bugs ([#16803](https://github.com/anthropics/claude-code/issues/16803), [#17283](https://github.com/anthropics/claude-code/issues/17283)). Currently, skills run inline in the parent context.
 
+## Session Workflow
+
+The v2.0.0 session commands create a complete development loop:
+
+```mermaid
+flowchart LR
+    SS["/session-start<br/>Pick issue, plan work"] --> IM["Implement<br/>Write code"]
+    IM --> RV["/review<br/>3 agents in parallel"]
+    RV -->|"P1s found"| FX["Fix P1s"]
+    FX --> RV
+    RV -->|"Clean"| SH["/ship<br/>PR, Linear, learnings"]
+    SH -->|"Next issue"| SS
+```
+
+**`/session-start`**: Pulls latest, queries Linear for open issues, helps pick one, creates an execution plan.
+
+**`/review`**: Runs `code-reviewer`, `security-reviewer`, and `typescript-reviewer` agents in parallel (all sonnet). Auto-fixes P1s, reports P2/P3s.
+
+**`/ship`**: Creates PR, updates Linear issue status, compounds learnings to CLAUDE.md and memory, suggests next issue.
+
+### Review Agents
+
+| Agent | Model | Focus |
+|-------|-------|-------|
+| `code-reviewer` | sonnet | Bugs, logic errors, edge cases, P1/P2/P3 severity |
+| `security-reviewer` | sonnet | OWASP Top 10, secrets exposure, auth issues |
+| `typescript-reviewer` | sonnet | Type safety, React/Next.js patterns, hook rules |
+
+All three produce findings in the same `**[P1/P2/P3]** file:line — title` format for consistent output.
+
 ## Hook Execution
 
-Three hooks run at different lifecycle points:
+Hooks use a **two-layer security architecture**: deterministic regex command hooks run first (fast, no LLM), then haiku prompt hooks as fallback for anything the regex misses.
 
-| Event | Matcher | Type | Model | Timeout | What It Checks |
-|-------|---------|------|-------|---------|----------------|
-| `PreToolUse` | `Bash` | prompt | haiku | 10s | Destructive commands, piped downloads, credential exposure, unsafe network ops |
-| `PreToolUse` | `Write\|Edit` | prompt | haiku | 10s | Hardcoded secrets, API key patterns, .env leaks, injection patterns |
-| `PostToolUse` | `Write\|Edit` | command | — | 30s | Auto-lint: ESLint (JS/TS) or Ruff (Python) if installed |
-| `SessionStart` | `startup` | prompt | haiku | 10s | Reminds Claude of Britenites conventions |
+| Event | Matcher | Layer | Type | What It Checks |
+|-------|---------|-------|------|----------------|
+| `PreToolUse` | `Bash` | 1 (regex) | command | Blocks `rm -rf`, `--force`, `DROP`, `chmod 777`, piped downloads |
+| `PreToolUse` | `Bash` | 2 (fallback) | prompt | Haiku evaluates anything not caught by regex |
+| `PreToolUse` | `Write\|Edit` | 1 (regex) | command | Blocks `sk-proj-`, `AKIA`, `ghp_`, `sk_live/test` patterns |
+| `PreToolUse` | `Write\|Edit` | 2 (fallback) | prompt | Haiku evaluates anything not caught by regex |
+| `PostToolUse` | `Write\|Edit` | — | command | Auto-lint: ESLint (JS/TS) or Ruff (Python) if installed |
+| `SessionStart` | `startup` | — | prompt | Reminds Claude of Britenites conventions |
 
-**Why haiku for prompt hooks?** Security checks need to be fast (< 10s) and run on every tool call. Haiku is cheap and fast enough for pattern matching without blocking the developer's flow.
+**Why two layers?** Regex command hooks are deterministic and instant — they catch known-bad patterns without LLM latency or cost. The haiku prompt hook catches novel threats the regex misses.
 
 **Why command (not prompt) for the linter?** Linting is deterministic — no LLM judgment needed. A shell command is faster and more reliable.
 
@@ -191,8 +223,11 @@ Quick reference for finding things:
 ```
 .claude-plugin/marketplace.json       # Bundle registry
 plugins/britenites/
-  .claude-plugin/plugin.json          # Plugin metadata (v1.5.0)
+  .claude-plugin/plugin.json          # Plugin metadata (v2.0.0)
   commands/
+    session-start.md                  # Pick a Linear issue, plan work
+    review.md                         # Run review agents, fix P1s
+    ship.md                           # Create PR, update Linear, learnings
     project-start.md                  # Guided project setup interview
     tech-stack.md                     # Display tech stack for decisions
     code-review.md                    # Standardized code review
@@ -212,10 +247,13 @@ plugins/britenites/
       validation-pattern.md           # Self-validation & retry loop
       output-formats.md               # Standard output formatting
   agents/
+    code-reviewer.md                  # Code quality reviewer (sonnet)
+    security-reviewer.md              # Security vulnerability reviewer (sonnet)
+    typescript-reviewer.md            # TypeScript/React reviewer (sonnet)
     post-plan-orchestrator.md         # Orchestrator agent (opus)
     plan-refiner.md                   # Plan refinement agent (opus)
     issue-creator.md                  # Issue creation agent (opus)
     claude-md-generator.md            # CLAUDE.md generation agent (sonnet)
-  hooks/hooks.json                    # Security + lint + session hooks
+  hooks/hooks.json                    # Two-layer security + lint + session hooks
   .mcp.json                           # MCP server configs
 ```

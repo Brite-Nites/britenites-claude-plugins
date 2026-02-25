@@ -89,6 +89,14 @@ If the work changed the project's architecture or public API:
 - Update README if the setup process changed
 - Note any doc updates needed that are outside your scope
 
+### 4d. CLAUDE.md Best Practices Check
+
+Run the `britenites:claude-md-generator` agent against the project's CLAUDE.md to ensure it still follows best practices after any learning updates from 4a. Use `plugins/britenites/skills/setup-claude-md/claude-code-best-practices.md` as the reference.
+
+- Auto-fix structural issues (missing sections, stale commands)
+- Flag content questions for the developer (e.g., new conventions that need confirmation)
+- Skip this step if CLAUDE.md wasn't modified in 4a
+
 ## Step 5: Session Close
 
 Present a session summary to the developer:
