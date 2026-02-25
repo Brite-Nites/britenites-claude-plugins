@@ -23,17 +23,19 @@ jobs:
           echo "Checking plugin.json is valid JSON..."
           python3 -m json.tool plugins/britenites/.claude-plugin/plugin.json > /dev/null
 
+          # Spec only requires 'name', but we enforce stricter validation
+          # as org policy to ensure consistent plugin metadata.
           echo "Checking required fields..."
           python3 -c "
           import json, sys
           with open('plugins/britenites/.claude-plugin/plugin.json') as f:
               data = json.load(f)
-          required = ['name', 'description', 'version', 'author']
+          required = ['name', 'description', 'author']
           missing = [k for k in required if k not in data]
           if missing:
               print(f'Missing required fields: {missing}', file=sys.stderr)
               sys.exit(1)
-          print(f'plugin.json valid: {data[\"name\"]} v{data[\"version\"]}')
+          print(f'plugin.json valid: {data[\"name\"]}')
           "
 
       - name: Validate referenced directories exist
@@ -107,6 +109,40 @@ jobs:
             fi
 
             echo "  OK: $dirname"
+          done
+          [ $errors -eq 0 ] || exit 1
+
+      - name: Validate agent frontmatter
+        run: |
+          echo "Checking agent frontmatter..."
+          errors=0
+          for file in plugins/britenites/agents/*.md; do
+            [ -f "$file" ] || continue
+            basename=$(basename "$file" .md)
+
+            if ! head -1 "$file" | grep -q '^---'; then
+              echo "  FAIL: $file missing YAML frontmatter"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            frontmatter=$(sed -n '1,/^---$/p' "$file" | tail -n +2)
+
+            name_val=$(echo "$frontmatter" | grep '^name:' | sed 's/name: *//')
+            if [ -z "$name_val" ]; then
+              echo "  FAIL: $basename.md missing 'name' field"
+              errors=$((errors + 1))
+            elif [ "$name_val" != "$basename" ]; then
+              echo "  FAIL: $basename.md name '$name_val' does not match filename '$basename'"
+              errors=$((errors + 1))
+            fi
+
+            if ! echo "$frontmatter" | grep -q '^description:'; then
+              echo "  FAIL: $basename.md missing 'description' field"
+              errors=$((errors + 1))
+            fi
+
+            echo "  OK: $basename"
           done
           [ $errors -eq 0 ] || exit 1
 

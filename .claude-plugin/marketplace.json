@@ -10,8 +10,9 @@
   "plugins": [
     {
       "name": "britenites",
-      "source": "./plugins/britenites",
-      "description": "Baseline tools for Britenites org"
+      "source": "./britenites",
+      "description": "Baseline tools for Britenites org",
+      "version": "2.0.0"
     }
   ]
 }

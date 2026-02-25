@@ -16,7 +16,21 @@ First, determine what to review based on the user's input:
 
 **If `$ARGUMENTS` is empty:** Check for uncommitted changes with `git diff` and `git diff --staged`. If there are none, ask the user what to review.
 
-## Review Process
+## Review Mode
+
+This command supports two modes:
+
+### Quick Mode (default for `$ARGUMENTS` with PR/files)
+Perform a direct review yourself, working through the checklists below. Best for quick spot-checks and PR reviews.
+
+### Deep Mode (use when `$ARGUMENTS` contains "deep" or "--deep")
+Dispatch the three specialized review agents in parallel for comprehensive coverage. This is what `/britenites:review` does during the session loop. Use it for thorough pre-merge reviews.
+
+**To run deep mode:** Launch the `code-reviewer`, `security-reviewer`, and `typescript-reviewer` agents in parallel via the Task tool, passing the diff context. Collect and merge their findings into a single P1/P2/P3 report.
+
+---
+
+## Quick Mode: Review Process
 
 Work through each section. Only report issues you actually find — skip sections with no findings.
 
@@ -82,15 +96,23 @@ Only apply if reviewing data code:
 - No unnecessary abstractions or premature optimization
 - File and folder structure follows project conventions
 
+## Test Suite Execution
+
+Before presenting findings, run the project's test suite if one exists:
+
+1. Check `package.json` for test scripts, or look for common test runners (`vitest`, `jest`, `pytest`).
+2. Run tests and report results alongside review findings.
+3. If no test suite exists, note it as a P2 finding.
+
 ## Output Format
 
-Present findings grouped by severity:
+Present findings using **P1/P2/P3 severity**:
 
-**Critical** — Must fix before merge (bugs, security issues, data loss risks)
+**P1 — Must Fix** (blocks merge: bugs, security issues, data loss risks)
 
-**Recommended** — Should fix, improves quality (code smells, missing tests, unclear naming)
+**P2 — Should Fix** (user decides: code smells, missing tests, unclear naming)
 
-**Nit** — Optional polish (formatting, style preferences, minor improvements)
+**P3 — Nit** (report only: formatting, style preferences, minor polish)
 
 For each finding, include:
 1. File and line reference
