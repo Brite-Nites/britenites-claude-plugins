@@ -26,7 +26,7 @@ plugins/
 
 ## How the Plugin System Works
 
-- **marketplace.json**: Registers plugins for distribution. The `pluginRoot` field points to `./plugins`.
+- **marketplace.json**: Registers plugins for distribution. Each plugin's `source` is a path relative to the repo root (e.g., `./plugins/britenites`).
 - **plugin.json**: Each plugin has metadata defining name, description, version, and author.
 - **Commands**: Markdown files in `commands/` become slash commands (e.g., `project-start.md` → `/project-start`).
 
@@ -71,10 +71,10 @@ Rules:
 
 ## Hooks
 
-The plugin includes hooks in `plugins/britenites/hooks/hooks.json`:
+The plugin includes hooks in `plugins/britenites/hooks/hooks.json` (auto-loaded by Claude Code — do NOT add a `hooks` field to `plugin.json`):
 
-- **PreToolUse (Bash)**: Security scan — checks commands for destructive operations, piped downloads, credential exposure
-- **PreToolUse (Write/Edit)**: Security scan — checks file content for hardcoded secrets, injection patterns
+- **PreToolUse (Bash)**: Two-layer security — regex command hook (deterministic, blocks `rm -rf`, `--force`, `DROP`, `chmod 777`, piped downloads) runs first, then Haiku prompt hook as fallback
+- **PreToolUse (Write/Edit)**: Two-layer security — regex command hook (deterministic, blocks `sk-proj-`, `AKIA`, `ghp_`, `sk_live/test` patterns) runs first, then Haiku prompt hook as fallback
 - **PostToolUse (Write/Edit)**: Auto-linter — runs ESLint (JS/TS) or Ruff (Python) if available
 - **SessionStart**: Team context — reminds Claude of Britenites conventions
 
