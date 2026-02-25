@@ -79,7 +79,7 @@ owner = data.get('owner', {})
 if not owner.get('name'):
     errors.append('Missing owner.name')
 
-plugin_root = data.get('metadata', {}).get('pluginRoot', './plugins')
+plugin_root = data.get('metadata', {}).get('pluginRoot', '.')
 
 for i, plugin in enumerate(data.get('plugins', [])):
     for field in ['name', 'source']:
