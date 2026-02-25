@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-02-24
+
+### Fixed
+- SessionStart hook `echo` replaced with `printf` for portable newline handling across shells
+- Version bumped to bust stale plugin cache (Claude Code caches by version key)
+
 ## [2.0.0] - 2026-02-24
 
 ### Added
@@ -87,7 +93,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.3.0...v1.5.0
 [1.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.2.0...v1.3.0

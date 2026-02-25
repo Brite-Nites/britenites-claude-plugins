@@ -20,7 +20,7 @@ flowchart LR
 
 **7 phases. One plugin. Every developer workflow covered.**
 
-## Current Coverage (v2.0.0)
+## Current Coverage (v2.0.1)
 
 | Phase | Coverage | Components |
 |-------|----------|------------|
