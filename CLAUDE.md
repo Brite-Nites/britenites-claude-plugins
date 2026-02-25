@@ -75,9 +75,12 @@ Rules:
 The plugin includes hooks in `plugins/britenites/hooks/hooks.json` (auto-loaded by Claude Code — do NOT add a `hooks` field to `plugin.json`):
 
 - **PreToolUse (Bash)**: Two-layer security — regex command hook (deterministic, blocks `rm -rf`, `--force`, `DROP`, `chmod 777`, piped downloads) runs first, then Haiku prompt hook as fallback
+- **PreToolUse (Bash)**: Pre-commit quality — intercepts `git commit` commands, detects project type (`package.json` → JS/TS, `pyproject.toml`/`setup.py` → Python), runs linters on staged files only (ESLint, `tsc --noEmit`, Ruff). Degrades gracefully if no linters installed. Note: inactive from plugins until upstream [#6305](https://github.com/anthropics/claude-code/issues/6305) is fixed.
 - **PreToolUse (Write/Edit)**: Two-layer security — regex command hook (deterministic, blocks `sk-proj-`, `AKIA`, `ghp_`, `sk_live/test` patterns) runs first, then Haiku prompt hook as fallback
 - **PostToolUse (Write/Edit)**: Auto-linter — runs ESLint (JS/TS) or Ruff (Python) if available
 - **SessionStart**: Team context — runs environment health checks (git, node, gh, npx) and shows key commands
+
+A standalone version of the pre-commit hook is available at `scripts/pre-commit.sh` for direct installation as a git hook (`cp scripts/pre-commit.sh .git/hooks/pre-commit`). This works today regardless of the upstream plugin hook bug.
 
 ## Skill Routing
 
@@ -124,7 +127,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 ## Testing & Validation
 
 - `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs). Run pre-push and in CI.
-- `scripts/test-hooks.sh` — tests security regex patterns against 24 known inputs. Run in CI.
+- `scripts/test-hooks.sh` — tests security and quality hook regex patterns against 35 known inputs. Run in CI.
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/britenites:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).

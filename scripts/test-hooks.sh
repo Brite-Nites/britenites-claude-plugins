@@ -25,6 +25,9 @@ BASH_REGEX='rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f|rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z
 # Write/Edit PreToolUse regex (the grep -Eq pattern)
 WRITE_REGEX='sk-[a-zA-Z0-9]{20,}|sk-proj-[a-zA-Z0-9]{10,}|AKIA[A-Z0-9]{12,}|gh[ps]_[a-zA-Z0-9]{20,}|sk_(live|test)_[a-zA-Z0-9]{10,}'
 
+# Git commit detection regex (pre-commit quality hook)
+COMMIT_REGEX='(^|[;&|[:space:]])git[[:space:]]+commit([[:space:]]|$)'
+
 # ── Helper: test a string against a regex ────────────────────────────
 # Usage: test_match "regex" "input" "expect_block" "description"
 #   expect_block: "block" or "allow"
@@ -102,6 +105,29 @@ test_match "$WRITE_REGEX" 'sk-short'                                     allow "
 test_match "$WRITE_REGEX" 'AKIA'                                         allow "AKIA prefix only"
 test_match "$WRITE_REGEX" 'ghp_'                                         allow "ghp_ prefix only"
 test_match "$WRITE_REGEX" 'This is a description of sk-proj keys'        allow "mention, not a real key"
+
+# ══════════════════════════════════════════════════════════════════════
+# Git Commit Detection — Should MATCH (triggers quality checks)
+# ══════════════════════════════════════════════════════════════════════
+section "Git Commit Detection — Should MATCH"
+
+test_match "$COMMIT_REGEX" 'git commit -m "test"'               block "git commit -m"
+test_match "$COMMIT_REGEX" 'git commit --amend'                  block "git commit --amend"
+test_match "$COMMIT_REGEX" 'git commit -a -m "msg"'              block "git commit -a -m"
+test_match "$COMMIT_REGEX" 'git commit'                          block "git commit (bare)"
+test_match "$COMMIT_REGEX" 'git add -A && git commit -m "msg"'  block "combined git add && git commit"
+test_match "$COMMIT_REGEX" 'git add . ; git commit -m "msg"'    block "combined git add ; git commit"
+
+# ══════════════════════════════════════════════════════════════════════
+# Git Commit Detection — Should NOT MATCH (passes through)
+# ══════════════════════════════════════════════════════════════════════
+section "Git Commit Detection — Should NOT MATCH"
+
+test_match "$COMMIT_REGEX" 'git log --oneline'                   allow "git log"
+test_match "$COMMIT_REGEX" 'git status'                          allow "git status"
+test_match "$COMMIT_REGEX" 'git diff'                            allow "git diff"
+test_match "$COMMIT_REGEX" 'git push origin main'                allow "git push"
+test_match "$COMMIT_REGEX" 'echo "git commit"'                   allow "echo containing git commit"
 
 # ══════════════════════════════════════════════════════════════════════
 # Summary

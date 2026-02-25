@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- Pre-commit quality hook (PreToolUse) — intercepts `git commit`, runs ESLint/tsc/Ruff on staged files by project type
+- `scripts/pre-commit.sh` — standalone git pre-commit hook for direct installation
 - `/britenites:smoke-test` command — in-session diagnostic for env, MCP, hooks, agent dispatch
 - Step 0 prerequisite guards in `session-start` (Linear + sequential-thinking MCP), `review` (agent dispatch), `ship` (gh auth)
 - `scripts/test-hooks.sh` — 24 regex tests for security hook patterns (CI + local)

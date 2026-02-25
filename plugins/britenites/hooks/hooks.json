@@ -17,6 +17,12 @@
             "model": "haiku",
             "timeout": 10,
             "statusMessage": "Security check..."
+          },
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | grep -o '\"command\":\"[^\"]*\"' | head -1 | sed 's/\"command\":\"//;s/\"//'); if ! echo \"$CMD\" | grep -Eq '(^|[;&|[:space:]])git[[:space:]]+commit([[:space:]]|$)'; then echo '{\"ok\":true}'; exit 0; fi; errors=0; OLD_IFS=$IFS; IFS=$'\\n'; staged=$(git diff --cached --name-only --diff-filter=d 2>/dev/null || true); if [ -z \"$staged\" ]; then IFS=$OLD_IFS; echo '{\"ok\":true}'; exit 0; fi; if [ -f package.json ]; then js_files=''; for f in $staged; do case \"$f\" in *.js|*.jsx|*.ts|*.tsx) js_files=\"$js_files\\n$f\" ;; esac; done; if [ -n \"$js_files\" ]; then if command -v npx >/dev/null 2>&1 && npx --no-install eslint --version >/dev/null 2>&1; then echo -e \"$js_files\" | xargs npx --no-install eslint --no-error-on-unmatched-pattern -- >/dev/null 2>&1 || errors=$((errors + 1)); fi; if [ -f tsconfig.json ] && command -v npx >/dev/null 2>&1 && npx --no-install tsc --version >/dev/null 2>&1; then npx --no-install tsc --noEmit >/dev/null 2>&1 || errors=$((errors + 1)); fi; fi; fi; if [ -f pyproject.toml ] || [ -f setup.py ]; then py_files=''; for f in $staged; do case \"$f\" in *.py) py_files=\"$py_files\\n$f\" ;; esac; done; if [ -n \"$py_files\" ] && command -v ruff >/dev/null 2>&1; then echo -e \"$py_files\" | xargs ruff check -- >/dev/null 2>&1 || errors=$((errors + 1)); fi; fi; IFS=$OLD_IFS; if [ \"$errors\" -gt 0 ]; then echo '{\"ok\":false,\"reason\":\"Pre-commit quality checks failed. Run linters locally to see details: ESLint (JS/TS), tsc --noEmit (TS), or ruff check (Python).\"}'; else echo '{\"ok\":true}'; fi",
+            "timeout": 60,
+            "statusMessage": "Running pre-commit quality checks..."
           }
         ]
       },
