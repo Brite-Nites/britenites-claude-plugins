@@ -24,7 +24,7 @@ After installing, the plugin provides:
 |------|-------|-----------|
 | Commands | 7 | `session-start`, `review`, `ship`, `code-review`, `project-start`, `tech-stack`, `onboarding-checklist` |
 | Agents | 7 | `code-reviewer`, `security-reviewer`, `typescript-reviewer`, `claude-md-generator`, `issue-creator`, `plan-refiner`, `post-plan-orchestrator` |
-| Skills | 10+ | Design, React, Prisma, SEO, accessibility |
+| Skills | 10 | Design, React/Next.js, browser automation, project planning, workflow |
 | Hooks | 4 | Bash security, write security, auto-lint, session context |
 | MCP Servers | 2 | Linear, sequential-thinking |
 
