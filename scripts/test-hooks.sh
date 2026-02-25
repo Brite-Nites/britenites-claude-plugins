@@ -20,7 +20,7 @@ section() { printf "\n\033[1m=== %s ===\033[0m\n" "$1"; }
 # ── Extract regex patterns from hooks.json ───────────────────────────
 
 # Bash PreToolUse regex (the grep -Eiq pattern)
-BASH_REGEX='rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f|rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r|git[[:space:]]+push.*[[:space:]]-f|git[[:space:]]+push.*--force([[:space:]]|")|drop[[:space:]]+(table|database)|chmod[[:space:]]+777|(curl|wget)[^"]*[|][[:space:]]*(bash|sh|zsh)'
+BASH_REGEX='rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f|rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r|git[[:space:]]+push.*[[:space:]]-f|git[[:space:]]+push.*--force([[:space:]]|"|$)|drop[[:space:]]+(table|database)|chmod[[:space:]]+777|(curl|wget)[^"]*[|][[:space:]]*(bash|sh|zsh)'
 
 # Write/Edit PreToolUse regex (the grep -Eq pattern)
 WRITE_REGEX='sk-[a-zA-Z0-9]{20,}|sk-proj-[a-zA-Z0-9]{10,}|AKIA[A-Z0-9]{12,}|gh[ps]_[a-zA-Z0-9]{20,}|sk_(live|test)_[a-zA-Z0-9]{10,}'
@@ -37,7 +37,7 @@ test_match() {
   local grep_flags="-Eq"
   [ "$case_insensitive" = "i" ] && grep_flags="-Eiq"
 
-  if echo "$input" | grep $grep_flags "$regex" 2>/dev/null; then
+  if printf '%s\n' "$input" | grep $grep_flags "$regex" 2>/dev/null; then
     matched=true
   else
     matched=false
@@ -67,6 +67,7 @@ test_match "$BASH_REGEX" 'rm -rf /'                          block "rm -rf /"   
 test_match "$BASH_REGEX" 'rm -fr /home'                      block "rm -fr /home"                     i
 test_match "$BASH_REGEX" 'git push --force origin main'      block "git push --force"                 i
 test_match "$BASH_REGEX" 'git push -f origin main'           block "git push -f"                      i
+test_match "$BASH_REGEX" 'git push --force-with-lease origin main' allow "git push --force-with-lease (safe)"  i
 test_match "$BASH_REGEX" 'DROP TABLE users'                  block "DROP TABLE users"                 i
 test_match "$BASH_REGEX" 'DROP DATABASE production'          block "DROP DATABASE production"         i
 test_match "$BASH_REGEX" 'chmod 777 /var/www'                block "chmod 777"                        i
@@ -80,6 +81,7 @@ section "Bash PreToolUse — Should ALLOW"
 
 test_match "$BASH_REGEX" 'rm README.md'                      allow "rm single file (no -rf)"          i
 test_match "$BASH_REGEX" 'git push origin main'              allow "normal git push"                  i
+test_match "$BASH_REGEX" 'git push --follow-tags origin main' allow "git push --follow-tags (not force)" i
 test_match "$BASH_REGEX" 'git log --oneline'                 allow "read-only git log"                i
 test_match "$BASH_REGEX" 'chmod 644 file.txt'                allow "safe chmod 644"                   i
 test_match "$BASH_REGEX" 'curl https://api.example.com'      allow "curl without pipe to shell"       i
