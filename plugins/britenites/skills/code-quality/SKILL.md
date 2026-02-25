@@ -95,6 +95,9 @@ export default [
 
 ```js
 // eslint.config.mjs
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import prettierConfig from "eslint-config-prettier";
 import { FlatCompat } from "@eslint/eslintrc";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -110,7 +113,7 @@ export default tseslint.config(
 );
 ```
 
-Install: `npm install -D eslint-config-next @eslint/eslintrc`
+Install: `npm install -D eslint @eslint/js typescript-eslint eslint-config-prettier prettier eslint-config-next @eslint/eslintrc`
 
 ### Prettier
 
@@ -190,7 +193,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["your_package"]
+known-first-party = ["your_package"]  # REPLACE with your actual package name
 
 [tool.ruff.format]
 quote-style = "double"
@@ -208,7 +211,7 @@ Commands: `ruff check --fix .` (lint), `ruff format .` (format).
 [tool.mypy]
 python_version = "3.12"
 strict = true               # enables disallow_untyped_defs, no_implicit_optional, warn_return_any, etc.
-warn_unused_ignores = true   # not covered by strict — must be set explicitly
+warn_unused_ignores = true   # included in strict since mypy 1.0 — explicit here for clarity
 ```
 
 For **incremental adoption** on existing codebases, start with per-module overrides:
@@ -264,7 +267,7 @@ jobs:
       - run: npm ci
       - run: npx --no-install eslint --max-warnings 0 .
       - run: npx --no-install prettier --check .
-      - run: npx --no-install tsc --noEmit  # TypeScript projects only
+      - run: if [ -f tsconfig.json ]; then npx --no-install tsc --noEmit; fi
 ```
 
 ### GitHub Actions — Python
@@ -283,7 +286,8 @@ jobs:
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2f  # v5.3.0
         with:
           python-version: "3.12"
-      - run: pip install ruff mypy  # pin versions in requirements-dev.txt for production
+          cache: "pip"
+      - run: pip install -r requirements-dev.txt  # ruff, mypy pinned
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy --ignore-missing-imports .  # remove flag once type stubs are installed
@@ -308,15 +312,17 @@ jobs:
       - run: npm ci
       - run: npx --no-install eslint --max-warnings 0 .
       - run: npx --no-install prettier --check .
-      - run: npx --no-install tsc --noEmit
+      - run: if [ -f tsconfig.json ]; then npx --no-install tsc --noEmit; fi
 
   lint-python:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2f  # v5.3.0
-        with: { python-version: "3.12" }
-      - run: pip install ruff mypy
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -r requirements-dev.txt
       - run: ruff check .
       - run: ruff format --check .
       - run: mypy --ignore-missing-imports .
@@ -340,10 +346,10 @@ When generating configs for a project, follow this order:
 
 **JS/TS** (npm):
 ```bash
-npm install -D eslint @eslint/js typescript-eslint eslint-config-prettier prettier
+npm install -D eslint @eslint/js typescript-eslint eslint-config-prettier prettier  # versions pinned in package.json
 ```
 
 **Python** (pip/uv):
 ```bash
-pip install ruff mypy  # or: uv add --dev ruff mypy
+pip install ruff mypy  # pin in requirements-dev.txt: ruff==0.11.x mypy==1.15.x
 ```
