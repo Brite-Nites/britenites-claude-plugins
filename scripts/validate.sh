@@ -117,25 +117,52 @@ import json, sys
 with open('$PLUGIN_JSON') as f:
     data = json.load(f)
 
+errors = []
+
+# Required fields
 required = ['name', 'description', 'author']
 missing = [k for k in required if k not in data]
 if missing:
-    print(f'ERROR:Missing required fields: {missing}')
-    sys.exit(0)
+    errors.append(f'Missing required fields: {missing}')
 
+# Author validation
 author = data.get('author', {})
 if not author.get('name'):
-    print('ERROR:author.name is missing')
-    sys.exit(0)
+    errors.append('author.name is missing')
 
-print(f'OK:{data[\"name\"]}')
+# CRITICAL: Claude Code validates plugin.json against a strict Zod schema.
+# Unrecognized fields cause a hard validation failure that silently prevents
+# the entire plugin from loading. This allowlist matches the actual schema.
+allowed_fields = {
+    'name', 'description', 'author', 'version',
+    'homepage', 'repository', 'license', 'keywords',
+    'commands', 'skills', 'mcpServers'
+}
+unknown = set(data.keys()) - allowed_fields
+if unknown:
+    errors.append(f'Unrecognized fields will break plugin loading: {sorted(unknown)}')
+    errors.append('agents/, hooks/, and .mcp.json are auto-discovered — do not declare in plugin.json')
+
+# mcpServers must be an object, not a string path
+mcp = data.get('mcpServers')
+if isinstance(mcp, str):
+    errors.append(f'mcpServers must be an inline object, not a file path (\"{mcp}\")')
+    errors.append('.mcp.json is auto-discovered — either use inline object or remove the field')
+
+if errors:
+    for e in errors:
+        print(f'ERROR:{e}')
+else:
+    print(f'OK:{data[\"name\"]}')
 " 2>&1)
 
-  if [[ "$pj_result" == OK:* ]]; then
-    pass "plugin.json: ${pj_result#OK:}"
-  else
-    fail "${pj_result#ERROR:}"
-  fi
+  while IFS= read -r line; do
+    if [[ "$line" == OK:* ]]; then
+      pass "plugin.json: ${line#OK:}"
+    elif [[ "$line" == ERROR:* ]]; then
+      fail "${line#ERROR:}"
+    fi
+  done <<< "$pj_result"
 fi
 
 # ══════════════════════════════════════════════════════════════════════
@@ -150,11 +177,15 @@ import json, os, sys
 with open('$PLUGIN_JSON') as f:
     data = json.load(f)
 
-path_keys = ['commands', 'skills', 'agents', 'hooks', 'mcpServers']
+# Only commands and skills are valid string-path references in plugin.json.
+# agents/, hooks/, and .mcp.json are auto-discovered — not declared.
+path_keys = ['commands', 'skills']
 for key in path_keys:
     if key not in data:
         continue
     ref = data[key]
+    if not isinstance(ref, str):
+        continue
     resolved = os.path.normpath(os.path.join('$PLUGIN_ROOT', ref))
     exists = os.path.exists(resolved)
     print(f'{\"PASS\" if exists else \"FAIL\"}:{key} -> {ref} ({resolved})')

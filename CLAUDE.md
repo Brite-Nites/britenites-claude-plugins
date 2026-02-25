@@ -27,7 +27,7 @@ plugins/
 ## How the Plugin System Works
 
 - **marketplace.json**: Registers plugins for distribution. Each plugin's `source` is a path relative to the repo root (e.g., `./plugins/britenites`).
-- **plugin.json**: Each plugin has metadata defining name, description, version, and author. Uses a **strict schema** — unrecognized fields cause a hard validation failure that silently prevents the entire plugin from loading.
+- **plugin.json**: Each plugin has metadata defining name, description, version, and author. See **plugin.json Schema** below — this is critical.
 - **Commands**: Markdown files in `commands/` become slash commands (e.g., `project-start.md` → `/project-start`).
 - **Auto-discovery**: `agents/`, `hooks/hooks.json`, and `.mcp.json` are discovered by convention from the plugin root. Do NOT declare them in `plugin.json`.
 
@@ -89,9 +89,11 @@ Design skills are differentiated by intent:
 | `ui-ux-pro-max` | "choose palette", "design system", "plan visual direction" | Design planning |
 | `web-design-guidelines` | "review", "audit", "check" existing UI | Compliance review |
 
-## plugin.json Schema
+## plugin.json Schema (STRICT — read before editing)
 
-Only these fields are recognized (unrecognized fields break loading):
+**Claude Code validates plugin.json against a strict Zod schema. Any unrecognized field causes a silent hard failure — the entire plugin won't load (no commands, no skills, nothing). There is no error message shown to the user.**
+
+Only these fields are recognized:
 
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
@@ -107,7 +109,12 @@ Only these fields are recognized (unrecognized fields break loading):
 | `skills` | string | no | Path to skills dir (e.g., `"./skills/"`) |
 | `mcpServers` | object | no | **Inline object only**, not a file path |
 
-Do NOT add: `agents`, `hooks`, or `mcpServers` as a string path. These are auto-discovered.
+**NEVER add these to plugin.json** (they are auto-discovered from the plugin root):
+- `agents` — the `agents/` directory is scanned automatically
+- `hooks` — `hooks/hooks.json` is loaded automatically
+- `mcpServers` as a string path (e.g., `"./.mcp.json"`) — `.mcp.json` is loaded automatically. If you must declare MCP servers in plugin.json, use the inline object format.
+
+The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowlist.
 
 ## Adding New Plugins
 
