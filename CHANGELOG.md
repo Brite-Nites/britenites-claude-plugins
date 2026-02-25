@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- `/britenites:security-audit` command — comprehensive project-wide security audit with automated checks (dependency vulnerabilities, secret scanning, env config) and security-reviewer agent dispatch
 - Pre-commit quality hook (PreToolUse) — intercepts `git commit`, runs ESLint/tsc/Ruff on staged files by project type
 - `scripts/pre-commit.sh` — standalone git pre-commit hook for direct installation
 - `/britenites:smoke-test` command — in-session diagnostic for env, MCP, hooks, agent dispatch
