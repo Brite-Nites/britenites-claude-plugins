@@ -20,19 +20,19 @@ flowchart LR
 
 **7 phases. One plugin. Every developer workflow covered.**
 
-## Current Coverage (v1.5.0)
+## Current Coverage (v2.0.0)
 
 | Phase | Coverage | Components |
 |-------|----------|------------|
 | **Ideate** | None | — |
 | **Plan** | Partial | `/project-start` command, `/tech-stack` command |
 | **Setup** | Strong | `post-plan-setup` orchestrator, `refine-plan`, `create-issues`, `setup-claude-md` skills, `/onboarding-checklist` command |
-| **Implement** | Partial | `frontend-design`, `ui-ux-pro-max`, `react-best-practices`, `agent-browser` skills |
-| **Review** | Partial | `/code-review` command, `web-design-guidelines` skill |
-| **Deploy** | None | — |
+| **Implement** | Partial | `/session-start` command, `frontend-design`, `ui-ux-pro-max`, `react-best-practices`, `agent-browser` skills |
+| **Review** | Strong | `/review` command (3 agents in parallel), `/code-review` command, `web-design-guidelines` skill, `code-reviewer`, `security-reviewer`, `typescript-reviewer` agents |
+| **Deploy** | Partial | `/ship` command (PR creation, Linear updates, learning compounding) |
 | **Maintain** | None | — |
 
-**Also available:** `find-skills` (skill discovery), `sequential-thinking` MCP (structured reasoning), `linear-server` MCP (issue management), security hooks, auto-linter hook.
+**Also available:** `find-skills` (skill discovery), `sequential-thinking` MCP (structured reasoning), `linear-server` MCP (issue management), two-layer security hooks, auto-linter hook.
 
 ## Competitive Context
 
@@ -48,31 +48,31 @@ The Claude Code plugin ecosystem is growing (9,000+ plugins in early 2026). Brit
 
 ### Phase 1: Foundation (Complete)
 
-**v1.0.0 – v1.4.0** | Shipped Feb 2026
+**v1.0.0 – v2.0.0** | Shipped Feb 2026
 
 What was built:
 - Plugin bundle infrastructure (marketplace, plugin.json, CI validation)
-- 4 commands: `project-start`, `tech-stack`, `code-review`, `onboarding-checklist`
+- 7 commands: `session-start`, `review`, `ship`, `project-start`, `tech-stack`, `code-review`, `onboarding-checklist`
 - 10 skills across design, frontend, planning, and workflow automation
-- 4 agents for post-plan orchestration
-- Hook system: security (PreToolUse), linting (PostToolUse), context (SessionStart)
+- 7 agents: 4 post-plan orchestration + 3 review agents (`code-reviewer`, `security-reviewer`, `typescript-reviewer`)
+- Two-layer hook security: regex command hooks (deterministic) + haiku prompt hooks (fallback)
+- Auto-linter hook (PostToolUse) and session context hook (SessionStart)
 - MCP integrations: sequential-thinking, linear-server
 - Shared utilities: validation-pattern, output-formats
-- Documentation: README, CHANGELOG, ROADMAP, CLAUDE.md
+- Documentation: README, CHANGELOG, ROADMAP, ARCHITECTURE, CONTRIBUTING, CLAUDE.md
 
-### Phase 2: Documentation & Command Library
+### Phase 2: Command Library Expansion
 
 **Target:** Mar 9, 2026
 
-Documentation:
-- ARCHITECTURE.md — system diagrams and design decisions
-- CONTRIBUTING.md — internal contributor guide
-- Getting started and troubleshooting guides
+Documentation (complete in v1.5.0–v2.0.0):
+- ~~ARCHITECTURE.md — system diagrams and design decisions~~ Done
+- ~~CONTRIBUTING.md — internal contributor guide~~ Done
+- ~~Getting started and troubleshooting guides~~ Done
 
 New commands:
 - `deploy` — production deployment workflow
 - `db-migrate` — database migration runner with safety checks
-- `pr-create` — standardized PR creation with template
 - `sprint-status` — pull sprint status from Linear
 
 ### Phase 3: Ideation Phase Tools
