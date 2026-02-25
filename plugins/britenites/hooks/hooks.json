@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -Eiq 'rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f|rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r|git[[:space:]]+push.*[[:space:]]-f|git[[:space:]]+push.*--force([[:space:]]|\")|drop[[:space:]]+(table|database)|chmod[[:space:]]+777|(curl|wget)[^\"]*[|][[:space:]]*(bash|sh|zsh)' && echo '{\"ok\":false,\"reason\":\"Blocked: destructive command detected (rm -rf, force push, DROP, chmod 777, or piped download)\"}' || echo '{\"ok\":true}'",
+            "command": "INPUT=$(cat); printf '%s\\n' \"$INPUT\" | grep -Eiq 'rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f|rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r|git[[:space:]]+push.*[[:space:]]-f|git[[:space:]]+push.*--force([[:space:]]|\"|$)|drop[[:space:]]+(table|database)|chmod[[:space:]]+777|(curl|wget)[^\"]*[|][[:space:]]*(bash|sh|zsh)' && echo '{\"ok\":false,\"reason\":\"Blocked: destructive command detected (rm -rf, force push, DROP, chmod 777, or piped download)\"}' || echo '{\"ok\":true}'",
             "timeout": 5,
             "statusMessage": "Scanning for destructive commands..."
           },
@@ -20,7 +20,7 @@
           },
           {
             "type": "command",
-            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | grep -o '\"command\":\"[^\"]*\"' | head -1 | sed 's/\"command\":\"//;s/\"//'); if ! echo \"$CMD\" | grep -Eq '(^|[;&|[:space:]])git[[:space:]]+commit([[:space:]]|$)'; then echo '{\"ok\":true}'; exit 0; fi; errors=0; OLD_IFS=$IFS; IFS=$'\\n'; staged=$(git diff --cached --name-only --diff-filter=d 2>/dev/null || true); if [ -z \"$staged\" ]; then IFS=$OLD_IFS; echo '{\"ok\":true}'; exit 0; fi; if [ -f package.json ]; then js_files=''; for f in $staged; do case \"$f\" in *.js|*.jsx|*.ts|*.tsx) js_files=\"$js_files\\0$f\" ;; esac; done; if [ -n \"$js_files\" ]; then if command -v npx >/dev/null 2>&1 && npx --no-install eslint --version >/dev/null 2>&1; then printf '%b' \"$js_files\" | xargs -0 npx --no-install eslint --no-error-on-unmatched-pattern -- >/dev/null 2>&1 || errors=$((errors + 1)); fi; if [ -f tsconfig.json ] && command -v npx >/dev/null 2>&1 && npx --no-install tsc --version >/dev/null 2>&1; then npx --no-install tsc --noEmit >/dev/null 2>&1 || errors=$((errors + 1)); fi; fi; fi; if [ -f pyproject.toml ] || [ -f setup.py ]; then py_files=''; for f in $staged; do case \"$f\" in *.py) py_files=\"$py_files\\0$f\" ;; esac; done; if [ -n \"$py_files\" ] && command -v ruff >/dev/null 2>&1; then printf '%b' \"$py_files\" | xargs -0 ruff check -- >/dev/null 2>&1 || errors=$((errors + 1)); fi; fi; IFS=$OLD_IFS; if [ \"$errors\" -gt 0 ]; then echo '{\"ok\":false,\"reason\":\"Pre-commit quality checks failed. Run linters locally to see details: ESLint (JS/TS), tsc --noEmit (TS), or ruff check (Python).\"}'; else echo '{\"ok\":true}'; fi",
+            "command": "INPUT=$(cat); CMD=$(printf '%s\\n' \"$INPUT\" | grep -o '\"command\":\"[^\"]*\"' | head -1 | sed 's/\"command\":\"//;s/\"//'); if ! printf '%s\\n' \"$CMD\" | grep -Eq '(^|[;&|[:space:]])git[[:space:]]+commit([[:space:]]|$)'; then echo '{\"ok\":true}'; exit 0; fi; errors=0; OLD_IFS=$IFS; IFS=$'\\n'; staged=$(git diff --cached --name-only --diff-filter=d 2>/dev/null || true); if [ -z \"$staged\" ]; then IFS=$OLD_IFS; echo '{\"ok\":true}'; exit 0; fi; if [ -f package.json ]; then js_files=''; for f in $staged; do case \"$f\" in *.js|*.jsx|*.ts|*.tsx) js_files=\"$js_files\\0$f\" ;; esac; done; if [ -n \"$js_files\" ]; then if command -v npx >/dev/null 2>&1 && npx --no-install eslint --version >/dev/null 2>&1; then printf '%b' \"$js_files\" | xargs -0 npx --no-install eslint --no-error-on-unmatched-pattern -- >/dev/null 2>&1 || errors=$((errors + 1)); fi; if [ -f tsconfig.json ] && command -v npx >/dev/null 2>&1 && npx --no-install tsc --version >/dev/null 2>&1; then npx --no-install tsc --noEmit >/dev/null 2>&1 || errors=$((errors + 1)); fi; fi; fi; if [ -f pyproject.toml ] || [ -f setup.py ]; then py_files=''; for f in $staged; do case \"$f\" in *.py) py_files=\"$py_files\\0$f\" ;; esac; done; if [ -n \"$py_files\" ] && command -v ruff >/dev/null 2>&1; then printf '%b' \"$py_files\" | xargs -0 ruff check -- >/dev/null 2>&1 || errors=$((errors + 1)); fi; fi; IFS=$OLD_IFS; if [ \"$errors\" -gt 0 ]; then echo '{\"ok\":false,\"reason\":\"Pre-commit quality checks failed. Run linters locally to see details: ESLint (JS/TS), tsc --noEmit (TS), or ruff check (Python).\"}'; else echo '{\"ok\":true}'; fi",
             "timeout": 60,
             "statusMessage": "Running pre-commit quality checks..."
           }
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -Eq 'sk-[a-zA-Z0-9]{20,}|sk-proj-[a-zA-Z0-9]{10,}|AKIA[A-Z0-9]{12,}|gh[ps]_[a-zA-Z0-9]{20,}|sk_(live|test)_[a-zA-Z0-9]{10,}' && echo '{\"ok\":false,\"reason\":\"Blocked: potential secret or API key detected in file content\"}' || echo '{\"ok\":true}'",
+            "command": "INPUT=$(cat); printf '%s\\n' \"$INPUT\" | grep -Eq 'sk-[a-zA-Z0-9]{20,}|sk-proj-[a-zA-Z0-9]{10,}|AKIA[A-Z0-9]{12,}|gh[ps]_[a-zA-Z0-9]{20,}|sk_(live|test)_[a-zA-Z0-9]{10,}' && echo '{\"ok\":false,\"reason\":\"Blocked: potential secret or API key detected in file content\"}' || echo '{\"ok\":true}'",
             "timeout": 5,
             "statusMessage": "Scanning for secrets..."
           },
@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); file_path=$(echo \"$INPUT\" | grep -o '\"file_path\":\"[^\"]*\"' | head -1 | sed 's/\"file_path\":\"//;s/\"//'); ext=\"${file_path##*.}\"; case \"$ext\" in js|jsx|ts|tsx) command -v npx >/dev/null 2>&1 && npx --no-install eslint --no-error-on-unmatched-pattern \"$file_path\" 2>/dev/null || true ;; py) command -v ruff >/dev/null 2>&1 && ruff check --fix \"$file_path\" 2>/dev/null || true ;; esac; exit 0",
+            "command": "INPUT=$(cat); file_path=$(printf '%s\\n' \"$INPUT\" | grep -o '\"file_path\":\"[^\"]*\"' | head -1 | sed 's/\"file_path\":\"//;s/\"//'); [ -z \"$file_path\" ] && exit 0; ext=\"${file_path##*.}\"; case \"$ext\" in js|jsx|ts|tsx) command -v npx >/dev/null 2>&1 && npx --no-install eslint --no-error-on-unmatched-pattern -- \"$file_path\" 2>/dev/null || true ;; py) command -v ruff >/dev/null 2>&1 && ruff check --fix -- \"$file_path\" 2>/dev/null || true ;; esac; exit 0",
             "timeout": 30,
             "statusMessage": "Running linter..."
           }
