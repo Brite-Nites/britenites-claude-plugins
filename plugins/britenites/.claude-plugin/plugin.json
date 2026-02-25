@@ -7,7 +7,7 @@
   "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
   "repository": "https://github.com/brite-nites/britenites-claude-plugins",
   "license": "MIT",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "keywords": [
     "claude-code",
     "plugin",
@@ -20,8 +20,6 @@
     "session-workflow",
     "review-agents"
   ],
-  "agents": "./agents/",
   "commands": "./commands/",
-  "mcpServers": "./.mcp.json",
   "skills": "./skills/"
 }
