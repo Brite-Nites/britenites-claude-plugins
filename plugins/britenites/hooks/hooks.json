@@ -57,10 +57,9 @@
         "matcher": "startup",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "You are starting a session in a Britenites project. Provide a brief session context:\n\n1. **Suggest workflow**: If this looks like a coding session, suggest `/britenites:session-start` to pick up the next Linear issue with a structured plan.\n2. **Key commands**: `/britenites:session-start` (pick issue & plan), `/britenites:review` (run review agents), `/britenites:ship` (PR & compound learnings), `/britenites:code-review` (quick review)\n3. **Conventions**: Check /britenites:tech-stack for the project's stack. Use react-best-practices for React/Next.js work.\n\nKeep this to 3-4 lines max. Respond with {\"ok\": true}.",
-            "model": "haiku",
-            "timeout": 10,
+            "type": "command",
+            "command": "echo '🔧 Britenites Session Context\n\nSuggested workflow: Use /britenites:session-start to pick up the next Linear issue with a structured plan.\n\nKey commands:\n  /britenites:session-start — Pick issue & create execution plan\n  /britenites:review — Run review agents in parallel\n  /britenites:ship — Create PR & compound learnings\n  /britenites:code-review — Quick code review\n\nConventions: Check /britenites:tech-stack for the project stack. Use react-best-practices skill for React/Next.js work.'",
+            "timeout": 5,
             "statusMessage": "Loading Britenites context..."
           }
         ]
