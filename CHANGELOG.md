@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- `/britenites:smoke-test` command — in-session diagnostic for env, MCP, hooks, agent dispatch
+- Step 0 prerequisite guards in `session-start` (Linear + sequential-thinking MCP), `review` (agent dispatch), `ship` (gh auth)
+- `scripts/test-hooks.sh` — 24 regex tests for security hook patterns (CI + local)
+- `scripts/check-prereqs.sh` — runtime prerequisite verification
+- `scripts/test-plugin-load.sh` — command registration test (terminal/CI only)
+- `docs/test-protocol.md` — manual flow verification checklist (7 tests)
+
+### Changed
+- SessionStart hook now shows environment health checks (git, node, gh, npx status)
+- CI workflow runs `test-hooks.sh` alongside structural validation
+
 ## [2.0.1] - 2026-02-24
 
 ### Fixed

@@ -63,6 +63,8 @@ Add to `~/.claude/settings.json`:
    - `code-review` — quick or deep code review
    - `tech-stack` — display established tech stack
    - `onboarding-checklist` — new dev setup guide
+   - `setup-claude-md` — generate a CLAUDE.md for the current project
+   - `smoke-test` — run in-session diagnostics (env, MCP, hooks, agents)
 
 3. **Check SessionStart hook**: On session start, you should see "Loading Britenites context..." as a status message.
 
@@ -104,13 +106,21 @@ python3 -m json.tool plugins/britenites/.claude-plugin/plugin.json > /dev/null
 python3 -m json.tool plugins/britenites/hooks/hooks.json > /dev/null
 ```
 
+### Run validation scripts
+
+```bash
+bash scripts/validate.sh       # Full structural validation
+bash scripts/test-hooks.sh     # Security regex pattern tests
+bash scripts/check-prereqs.sh  # Runtime prerequisites
+```
+
 ## Project Structure
 
 ```
 .claude-plugin/marketplace.json    # Plugin registry
 plugins/britenites/
   .claude-plugin/plugin.json       # Plugin metadata (name, version, author)
-  commands/*.md                    # 7 slash commands
+  commands/*.md                    # 9 slash commands
   skills/*/SKILL.md                # 10 skills (6 user-invocable, 4 internal)
   skills/_shared/                  # Shared validation + output format templates
   agents/*.md                      # 7 specialized agents

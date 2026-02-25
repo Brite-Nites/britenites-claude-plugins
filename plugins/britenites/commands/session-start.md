@@ -6,6 +6,19 @@ description: Start a work session — pull latest, pick a Linear issue, create a
 
 You are beginning a focused work session. Your job is to get the developer oriented, pick the next issue to work on, and produce an execution plan they approve before any code is written.
 
+## Step 0: Verify Prerequisites
+
+Before starting the session, confirm critical dependencies are reachable:
+
+1. **Linear MCP** — Call the Linear MCP to list projects (just 1 result). This confirms auth and connectivity.
+2. **Sequential-thinking MCP** — Send a trivial thought (e.g., "Planning session start"). This confirms the MCP server is running.
+
+If either fails:
+- Stop immediately with a clear error: "Cannot reach [Linear/sequential-thinking]. Run `/britenites:smoke-test` to diagnose."
+- Do NOT proceed to environment setup or issue querying.
+
+If both succeed, continue to Step 1.
+
 ## Step 1: Environment Setup
 
 1. **Check git status** — Ensure working directory is clean. If there are uncommitted changes, warn the user and ask how to proceed.
