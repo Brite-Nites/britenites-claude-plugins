@@ -11,7 +11,7 @@
       "name": "britenites",
       "source": "./plugins/britenites",
       "description": "Baseline tools for Britenites org",
-      "version": "2.1.1"
+      "version": "2.1.2"
     }
   ]
 }

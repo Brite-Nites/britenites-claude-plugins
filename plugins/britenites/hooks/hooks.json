@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"$TOOL_INPUT\" | grep -Eiq 'rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f|rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r|git[[:space:]]+push.*[[:space:]]-f|git[[:space:]]+push.*--force([[:space:]]|\")|drop[[:space:]]+(table|database)|chmod[[:space:]]+777|(curl|wget)[^\"]*[|][[:space:]]*(bash|sh|zsh)' && echo '{\"ok\":false,\"reason\":\"Blocked: destructive command detected (rm -rf, force push, DROP, chmod 777, or piped download)\"}' || echo '{\"ok\":true}'",
+            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -Eiq 'rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f|rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r|git[[:space:]]+push.*[[:space:]]-f|git[[:space:]]+push.*--force([[:space:]]|\")|drop[[:space:]]+(table|database)|chmod[[:space:]]+777|(curl|wget)[^\"]*[|][[:space:]]*(bash|sh|zsh)' && echo '{\"ok\":false,\"reason\":\"Blocked: destructive command detected (rm -rf, force push, DROP, chmod 777, or piped download)\"}' || echo '{\"ok\":true}'",
             "timeout": 5,
             "statusMessage": "Scanning for destructive commands..."
           },
@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"$TOOL_INPUT\" | grep -Eq 'sk-[a-zA-Z0-9]{20,}|sk-proj-[a-zA-Z0-9]{10,}|AKIA[A-Z0-9]{12,}|gh[ps]_[a-zA-Z0-9]{20,}|sk_(live|test)_[a-zA-Z0-9]{10,}' && echo '{\"ok\":false,\"reason\":\"Blocked: potential secret or API key detected in file content\"}' || echo '{\"ok\":true}'",
+            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -Eq 'sk-[a-zA-Z0-9]{20,}|sk-proj-[a-zA-Z0-9]{10,}|AKIA[A-Z0-9]{12,}|gh[ps]_[a-zA-Z0-9]{20,}|sk_(live|test)_[a-zA-Z0-9]{10,}' && echo '{\"ok\":false,\"reason\":\"Blocked: potential secret or API key detected in file content\"}' || echo '{\"ok\":true}'",
             "timeout": 5,
             "statusMessage": "Scanning for secrets..."
           },
@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "file_path=$(echo \"$TOOL_INPUT\" | grep -o '\"file_path\":\"[^\"]*\"' | head -1 | sed 's/\"file_path\":\"//;s/\"//'); ext=\"${file_path##*.}\"; case \"$ext\" in js|jsx|ts|tsx) command -v npx >/dev/null 2>&1 && npx --no-install eslint --no-error-on-unmatched-pattern \"$file_path\" 2>/dev/null || true ;; py) command -v ruff >/dev/null 2>&1 && ruff check --fix \"$file_path\" 2>/dev/null || true ;; esac; exit 0",
+            "command": "INPUT=$(cat); file_path=$(echo \"$INPUT\" | grep -o '\"file_path\":\"[^\"]*\"' | head -1 | sed 's/\"file_path\":\"//;s/\"//'); ext=\"${file_path##*.}\"; case \"$ext\" in js|jsx|ts|tsx) command -v npx >/dev/null 2>&1 && npx --no-install eslint --no-error-on-unmatched-pattern \"$file_path\" 2>/dev/null || true ;; py) command -v ruff >/dev/null 2>&1 && ruff check --fix \"$file_path\" 2>/dev/null || true ;; esac; exit 0",
             "timeout": 30,
             "statusMessage": "Running linter..."
           }
