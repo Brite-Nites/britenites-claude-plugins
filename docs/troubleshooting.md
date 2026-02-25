@@ -45,7 +45,7 @@ Common issues and solutions when developing or using the Britenites Claude Plugi
    pip install ruff              # For Python files
    ```
 
-5. **Haiku unavailable** — PreToolUse and SessionStart hooks use the `haiku` model. If haiku is unavailable or rate-limited, prompt-type hooks may fail silently.
+5. **Haiku unavailable** — PreToolUse prompt hooks use the `haiku` model. If haiku is unavailable or rate-limited, prompt-type hooks may fail silently. (Note: SessionStart uses a `command` type hook, not haiku.)
 
 ## MCP Server Issues
 
@@ -79,9 +79,25 @@ Common issues and solutions when developing or using the Britenites Claude Plugi
 
 2. **Missing required fields** — `plugin.json` must have `name`, `description`, `version`, and `author`.
 
-3. **Incorrect pluginRoot** — `marketplace.json` sets `pluginRoot: "./plugins"`. The plugin directory must be at `plugins/britenites/`.
+3. **Source path** — The plugin `source` in `marketplace.json` must be the full relative path (e.g., `./plugins/britenites`). Do not use a separate `pluginRoot` field.
 
 4. **Installation method** — If installed via `settings.json`, the `source` path must be absolute. Relative paths may not resolve correctly.
+
+## Stale Plugin Cache After Update
+
+**Symptom:** You updated the plugin and ran `claude plugins update`, but old behavior persists (e.g., old hooks still fire).
+
+**Cause:** Claude Code caches plugins by version. If the version number didn't change, `plugins update` refreshes the marketplace registry but serves the old cached files.
+
+**Fix:**
+1. Delete the old cache directory:
+   ```bash
+   rm -rf ~/.claude/plugins/cache/britenites-claude-plugins/britenites/<old-version>
+   ```
+2. Run `claude plugins update britenites@britenites-claude-plugins`
+3. Start a new session
+
+**Prevention:** Always bump the version in both `plugin.json` and `marketplace.json` when making changes that need to reach installed users.
 
 ## `context: fork` Not Working
 
