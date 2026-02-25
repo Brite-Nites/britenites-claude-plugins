@@ -130,6 +130,10 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `/britenites:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
 - `docs/test-protocol.md` — manual flow verification checklist (7 tests).
 
+## Known Issues
+
+- **PreToolUse/PostToolUse hooks don't fire from plugins** — upstream Claude Code bug ([#6305](https://github.com/anthropics/claude-code/issues/6305)). Our hook definitions in `hooks/hooks.json` are correct; no changes needed on our side. SessionStart hooks work fine. Track the issue for updates.
+
 ## No Build Process
 
 This repository has no dependencies, build steps, or tests. Changes are version-controlled with Git and distributed directly.
