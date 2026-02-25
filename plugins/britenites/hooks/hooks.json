@@ -58,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '🔧 Britenites Session Context\n\nSuggested workflow: Use /britenites:session-start to pick up the next Linear issue with a structured plan.\n\nKey commands:\n  /britenites:session-start — Pick issue & create execution plan\n  /britenites:review — Run review agents in parallel\n  /britenites:ship — Create PR & compound learnings\n  /britenites:code-review — Quick code review\n\nConventions: Check /britenites:tech-stack for the project stack. Use react-best-practices skill for React/Next.js work.'",
+            "command": "printf '🔧 Britenites Session Context\n\nSuggested workflow: Use /britenites:session-start to pick up the next Linear issue with a structured plan.\n\nKey commands:\n  /britenites:session-start — Pick issue & create execution plan\n  /britenites:review — Run review agents in parallel\n  /britenites:ship — Create PR & compound learnings\n  /britenites:code-review — Quick code review\n\nConventions: Check /britenites:tech-stack for the project stack. Use react-best-practices skill for React/Next.js work.\n'",
             "timeout": 5,
             "statusMessage": "Loading Britenites context..."
           }
