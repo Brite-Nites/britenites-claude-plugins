@@ -77,7 +77,7 @@ The plugin includes hooks in `plugins/britenites/hooks/hooks.json` (auto-loaded 
 - **PreToolUse (Bash)**: Two-layer security — regex command hook (deterministic, blocks `rm -rf`, `--force`, `DROP`, `chmod 777`, piped downloads) runs first, then Haiku prompt hook as fallback
 - **PreToolUse (Write/Edit)**: Two-layer security — regex command hook (deterministic, blocks `sk-proj-`, `AKIA`, `ghp_`, `sk_live/test` patterns) runs first, then Haiku prompt hook as fallback
 - **PostToolUse (Write/Edit)**: Auto-linter — runs ESLint (JS/TS) or Ruff (Python) if available
-- **SessionStart**: Team context — reminds Claude of Britenites conventions
+- **SessionStart**: Team context — runs environment health checks (git, node, gh, npx) and shows key commands
 
 ## Skill Routing
 
@@ -120,6 +120,15 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 
 1. Create a new directory under `plugins/` with `.claude-plugin/plugin.json`
 2. Register the plugin in `.claude-plugin/marketplace.json` under the `plugins` array
+
+## Testing & Validation
+
+- `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs). Run pre-push and in CI.
+- `scripts/test-hooks.sh` — tests security regex patterns against 24 known inputs. Run in CI.
+- `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
+- `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
+- `/britenites:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
+- `docs/test-protocol.md` — manual flow verification checklist (7 tests).
 
 ## No Build Process
 

@@ -6,6 +6,16 @@ description: Self-verify work, run review agents in parallel, fix P1s, report fi
 
 You are reviewing work before it ships. Your job is to verify correctness, run specialized review agents, fix critical issues, and produce a clean report for the developer.
 
+## Step 0: Verify Agent Dispatch
+
+Before running review agents, confirm the Task tool works:
+
+1. **Launch a trivial Task agent** — Dispatch a general-purpose agent with the prompt: "Reply with the single word: pong". Set max_turns to 1.
+2. **If it completes** and returns "pong" (or any response) → proceed to Step 1.
+3. **If it fails or times out** → Stop with: "Agent dispatch failed. Cannot run review agents. Check Task tool availability."
+
+This catches the case where you'd wait for 3 parallel agents that all silently fail.
+
 ## Step 1: Self-Verification
 
 Before launching review agents, verify your own work against the execution plan:

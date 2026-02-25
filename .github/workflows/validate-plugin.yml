@@ -59,6 +59,9 @@ jobs:
           print(f'plugin.json valid: {data[\"name\"]}')
           "
 
+      - name: Test security hook regexes
+        run: bash scripts/test-hooks.sh
+
       - name: Validate referenced directories exist
         run: |
           echo "Checking plugin directories..."

@@ -83,6 +83,17 @@ Common issues and solutions when developing or using the Britenites Claude Plugi
 
 4. **Installation method** — If installed via `settings.json`, the `source` path must be absolute. Relative paths may not resolve correctly.
 
+## Step 0 Prerequisite Failures
+
+**Symptom:** `/session-start`, `/review`, or `/ship` stop at Step 0 with a prerequisite error.
+
+Each command now verifies its critical dependencies before running:
+- **session-start**: Checks Linear MCP + sequential-thinking MCP connectivity
+- **review**: Checks agent dispatch (Task tool) with a trivial ping
+- **ship**: Checks `gh auth status` and GitHub repo connectivity
+
+**Fix:** Run `/britenites:smoke-test` for a full diagnostic. It will identify exactly which dependency is failing and suggest remediation.
+
 ## Stale Plugin Cache After Update
 
 **Symptom:** You updated the plugin and ran `claude plugins update`, but old behavior persists (e.g., old hooks still fire).

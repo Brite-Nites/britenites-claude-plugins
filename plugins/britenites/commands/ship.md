@@ -6,6 +6,15 @@ description: Create PR, update Linear, compound learnings, suggest next issue
 
 You are shipping completed work and capturing what was learned. Your job is to create a clean PR, update project management, record learnings, and close the session loop.
 
+## Step 0: Verify GitHub CLI
+
+Before creating a PR, confirm `gh` is available and authenticated:
+
+1. **Run `gh auth status`** — Must succeed. If not authenticated, stop with: "GitHub CLI not authenticated. Run `gh auth login` first."
+2. **Run `gh repo view --json name`** — Must succeed. If this fails, stop with: "Not in a GitHub-connected repository. Ensure a remote is configured."
+
+If both succeed, continue to Step 1.
+
 ## Step 1: Pre-Ship Checks
 
 Before creating a PR:
