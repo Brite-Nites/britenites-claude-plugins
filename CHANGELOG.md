@@ -6,15 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-02-26
+
+### Added
+- **8 new Inner Loop skills** — Full superpowers-equivalent methodology:
+  - `brainstorming` — Socratic discovery before planning (BRI-1636)
+  - `writing-plans` — Bite-sized tasks with exact files, TDD, verification (BRI-1617)
+  - `git-worktrees` — Isolated workspace per task with Linear issue ID in branch name (BRI-1637)
+  - `executing-plans` — Subagent-per-task execution with TDD enforcement (BRI-1618)
+  - `compound-learnings` — Knowledge capture and compounding after each session (BRI-1619)
+  - `systematic-debugging` — 4-phase root cause analysis (BRI-1620)
+  - `best-practices-audit` — CLAUDE.md audit + auto-fix against Anthropic guidelines (BRI-1638)
+  - `verification-before-completion` — 4-level verification before marking tasks done (BRI-1639)
+- `/britenites:scope` command — Collaborative creative scoping sessions that produce Linear issues (BRI-1641)
+- 6 new Linear issues created for v3 milestone items (BRI-1636 through BRI-1641)
+
 ### Changed
-- **Plugin philosophy refactor** — Reframed as a Process + Org plugin (not a domain encyclopedia). Tech-stack skills cancelled; future domain knowledge lives in separate plugins.
-- Milestones restructured: Foundation → The Inner Loop → The Outer Loop → Orchestration → Plugin Ecosystem
-- 10 domain/tech-stack issues cancelled (Python, PostgreSQL, Shopify, GCP, HubSpot, data engineering, API design, testing, design tokens, framework templates)
-- 13 new process-focused issues created across 4 milestones
-- ROADMAP.md rewritten with process-first philosophy and compound engineering influences
-- README.md updated: new tagline, full command list (12), skill matrix grouped by category
-- CONTRIBUTING.md updated: process-first guidance for new contributions
-- CLAUDE.md updated: plugin philosophy section, process skill routing table
+- **Plugin philosophy refactor** — Reframed as superpowers + compound engineering + Linear integration
+- `/britenites:session-start` — Now drives the full inner loop: brainstorm → plan → worktree → execute
+- `/britenites:ship` — Now invokes compound-learnings and best-practices-audit skills, adds worktree cleanup
+- Plugin description updated to "Process + Org plugin — structured workflow methodology with Linear integration"
+- Keywords updated: removed design-system/react/ui-ux, added process/workflow/tdd/compound-engineering
+- ROADMAP.md rewritten with three-workflow model (Greenfield, Inner Loop, Scoping)
+- Milestone 2 (Inner Loop) expanded with 5 new issues
+- Milestone 3 renamed from "The Outer Loop" to "Scoping & Discovery" with scope command
+- README.md updated: 13 commands, 19 skills, full inner loop diagram
+- CLAUDE.md updated: complete skill routing tables, inner loop documentation
+- Version bumped to 3.0.0 in plugin.json and marketplace.json
 
 ## [2.3.0] - 2026-02-25
 
@@ -129,7 +147,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.3.0...v3.0.0
+[2.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.1...v2.3.0
 [2.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.3.0...v1.5.0

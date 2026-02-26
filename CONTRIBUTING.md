@@ -152,7 +152,7 @@ After `./scripts/validate.sh` passes, test interactively:
 claude --plugin-dir ./plugins/britenites
 ```
 
-1. Type `/britenites:` — confirm 7 commands appear
+1. Type `/britenites:` — confirm 13 commands appear
 2. Say "review my UI" — should trigger `web-design-guidelines` skill
 3. Say "build a login form" — should trigger `frontend-design` skill
 4. New session check — SessionStart hook fires ("Loading Britenites context...")

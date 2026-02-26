@@ -1,21 +1,21 @@
 # Britenites Claude Plugins
 
-A **Process + Org** plugin for Claude Code. Provides structured workflow methodology (plan → execute → review → compound) and Britenites-specific integrations (Linear, security hooks, conventions).
+A **Process + Org** plugin for Claude Code. Superpowers methodology + compound engineering + Linear integration — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
-**Current version:** 2.3.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 3.0.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
 ## Philosophy
 
 This plugin teaches *how* to work, not *what* to know about specific technologies:
 
 ```
-session-start → [plan] → [execute] → review → [compound] → ship
-       ↑                                                      |
-       └──────────── sprint-planning ← retrospective ←────────┘
+session-start → brainstorm → plan → [worktree] → execute (subagent + TDD) → review → ship (compound + audit)
+       ↑                                                                                         |
+       └───────────────────── scope (creative discovery) ←───────────────────────────────────────┘
 ```
 
-- **Process layer**: Structured planning, execution, review, and knowledge compounding
-- **Org layer**: Linear integration, tech-stack conventions, security hooks, onboarding
+- **Process**: Superpowers' full workflow with TDD, subagent-per-task execution, and compound knowledge
+- **Org**: Linear integration at every step, security hooks, team conventions
 - **Domain skills are separate plugins** — tech-stack knowledge comes from context7 MCP or dedicated domain plugins
 
 Influenced by [superpowers](https://github.com/obra/superpowers) and [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin). See the [Roadmap](ROADMAP.md) for what's coming next.
@@ -50,13 +50,20 @@ Verify installation by typing `/britenites:` in Claude Code — you should see t
 
 ## Available Commands
 
-**Core workflow:**
+**Core workflow (the inner loop):**
 
 | Command | Description |
 |---------|-------------|
-| `/britenites:session-start` | Start a work session — pick a Linear issue, create an execution plan |
+| `/britenites:session-start` | Start a work session — pick a Linear issue, brainstorm, plan, execute |
 | `/britenites:review` | Run review agents in parallel, fix P1s, report findings |
-| `/britenites:ship` | Create PR, update Linear, compound learnings, suggest next issue |
+| `/britenites:ship` | Create PR, update Linear, compound learnings, best-practices audit |
+
+**Direction-setting:**
+
+| Command | Description |
+|---------|-------------|
+| `/britenites:scope` | Collaborative scoping session — discover what to build, create Linear issues |
+| `/britenites:project-start` | Start a new project with a guided interview |
 
 **Utilities:**
 
@@ -66,7 +73,6 @@ Verify installation by typing `/britenites:` in Claude Code — you should see t
 | `/britenites:security-audit` | Comprehensive project security audit |
 | `/britenites:bug-report` | Standardized bug reporting with Linear integration |
 | `/britenites:deployment-checklist` | Pre-deployment validation checklist |
-| `/britenites:project-start` | Start a new project with a guided interview |
 | `/britenites:tech-stack` | Display the Britenites technology stack |
 | `/britenites:onboarding-checklist` | Guide for setting up a new dev environment |
 | `/britenites:setup-claude-md` | Generate best-practices CLAUDE.md for a project |
@@ -76,14 +82,18 @@ Verify installation by typing `/britenites:` in Claude Code — you should see t
 
 Skills activate automatically when Claude detects relevant context.
 
-**Process skills** (planned — [The Inner Loop](ROADMAP.md#milestone-2-the-inner-loop)):
+**Inner Loop skills** (auto-activate in sequence):
 
 | Skill | Category | Trigger |
 |-------|----------|---------|
+| `brainstorming` | Discovery | Non-trivial issue, before planning |
 | `writing-plans` | Planning | Multi-step task, before coding |
-| `executing-plans` | Execution | Given a structured plan to implement |
-| `compound-learnings` | Knowledge | After completing work, before shipping |
-| `systematic-debugging` | Debugging | Bug investigation, unexpected behavior |
+| `git-worktrees` | Setup | After plan approval, before coding |
+| `executing-plans` | Execution | Given an approved plan to implement |
+| `verification-before-completion` | Quality | Task checkpoints during execution |
+| `compound-learnings` | Knowledge | After completing work (via ship) |
+| `best-practices-audit` | Quality | After compound learnings (via ship) |
+| `systematic-debugging` | Debugging | Bug investigation (anytime) |
 
 **Design & quality skills** (shipped):
 
@@ -101,7 +111,7 @@ Skills activate automatically when Claude detects relevant context.
 
 | Skill | Category | Trigger |
 |-------|----------|---------|
-| `post-plan-setup` | Workflow | After `/plan-project` produces a v1 plan (orchestrates 3 phases) |
+| `post-plan-setup` | Workflow | After `/britenites:project-start` produces a v1 plan (orchestrates 3 phases) |
 | `refine-plan` | Workflow | Decomposes v1 plans into agent-ready tasks (internal) |
 | `create-issues` | Workflow | Creates Linear issues from refined plans (internal) |
 | `setup-claude-md` | Workflow | Generates best-practices CLAUDE.md for a project (internal) |
@@ -145,16 +155,14 @@ Each plugin requires `.claude-plugin/plugin.json`:
 ```json
 {
   "name": "britenites",
-  "description": "Baseline tools for Britenites org",
-  "version": "2.0.0",
+  "description": "Process + Org plugin — structured workflow methodology with Linear integration",
+  "version": "3.0.0",
   "author": { "name": "Britenites" },
   "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
   "repository": "https://github.com/brite-nites/britenites-claude-plugins",
   "license": "MIT",
-  "keywords": ["claude-code", "plugin", "design-system", "code-review", "hooks", "react", "ui-ux", "project-planning", "session-workflow", "review-agents"],
-  "agents": "./agents/",
+  "keywords": ["claude-code", "plugin", "process", "workflow", "linear"],
   "commands": "./commands/",
-  "mcpServers": "./.mcp.json",
   "skills": "./skills/"
 }
 ```
@@ -474,8 +482,8 @@ The root `marketplace.json` registers plugins for distribution:
     {
       "name": "britenites",
       "source": "./plugins/britenites",
-      "description": "Baseline tools for Britenites org",
-      "version": "2.0.0"
+      "description": "Process + Org plugin — structured workflow methodology with Linear integration",
+      "version": "3.0.0"
     }
   ]
 }

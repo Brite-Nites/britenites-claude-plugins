@@ -1,22 +1,23 @@
 {
   "name": "britenites",
-  "description": "Baseline tools for Britenites org",
+  "description": "Process + Org plugin — structured workflow methodology with Linear integration",
   "author": {
     "name": "Britenites"
   },
   "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
   "repository": "https://github.com/brite-nites/britenites-claude-plugins",
   "license": "MIT",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "keywords": [
     "claude-code",
     "plugin",
-    "design-system",
+    "process",
+    "workflow",
+    "linear",
     "code-review",
     "hooks",
-    "react",
-    "ui-ux",
-    "project-planning",
+    "tdd",
+    "compound-engineering",
     "session-workflow",
     "review-agents"
   ],

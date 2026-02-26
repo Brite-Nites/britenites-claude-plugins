@@ -4,17 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Process + Org plugin** for the Britenites organization. It provides workflow methodology (plan → execute → review → compound) and org-specific integrations (Linear, security hooks, conventions), distributed via a marketplace system.
+**Superpowers methodology + compound engineering + Linear integration.** A Process + Org plugin for the Britenites organization — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
 ## Plugin Philosophy
 
-This plugin focuses on **process and methodology**, not domain knowledge:
-
-- **Process layer**: How to plan, execute, review, and compound knowledge (inspired by [superpowers](https://github.com/obra/superpowers) and [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin))
-- **Org layer**: Britenites-specific integrations (Linear, tech-stack conventions, onboarding, deployment)
-- **NOT a domain encyclopedia**: Tech-stack skills (Python, Shopify, GCP, etc.) belong in separate domain plugins. Use context7 MCP or third-party skills for framework-specific docs.
-
-Domain plugins are separate repos (e.g., `britenites-shopify`, `britenites-data-engineering`) — see Milestone 5 (Plugin Ecosystem).
+- **Process**: Superpowers' full workflow with TDD, subagent-per-task execution, and compound knowledge accumulation
+- **Org**: Linear integration at every step, security hooks, team conventions
+- **Not domain**: Tech-stack skills belong in separate plugins. Use context7 MCP for framework docs.
 
 ## Repository Structure
 
@@ -94,18 +90,20 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 
 ## Skill Routing
 
-Skills are differentiated by intent:
-
-**Process skills** (planned — The Inner Loop milestone):
+### Inner Loop Skills (auto-activate in sequence)
 
 | Skill | Triggers on | Purpose |
 |-------|-------------|---------|
-| `writing-plans` | Multi-step task, before coding | Structured planning with bite-sized tasks |
-| `executing-plans` | Given a structured plan | Task-by-task execution with checkpoints |
-| `compound-learnings` | After completing work | Knowledge capture and compounding |
-| `systematic-debugging` | Bug investigation | Four-phase root-cause analysis |
+| `brainstorming` | Non-trivial issue, before planning | Socratic discovery, design document |
+| `writing-plans` | Multi-step task, before coding | Bite-sized tasks with TDD, verification |
+| `git-worktrees` | After plan approval, before coding | Isolated workspace with Linear issue ID |
+| `executing-plans` | Given an approved plan | Subagent-per-task + TDD + checkpoints |
+| `verification-before-completion` | Task checkpoints | 4-level verification before marking done |
+| `compound-learnings` | After completing work (via ship) | Knowledge capture to CLAUDE.md + memory |
+| `best-practices-audit` | After compound (via ship) | CLAUDE.md audit + auto-fix |
+| `systematic-debugging` | Bug investigation (anytime) | 4-phase root-cause analysis |
 
-**Design skills** (shipped):
+### Design Skills
 
 | Skill | Triggers on | Purpose |
 |-------|-------------|---------|
