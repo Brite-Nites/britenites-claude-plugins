@@ -2,6 +2,16 @@
 
 Internal guide for the Brite Nites team working on this plugin bundle.
 
+## Plugin Philosophy
+
+This is a **Process + Org plugin**. When adding new components:
+
+- **Process skills** (how to work): writing-plans, executing-plans, debugging methodology — YES
+- **Org commands** (team workflows): sprint-planning, retrospective, deployment-checklist — YES
+- **Domain skills** (tech-stack knowledge): Python patterns, Shopify docs, database guides — NO (create a separate domain plugin instead)
+
+If you're unsure whether something belongs here, ask: "Is this about *how* we work, or *what* we know about a technology?" Process and workflow → this plugin. Technology knowledge → separate domain plugin.
+
 ## Quick Reference
 
 ### Add a command

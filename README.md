@@ -1,24 +1,24 @@
 # Britenites Claude Plugins
 
-Claude Code plugin bundle for the Britenites organization. Provides custom commands, skills, and MCP integrations that extend Claude Code's functionality.
+A **Process + Org** plugin for Claude Code. Provides structured workflow methodology (plan → execute → review → compound) and Britenites-specific integrations (Linear, security hooks, conventions).
 
-**Current version:** 2.0.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 2.3.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
-## Vision
+## Philosophy
 
-A full project lifecycle platform — one plugin bundle that supports every phase of development:
+This plugin teaches *how* to work, not *what* to know about specific technologies:
 
-```mermaid
-flowchart LR
-    I["Ideate"] --> P["Plan"]
-    P --> S["Setup"]
-    S --> Im["Implement"]
-    Im --> R["Review"]
-    R --> D["Deploy"]
-    D --> M["Maintain"]
+```
+session-start → [plan] → [execute] → review → [compound] → ship
+       ↑                                                      |
+       └──────────── sprint-planning ← retrospective ←────────┘
 ```
 
-Today, Britenites covers **Plan**, **Setup**, **Implement**, and **Review** with 10 skills, 7 commands, and 7 agents. See the [Roadmap](ROADMAP.md) for what's coming next.
+- **Process layer**: Structured planning, execution, review, and knowledge compounding
+- **Org layer**: Linear integration, tech-stack conventions, security hooks, onboarding
+- **Domain skills are separate plugins** — tech-stack knowledge comes from context7 MCP or dedicated domain plugins
+
+Influenced by [superpowers](https://github.com/obra/superpowers) and [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin). See the [Roadmap](ROADMAP.md) for what's coming next.
 
 ## Prerequisites
 
@@ -50,40 +50,61 @@ Verify installation by typing `/britenites:` in Claude Code — you should see t
 
 ## Available Commands
 
+**Core workflow:**
+
 | Command | Description |
 |---------|-------------|
 | `/britenites:session-start` | Start a work session — pick a Linear issue, create an execution plan |
 | `/britenites:review` | Run review agents in parallel, fix P1s, report findings |
 | `/britenites:ship` | Create PR, update Linear, compound learnings, suggest next issue |
-| `/britenites:project-start` | Start a new project with a guided interview |
-| `/britenites:tech-stack` | Display the Britenites technology stack for tech decisions |
+
+**Utilities:**
+
+| Command | Description |
+|---------|-------------|
 | `/britenites:code-review` | Standardized code review for Britenites projects |
+| `/britenites:security-audit` | Comprehensive project security audit |
+| `/britenites:bug-report` | Standardized bug reporting with Linear integration |
+| `/britenites:deployment-checklist` | Pre-deployment validation checklist |
+| `/britenites:project-start` | Start a new project with a guided interview |
+| `/britenites:tech-stack` | Display the Britenites technology stack |
 | `/britenites:onboarding-checklist` | Guide for setting up a new dev environment |
+| `/britenites:setup-claude-md` | Generate best-practices CLAUDE.md for a project |
+| `/britenites:smoke-test` | Diagnostic checks on plugin environment |
 
 ## Skill Coverage Matrix
 
-Skills activate automatically when Claude detects relevant context. No manual invocation needed.
+Skills activate automatically when Claude detects relevant context.
 
-| Skill | Domain | Trigger |
-|-------|--------|---------|
-| `react-best-practices` | React / Next.js | Writing, reviewing, or optimizing React components |
-| `frontend-design` | Frontend UI | Building web components, pages, landing pages, dashboards |
-| `ui-ux-pro-max` | UI/UX Design | Design tasks across 50 styles, 9 frameworks, 21 palettes |
-| `web-design-guidelines` | Design Review | Reviewing UI code for best practices and accessibility |
-| `agent-browser` | Browser Automation | Navigating websites, filling forms, taking screenshots |
-| `find-skills` | Skill Discovery | Looking for new skills or capabilities to install |
-| `post-plan-setup` | Project Workflow | After `/plan-project` produces a v1 plan (orchestrates 3 phases) |
-| `refine-plan` | Plan Refinement | Decomposes v1 plans into agent-ready tasks (internal) |
-| `create-issues` | Issue Creation | Creates Linear issues from refined plans (internal) |
-| `setup-claude-md` | CLAUDE.md Gen | Generates best-practices CLAUDE.md for a project (internal) |
+**Process skills** (planned — [The Inner Loop](ROADMAP.md#milestone-2-the-inner-loop)):
 
-### Manually Invoking Skills
+| Skill | Category | Trigger |
+|-------|----------|---------|
+| `writing-plans` | Planning | Multi-step task, before coding |
+| `executing-plans` | Execution | Given a structured plan to implement |
+| `compound-learnings` | Knowledge | After completing work, before shipping |
+| `systematic-debugging` | Debugging | Bug investigation, unexpected behavior |
 
-Some skills can also be invoked directly:
+**Design & quality skills** (shipped):
 
-```
-/britenites:react-best-practices
-```
+| Skill | Category | Trigger |
+|-------|----------|---------|
+| `react-best-practices` | Frontend | Writing, reviewing, or optimizing React components |
+| `frontend-design` | Frontend | Building web components, pages, dashboards |
+| `ui-ux-pro-max` | Design | Design tasks across 50 styles, 9 frameworks, 21 palettes |
+| `web-design-guidelines` | Design | Reviewing UI code for best practices and accessibility |
+| `code-quality` | Quality | ESLint, Prettier, Ruff, TypeScript strict enforcement |
+| `agent-browser` | Automation | Navigating websites, filling forms, taking screenshots |
+| `find-skills` | Discovery | Looking for new skills or capabilities to install |
+
+**Workflow skills** (shipped):
+
+| Skill | Category | Trigger |
+|-------|----------|---------|
+| `post-plan-setup` | Workflow | After `/plan-project` produces a v1 plan (orchestrates 3 phases) |
+| `refine-plan` | Workflow | Decomposes v1 plans into agent-ready tasks (internal) |
+| `create-issues` | Workflow | Creates Linear issues from refined plans (internal) |
+| `setup-claude-md` | Workflow | Generates best-practices CLAUDE.md for a project (internal) |
 
 ## MCP Servers
 
