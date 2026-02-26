@@ -8,9 +8,11 @@ You are running a pre-deployment validation checklist. Your job is to execute au
 
 `$ARGUMENTS` may contain the target environment (e.g., `staging`, `production`). Default to production-level rigor if not specified.
 
-## Step 0: Detect Project & Prerequisites
+## Step 0: Validate Input & Detect Project
 
-1. **Detect project type** from these markers:
+0. **Validate target environment**: `$ARGUMENTS` must be one of `staging`, `production`, `preview`, or empty. If the value doesn't match, default to `production` and note the override in the report.
+
+1. **Detect project type** from these markers (check for all applicable markers — a project may match multiple):
 
 | Marker | Stack | Extra checks |
 |---|---|---|
@@ -38,7 +40,7 @@ Run each applicable check and record the result. Show the actual command output 
 
 ### 1a. Tests
 
-- **Node.js**: Run `npm test` (or `yarn test` / `pnpm test` based on lockfile).
+- **Node.js**: Run `npm test` (or `yarn test` / `pnpm test` based on lockfile). Use a 120-second timeout (e.g., `timeout 120 npm test`). If the command times out, record as `FAIL — test command timed out` and continue to the next check.
 - **Python**: Run `pytest` (or the test command from `pyproject.toml`).
 - If no test command is found, record as `SKIP — no test command detected`.
 
@@ -52,14 +54,14 @@ Run each applicable check and record the result. Show the actual command output 
 ### 1c. Lint & Type Check
 
 - **Next.js**: Run `npx --no-install next lint` if `next.config.js`, `next.config.ts`, or `next.config.mjs` is present. This applies `core-web-vitals` and App Router rules that `eslint .` would miss.
-- **JS/TS (non-Next)**: Run `npx --no-install eslint . --max-warnings 0` and `npx --no-install prettier --check .`
+- **JS/TS (non-Next)**: Run `npx --no-install eslint . --max-warnings 0`. Run `npx --no-install prettier --check --ignore-unknown .` only if a Prettier config exists (`.prettierrc*`, `prettier` key in `package.json`, or `prettier.config.*`). If no config, record Prettier as `SKIP — no Prettier config found`.
 - **TypeScript**: Run `npx --no-install tsc --noEmit` if `tsconfig.json` exists. Still run this for Next.js projects — `next build` type-checks compiled files but `tsc --noEmit` catches issues in files outside the build scope.
 - **Python**: Run `ruff check .` and `mypy .` if available.
 - If linters are not installed, record as `SKIP — linter not installed`.
 
 ### 1d. Database Migrations
 
-- **Prisma**: Run `npx prisma migrate status`. Check for pending migrations.
+- **Prisma**: Run `npx prisma migrate status`. If pending migrations exist, record as WARN: "Run `npx prisma migrate deploy` against the target database before deploying. Do not deploy application code ahead of schema if the migration includes breaking changes (column renames, drops)."
 - If no Prisma schema found, record as `N/A`.
 
 ## Step 2: Release Readiness
@@ -87,7 +89,7 @@ Run each applicable check and record the result. Show the actual command output 
 
 ## Step 3: Manual Confirmations
 
-Use AskUserQuestion to confirm items that cannot be automated. Present all at once as a multi-select:
+Present the following questions to the developer and ask for confirmation. Use a multi-select format so all items can be answered at once:
 
 1. **Rollback plan**: "Is a rollback plan documented or understood? (How to revert if this deployment fails)"
 2. **Staging verification**: "Has this been verified on staging/preview? (If applicable)"
