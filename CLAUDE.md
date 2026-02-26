@@ -4,7 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Claude Code Plugin Bundle** for the Britenites organization. It provides custom commands that extend Claude Code's functionality, distributed via a marketplace system.
+This is a **Process + Org plugin** for the Britenites organization. It provides workflow methodology (plan → execute → review → compound) and org-specific integrations (Linear, security hooks, conventions), distributed via a marketplace system.
+
+## Plugin Philosophy
+
+This plugin focuses on **process and methodology**, not domain knowledge:
+
+- **Process layer**: How to plan, execute, review, and compound knowledge (inspired by [superpowers](https://github.com/obra/superpowers) and [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin))
+- **Org layer**: Britenites-specific integrations (Linear, tech-stack conventions, onboarding, deployment)
+- **NOT a domain encyclopedia**: Tech-stack skills (Python, Shopify, GCP, etc.) belong in separate domain plugins. Use context7 MCP or third-party skills for framework-specific docs.
+
+Domain plugins are separate repos (e.g., `britenites-shopify`, `britenites-data-engineering`) — see Milestone 5 (Plugin Ecosystem).
 
 ## Repository Structure
 
@@ -84,7 +94,18 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 
 ## Skill Routing
 
-Design skills are differentiated by intent:
+Skills are differentiated by intent:
+
+**Process skills** (planned — The Inner Loop milestone):
+
+| Skill | Triggers on | Purpose |
+|-------|-------------|---------|
+| `writing-plans` | Multi-step task, before coding | Structured planning with bite-sized tasks |
+| `executing-plans` | Given a structured plan | Task-by-task execution with checkpoints |
+| `compound-learnings` | After completing work | Knowledge capture and compounding |
+| `systematic-debugging` | Bug investigation | Four-phase root-cause analysis |
+
+**Design skills** (shipped):
 
 | Skill | Triggers on | Purpose |
 |-------|-------------|---------|

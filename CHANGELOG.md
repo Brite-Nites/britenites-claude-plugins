@@ -6,8 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Changed
+- **Plugin philosophy refactor** — Reframed as a Process + Org plugin (not a domain encyclopedia). Tech-stack skills cancelled; future domain knowledge lives in separate plugins.
+- Milestones restructured: Foundation → The Inner Loop → The Outer Loop → Orchestration → Plugin Ecosystem
+- 10 domain/tech-stack issues cancelled (Python, PostgreSQL, Shopify, GCP, HubSpot, data engineering, API design, testing, design tokens, framework templates)
+- 13 new process-focused issues created across 4 milestones
+- ROADMAP.md rewritten with process-first philosophy and compound engineering influences
+- README.md updated: new tagline, full command list (12), skill matrix grouped by category
+- CONTRIBUTING.md updated: process-first guidance for new contributions
+- CLAUDE.md updated: plugin philosophy section, process skill routing table
+
+## [2.3.0] - 2026-02-25
+
 ### Added
 - `/britenites:security-audit` command — comprehensive project-wide security audit with automated checks (dependency vulnerabilities, secret scanning, env config) and security-reviewer agent dispatch
+- `/britenites:deployment-checklist` command — pre-deployment validation checklist
+- `/britenites:bug-report` command — standardized bug reporting with Linear integration
+- `code-quality` skill — ESLint, Prettier, Ruff, mypy, TypeScript strict enforcement
 - Pre-commit quality hook (PreToolUse) — intercepts `git commit`, runs ESLint/tsc/Ruff on staged files by project type
 - `scripts/pre-commit.sh` — standalone git pre-commit hook for direct installation
 - `/britenites:smoke-test` command — in-session diagnostic for env, MCP, hooks, agent dispatch
@@ -20,6 +35,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Changed
 - SessionStart hook now shows environment health checks (git, node, gh, npx status)
 - CI workflow runs `test-hooks.sh` alongside structural validation
+
+### Security
+- Fixed PostToolUse hook file path injection vulnerability
+- Replaced `echo` with `printf` in security hook command pipes
+- Fixed force-push regex to catch `--force-with-lease`
+- Pinned MCP server package version in `.mcp.json`
 
 ## [2.0.1] - 2026-02-24
 
