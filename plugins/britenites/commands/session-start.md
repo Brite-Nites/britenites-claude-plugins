@@ -26,22 +26,26 @@ If either fails:
 
 ## Step 2: Query Linear for Open Issues
 
-Use the Linear MCP tools to find actionable work:
+**Project scoping is mandatory.** Only show issues from the Linear project associated with this repo.
 
-1. **List open issues** assigned to the current user or unassigned in the active project.
-2. **Sort by priority** — Urgent/High first, then by cycle.
-3. **Present the top 5** in a table:
+1. **Resolve the project name** — Read the repo's CLAUDE.md and find the `## Linear Project` section. Extract the `Project:` value (e.g., "Brite Claude Code Plugin"). If no `## Linear Project` section exists, warn: "No Linear project configured in CLAUDE.md. Add a `## Linear Project` section with `Project: <name>` and `Team: <name>`." Then ask the user for the project name manually.
+2. **Query in-progress issues first** — `list_issues` with `project` set to the resolved name, `state: "started"`. This finds issues already being worked on.
+3. **Query backlog if none** — If no in-progress issues, query `state: "unstarted"` with the same project filter. This surfaces Todo/Backlog items.
+4. **Empty state** — If no issues at all, tell the user: "No open issues in [project]. Would you like to create a new issue or work on something from another project?" Use AskUserQuestion with those two options.
+5. **Present the top 5** in a table, sorted by priority (Urgent → High → Medium → Low):
 
 ```
-| # | ID    | Title                        | Priority | Labels      |
-|---|-------|------------------------------|----------|-------------|
-| 1 | BN-42 | Add auth endpoint            | Urgent   | backend     |
-| 2 | BN-38 | Fix dashboard loading state  | High     | frontend    |
+| # | ID    | Title                        | Priority | Status | Labels      |
+|---|-------|------------------------------|----------|--------|-------------|
+| 1 | BN-42 | Add auth endpoint            | Urgent   | Todo   | backend     |
+| 2 | BN-38 | Fix dashboard loading state  | High     | Todo   | frontend    |
 | ...
 ```
 
-4. **Suggest which to pick** based on priority, dependencies, and any follow-ups from auto-memory.
-5. **Ask the user** which issue to work on using AskUserQuestion.
+6. **Suggest which to pick** based on priority, dependencies, and any follow-ups from auto-memory.
+7. **Ask the user** which issue to work on using AskUserQuestion.
+
+**Never query across all projects or teams.** The issue picker is scoped to this repo's project.
 
 If `$ARGUMENTS` contains an issue ID or URL, skip the table and go directly to that issue.
 
