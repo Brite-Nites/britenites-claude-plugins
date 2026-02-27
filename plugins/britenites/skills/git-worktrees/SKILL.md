@@ -39,8 +39,12 @@ Use the EnterWorktree tool to create an isolated worktree. Name it after the Lin
 
 If the EnterWorktree tool is not available, fall back to manual git commands (always quote variables):
 ```bash
+# ISSUE_ID = Linear issue ID (e.g. BRI-42)
+# DESCRIPTION = slugified short summary of the issue (e.g. fix-auth-redirect)
 git worktree add ".claude/worktrees/${ISSUE_ID}" -b "${ISSUE_ID}/${DESCRIPTION}" origin/main
 ```
+
+Derive `DESCRIPTION` from the issue title: lowercase, replace non-alphanumeric characters with hyphens, truncate to 50 chars. Validate it matches `^[a-z0-9-]+$` before use.
 
 ### Step 3: Project Setup
 

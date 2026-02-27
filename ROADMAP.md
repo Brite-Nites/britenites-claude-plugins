@@ -61,12 +61,12 @@ Core session workflow. All skills needed for the full inner loop.
 
 | Issue | Type | Priority | Status |
 |-------|------|----------|--------|
-| BRI-1617 | skill | High | **writing-plans** — bite-sized tasks, files, verification |
-| BRI-1618 | skill | High | **executing-plans** — subagent-per-task + TDD + checkpoints |
-| BRI-1619 | skill | High | **compound-learnings** — knowledge capture (invoked by ship) |
-| BRI-1620 | skill | Medium | **systematic-debugging** — 4-phase root cause |
-| BRI-1621 | enhancement | Medium | Enhance session-start with brainstorming + plans integration |
-| BRI-1622 | enhancement | Medium | Enhance ship with compound + best-practices audit |
+| BRI-1617 | skill | High | **writing-plans** — bite-sized tasks, files, verification ✅ |
+| BRI-1618 | skill | High | **executing-plans** — subagent-per-task + TDD + checkpoints ✅ |
+| BRI-1619 | skill | High | **compound-learnings** — knowledge capture (invoked by ship) ✅ |
+| BRI-1620 | skill | Medium | **systematic-debugging** — 4-phase root cause ✅ |
+| BRI-1621 | enhancement | Medium | Enhance session-start with brainstorming + plans integration ✅ |
+| BRI-1622 | enhancement | Medium | Enhance ship with compound + best-practices audit ✅ |
 | BRI-1630 | documentation | High | Docs update for v3.0 ✅ |
 | BRI-1636 | skill | High | **brainstorming** — Socratic discovery before planning ✅ |
 | BRI-1637 | skill | Medium | **git-worktrees** — isolated workspace per task ✅ |

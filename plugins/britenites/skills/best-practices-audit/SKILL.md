@@ -16,7 +16,7 @@ You are auditing a project's CLAUDE.md to ensure it follows Anthropic's official
 
 ## Reference
 
-Use `plugins/britenites/skills/setup-claude-md/claude-code-best-practices.md` as the authoritative reference for best practices.
+Read the best-practices reference from `setup-claude-md/claude-code-best-practices.md` (relative to the plugin's `skills/` directory). If the file is not accessible, use the audit checklist below as the authoritative guide.
 
 ## Audit Checklist
 
