@@ -103,6 +103,12 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 | `best-practices-audit` | After compound (via ship) | CLAUDE.md audit + auto-fix |
 | `systematic-debugging` | Bug investigation (anytime) | 4-phase root-cause analysis |
 
+### Backend Skills
+
+| Skill | Triggers on | Purpose |
+|-------|-------------|---------|
+| `python-best-practices` | Writing, reviewing, refactoring FastAPI/Python code | Architectural patterns audit |
+
 ### Design Skills
 
 | Skill | Triggers on | Purpose |
