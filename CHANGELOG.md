@@ -9,8 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [3.2.0] - 2026-02-27
 
 ### Changed
-- **session-start issue picker scoped to repo's Linear project** — Step 2 now reads `## Linear Project` from CLAUDE.md to resolve the project name, queries only that project, falls back to backlog if no in-progress issues, and shows an empty-state prompt if no issues exist at all (BRI-1654)
-- Added `## Linear Project` section to CLAUDE.md with project/team mapping convention
+- **session-start issue picker scoped to repo's Linear project** — Step 2 now reads `## Linear Project` from CLAUDE.md to resolve the project name, queries only that project, falls back to both Todo and Backlog states if no in-progress issues, and shows an empty-state prompt if no issues exist at all (BRI-1654)
+- Added `## Linear Project` section to CLAUDE.md with project mapping convention
 
 ## [3.1.0] - 2026-02-27
 
