@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-02-27
+
+### Added
+- **python-best-practices skill** — 38-rule architectural guide for FastAPI, Pydantic v2, and SQLAlchemy 2.0 covering async correctness, dependency injection, database patterns, error handling, API design, testing, and project structure (BRI-1339)
+- `code-review.md` Section 4 defers to python-best-practices skill for full backend audit
+- Backend Skills subsection in CLAUDE.md Skill Routing
+
 ## [3.0.1] - 2026-02-27
 
 ### Changed
@@ -158,7 +165,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.3.0...v3.0.0
 [2.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.1...v2.3.0

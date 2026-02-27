@@ -60,7 +60,7 @@ Only apply if reviewing frontend code. Defer to the **react-best-practices** ski
 
 ### 4. Backend Checklist (FastAPI / Python)
 
-Only apply if reviewing backend code:
+Only apply if reviewing backend code. Defer to the **python-best-practices** skill for the full 38-rule audit (async correctness, DI, database patterns, Pydantic, etc.).
 
 - Pydantic models validate request/response data
 - Async endpoints where I/O-bound
