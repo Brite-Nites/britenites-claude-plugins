@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - `/britenites:ship` — Now invokes compound-learnings and best-practices-audit skills, adds worktree cleanup
 - Plugin description updated to "Process + Org plugin — structured workflow methodology with Linear integration"
 - Keywords updated: removed design-system/react/ui-ux, added process/workflow/tdd/compound-engineering
+- Hook regex tests expanded from 24 to 37 (added git commit detection, force-push variants)
 - ROADMAP.md rewritten with three-workflow model (Greenfield, Inner Loop, Scoping)
 - Milestone 2 (Inner Loop) expanded with 5 new issues
 - Milestone 3 renamed from "The Outer Loop" to "Scoping & Discovery" with scope command
@@ -45,7 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - `scripts/pre-commit.sh` — standalone git pre-commit hook for direct installation
 - `/britenites:smoke-test` command — in-session diagnostic for env, MCP, hooks, agent dispatch
 - Step 0 prerequisite guards in `session-start` (Linear + sequential-thinking MCP), `review` (agent dispatch), `ship` (gh auth)
-- `scripts/test-hooks.sh` — 37 regex tests for security hook patterns (CI + local)
+- `scripts/test-hooks.sh` — 24 regex tests for security hook patterns (CI + local)
 - `scripts/check-prereqs.sh` — runtime prerequisite verification
 - `scripts/test-plugin-load.sh` — command registration test (terminal/CI only)
 - `docs/test-protocol.md` — manual flow verification checklist (7 tests)

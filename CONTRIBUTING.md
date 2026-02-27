@@ -144,22 +144,9 @@ To run validation automatically before every push:
 ./scripts/setup-hooks.sh
 ```
 
-### Manual testing checklist
+### Manual testing
 
-After `./scripts/validate.sh` passes, test interactively:
-
-```bash
-claude --plugin-dir ./plugins/britenites
-```
-
-1. Type `/britenites:` — confirm 13 commands appear
-2. Say "review my UI" — should trigger `web-design-guidelines` skill
-3. Say "build a login form" — should trigger `frontend-design` skill
-4. Say "I need to plan a new feature" — should trigger `brainstorming` skill
-5. Say "I have a bug that's hard to reproduce" — should trigger `systematic-debugging` skill
-6. New session check — SessionStart hook fires ("Loading Britenites context...")
-7. Edit a `.ts` file — PostToolUse linter hook fires
-8. Run `claude plugin validate .` from repo root for official CLI validation
+After `./scripts/validate.sh` passes, see [`docs/testing-guide.md`](docs/testing-guide.md) for the full interactive testing checklist (49 tests across 7 layers). For quick validation, use the **Quick Smoke Subset** section (~10 min).
 
 ## Versioning
 

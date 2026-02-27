@@ -93,7 +93,7 @@ If working in a git worktree:
 1. Verify all changes are committed and pushed
 2. Switch back to the main working directory: `cd` to the original repo root (outside `.claude/worktrees/`)
 3. Remove the worktree: `git worktree remove .claude/worktrees/[ISSUE_ID]`
-4. Optionally delete the local branch: `git branch -D [branch-name]`
+4. Optionally delete the local branch: `git branch -D "[branch-name]"`
 
 If not in a worktree, skip this step.
 

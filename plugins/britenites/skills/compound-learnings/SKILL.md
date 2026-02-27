@@ -18,7 +18,7 @@ You are capturing knowledge from the work just completed so that future sessions
 
 Review the session's work:
 
-1. **Read the diff** — `git diff $(git symbolic-ref refs/remotes/origin/HEAD | sed 's|refs/remotes/origin/||')...HEAD` to see everything that changed (falls back to `main` if symbolic-ref fails)
+1. **Read the diff** — `base_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main)` then `git diff "$base_branch"...HEAD` to see everything that changed
 2. **Read the plan** — `docs/plans/[issue-id]-plan.md` if it exists
 3. **Read the design doc** — `docs/designs/[issue-id]-*.md` if it exists
 4. **Recall the session** — What problems were encountered? What took longer than expected? What was surprisingly easy?
