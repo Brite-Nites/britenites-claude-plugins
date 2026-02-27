@@ -9,7 +9,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Linear Project
 
 Project: Brite Claude Code Plugin
-Team: Brite Company
 
 ## Plugin Philosophy
 
