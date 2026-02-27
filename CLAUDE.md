@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Superpowers methodology + compound engineering + Linear integration.** A Process + Org plugin for the Britenites organization — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
+## Linear Project
+
+Project: Brite Claude Code Plugin
+
 ## Plugin Philosophy
 
 - **Process**: Superpowers' full workflow with TDD, subagent-per-task execution, and compound knowledge accumulation
