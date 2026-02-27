@@ -150,7 +150,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/britenites:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
-- `docs/test-protocol.md` — manual flow verification checklist (7 tests).
+- `docs/testing-guide.md` — comprehensive testing guide (49 tests across 7 layers).
 
 ## Known Issues
 

@@ -61,19 +61,23 @@ echo ""
 section "2. Verifying Commands"
 
 expected_commands=(
-  "britenites:tech-stack"
-  "britenites:session-start"
-  "britenites:review"
-  "britenites:ship"
+  "britenites:bug-report"
   "britenites:code-review"
-  "britenites:project-start"
-  "britenites:setup-claude-md"
+  "britenites:deployment-checklist"
   "britenites:onboarding-checklist"
+  "britenites:project-start"
+  "britenites:review"
+  "britenites:scope"
+  "britenites:security-audit"
+  "britenites:session-start"
+  "britenites:setup-claude-md"
+  "britenites:ship"
   "britenites:smoke-test"
+  "britenites:tech-stack"
 )
 
 for cmd in "${expected_commands[@]}"; do
-  if echo "$output" | grep -q "$cmd"; then
+  if echo "$output" | grep -qw "$cmd"; then
     pass "$cmd registered"
   else
     fail "$cmd NOT found in output"
