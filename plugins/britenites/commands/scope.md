@@ -15,6 +15,7 @@ Before starting, confirm critical dependencies:
 
 If either fails:
 - Stop with: "Cannot reach [Linear/sequential-thinking]. Run `/britenites:smoke-test` to diagnose."
+- Do NOT proceed.
 
 ## Step 1: Interview Phase
 

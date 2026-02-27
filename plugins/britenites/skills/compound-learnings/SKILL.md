@@ -18,7 +18,7 @@ You are capturing knowledge from the work just completed so that future sessions
 
 Review the session's work:
 
-1. **Read the diff** — `git diff main...HEAD` to see everything that changed
+1. **Read the diff** — `git diff $(git symbolic-ref refs/remotes/origin/HEAD | sed 's|refs/remotes/origin/||')...HEAD` to see everything that changed (falls back to `main` if symbolic-ref fails)
 2. **Read the plan** — `docs/plans/[issue-id]-plan.md` if it exists
 3. **Read the design doc** — `docs/designs/[issue-id]-*.md` if it exists
 4. **Recall the session** — What problems were encountered? What took longer than expected? What was surprisingly easy?
@@ -73,7 +73,7 @@ After updates, check CLAUDE.md line count. If it exceeds ~100 lines:
 
 ## Phase 3: Write Session Summary to Memory
 
-Write to auto-memory (`~/.claude/projects/*/memory/`):
+Write to auto-memory (the current project's memory directory):
 
 ```markdown
 ## Session: [Issue ID] — [Title] ([date])

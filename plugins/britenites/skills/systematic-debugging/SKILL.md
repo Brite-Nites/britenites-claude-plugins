@@ -119,7 +119,7 @@ Beyond the immediate fix, consider:
 If the bug involves timing or async behavior:
 - **Never use arbitrary delays** (`sleep 5`, `setTimeout(5000)`)
 - **Wait for conditions**: poll for the expected state, with a timeout
-- **Example**: Instead of `sleep 2 && check_result`, use `while ! check_result; do sleep 0.1; done` with a max iteration count
+- **Example**: Instead of `sleep 2 && check_result`, use `i=0; while ! check_result && [ $i -lt 100 ]; do sleep 0.1; i=$((i+1)); done`
 
 ### Fix Report
 ```

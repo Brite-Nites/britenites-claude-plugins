@@ -144,7 +144,6 @@ plugins/
     skills/                 # Model-invoked skills
     agents/                 # Specialized subagents
     hooks/                  # Event handlers
-    styles/                 # Output style overrides
     .mcp.json               # MCP server configurations
 ```
 

@@ -91,8 +91,9 @@ Skip this step if CLAUDE.md wasn't modified in Step 4.
 If working in a git worktree:
 
 1. Verify all changes are committed and pushed
-2. Switch back to the main working directory
-3. Remove the worktree: the developer will be prompted to keep or remove on session exit
+2. Switch back to the main working directory: `cd` to the original repo root (outside `.claude/worktrees/`)
+3. Remove the worktree: `git worktree remove .claude/worktrees/[ISSUE_ID]`
+4. Optionally delete the local branch: `git branch -D [branch-name]`
 
 If not in a worktree, skip this step.
 

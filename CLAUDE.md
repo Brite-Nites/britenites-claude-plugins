@@ -146,7 +146,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 ## Testing & Validation
 
 - `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs). Run pre-push and in CI.
-- `scripts/test-hooks.sh` — tests security and quality hook regex patterns against 35 known inputs. Run in CI.
+- `scripts/test-hooks.sh` — tests security and quality hook regex patterns against 37 known inputs. Run in CI.
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/britenites:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
