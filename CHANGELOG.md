@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-02-27
+
+### Changed
+- **Best-practices reference rewrite** — `claude-code-best-practices.md` expanded from 84 to 178 lines with memory hierarchy, modular rules, @import syntax, hooks system, custom slash commands, Model Context Protocol, and multi-project setup (BRI-1640)
+- `setup-claude-md/SKILL.md` size guidance corrected from 150 to 100 lines to match Anthropic's current recommendation
+
+### Fixed
+- `best-practices-audit/SKILL.md` — reference path changed from ambiguous relative path to installed convention (`.claude/skills/setup-claude-md/claude-code-best-practices.md`)
+- `git-worktrees/SKILL.md` — DESCRIPTION derivation now collapses consecutive hyphens and strips leading/trailing hyphens; validation regex tightened to `^[a-z0-9][a-z0-9-]*[a-z0-9]$`; derivation block moved before code block so agents read rules before using the variable
+
 ## [3.0.0] - 2026-02-26
 
 ### Added
@@ -148,7 +158,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.3.0...v3.0.0
 [2.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.1...v2.3.0
 [2.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.0...v2.0.1
