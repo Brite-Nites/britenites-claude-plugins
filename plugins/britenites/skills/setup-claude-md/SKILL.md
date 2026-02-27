@@ -69,5 +69,5 @@ Specific criteria for this skill:
 - [ ] Code style section matches what's actually in the codebase
       (check a few real files)
 - [ ] No generic filler — every line is specific to this project
-- [ ] File is concise (aim for under 150 lines; agents perform
+- [ ] File is concise (aim for under 100 lines; agents perform
       worse with bloated CLAUDE.md files)
