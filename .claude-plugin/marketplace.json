@@ -10,8 +10,8 @@
     {
       "name": "britenites",
       "source": "./plugins/britenites",
-      "description": "Baseline tools for Britenites org",
-      "version": "2.3.0"
+      "description": "Process + Org plugin — structured workflow methodology with Linear integration",
+      "version": "3.0.0"
     }
   ]
 }

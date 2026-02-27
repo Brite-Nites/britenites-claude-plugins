@@ -6,69 +6,84 @@ For detailed issue tracking, see the [Linear project](https://linear.app/brite-n
 
 ## Philosophy
 
-This is a **Process + Org plugin** — it teaches *how* to work, not *what* to know about specific technologies.
+**Superpowers methodology + compound engineering + Linear integration.**
 
-- **Process**: Structured planning, step-by-step execution, parallel review, knowledge compounding
-- **Org**: Linear integration, Britenites conventions, security hooks, team onboarding
+This is a **Process + Org plugin** — superpowers' full workflow (brainstorming, worktrees, bite-sized plans, subagent execution, TDD, code review, branch completion) with Linear woven into every step, compound engineering's knowledge accumulation, and Anthropic's best practices enforced automatically.
+
+- **Process**: brainstorm → plan → worktree → execute (subagent-per-task + TDD) → review → compound → audit
+- **Org**: Linear integration at every step, security hooks, team conventions, onboarding
 - **Not domain**: Tech-stack skills (Python, Shopify, GCP, etc.) belong in separate domain plugins
 
-Influenced by [superpowers](https://github.com/obra/superpowers) (61.8k stars, process-first methodology) and [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin) (9.6k stars, plan→work→review→compound cycle).
+Influenced by [superpowers](https://github.com/obra/superpowers) and [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin).
 
-## Core Workflow
+## The Three Workflows
 
+### 1. Greenfield: `/britenites:project-start`
+Runs once per project. Creates everything from scratch.
 ```
-session-start → [plan] → [execute] → review → [compound] → ship
-       ↑                                                      |
-       └──────────── sprint-planning ← retrospective ←────────┘
+project-start → post-plan-setup (refine → issues → CLAUDE.md) → ready for sessions
 ```
 
-The **inner loop** (plan → execute → review → compound) happens in a single session.
-The **outer loop** (sprint-planning → sessions → retrospective) happens across sprints.
+### 2. Daily Work: The Inner Loop
+Every coding session follows this sequence. Skills activate automatically:
+```
+session-start → brainstorm → plan → [worktree] → execute (subagent-per-task + TDD) → review → ship (compound + audit)
+```
+**User runs 3 commands**: session-start, review, ship. Everything else is skills that activate in sequence.
 
-## Current State (v2.3.0)
+### 3. Direction-Setting: `/britenites:scope`
+Collaborative creative session for deciding *what to build next*. Produces Linear issues.
+```
+scope → [Socratic discovery] → [ideation] → [Linear issue creation] → [prioritization]
+```
+
+## Current State (v3.0.0)
 
 **Shipped:**
-- 12 commands, 12 skills, 7 agents, 4 hook layers, 2 MCP servers
-- Core workflow: session-start → (ad-hoc coding) → review → ship
+- 13 commands, 19 skills, 7 agents, 4 hook layers, 2 MCP servers
+- Full inner loop: session-start → brainstorm → plan → worktree → execute → review → ship
+- Compound methodology: knowledge accumulates across sessions via CLAUDE.md + memory
+- Best-practices audit: auto-audit CLAUDE.md after every cycle
 - Security: two-layer hooks (regex + haiku), pre-commit quality, auto-linter
 - CI/CD: GitHub Actions validation, 5 test scripts
-- Docs: README, CHANGELOG, CONTRIBUTING, ARCHITECTURE, CLAUDE.md
-
-**Gap:** The middle of the workflow (planning, execution, compounding) is undefined. Session-start creates a loose plan, but there's no structured methodology for *how* to plan, execute, or capture learnings.
 
 ## Milestones
 
 ### Milestone 1: Foundation ✅
 *Shipped Feb 2026 (v1.0.0 – v2.3.0)*
 
-Plugin infrastructure, core commands, hooks, CI, docs. Everything through v2.3.0.
+Plugin infrastructure, core commands, hooks, CI, docs.
 
-### Milestone 2: The Inner Loop
+### Milestone 2: The Inner Loop (expanded)
 *Target: Mar 18, 2026*
 
-How a developer plans, executes, and compounds knowledge in a single work session.
+Core session workflow. All skills needed for the full inner loop.
 
-| Issue | Type | Priority | Description |
-|-------|------|----------|-------------|
-| BRI-1617 | skill | High | **writing-plans** — Structured planning with bite-sized tasks, exact files, verification steps |
-| BRI-1618 | skill | High | **executing-plans** — Task-by-task execution with checkpoints and progress tracking |
-| BRI-1619 | skill | High | **compound-learnings** — Knowledge capture and compounding after each task |
-| BRI-1620 | skill | Medium | **systematic-debugging** — Four-phase root-cause analysis methodology |
-| BRI-1621 | enhancement | Medium | Enhance session-start with writing-plans integration |
-| BRI-1622 | enhancement | Medium | Enhance ship with explicit compound step |
-| BRI-1630 | documentation | High | Update docs for v3.0 process-first refactor |
+| Issue | Type | Priority | Status |
+|-------|------|----------|--------|
+| BRI-1617 | skill | High | **writing-plans** — bite-sized tasks, files, verification ✅ |
+| BRI-1618 | skill | High | **executing-plans** — subagent-per-task + TDD + checkpoints ✅ |
+| BRI-1619 | skill | High | **compound-learnings** — knowledge capture (invoked by ship) ✅ |
+| BRI-1620 | skill | Medium | **systematic-debugging** — 4-phase root cause ✅ |
+| BRI-1621 | enhancement | Medium | Enhance session-start with brainstorming + plans integration ✅ |
+| BRI-1622 | enhancement | Medium | Enhance ship with compound + best-practices audit ✅ |
+| BRI-1630 | documentation | High | Docs update for v3.0 ✅ |
+| BRI-1636 | skill | High | **brainstorming** — Socratic discovery before planning ✅ |
+| BRI-1637 | skill | Medium | **git-worktrees** — isolated workspace per task ✅ |
+| BRI-1638 | skill | High | **best-practices-audit** — CLAUDE.md audit + auto-fix ✅ |
+| BRI-1639 | skill | Medium | **verification-before-completion** — ensure tasks genuinely done ✅ |
+| BRI-1640 | reference | High | Update best-practices reference from official Anthropic docs |
 
-### Milestone 3: The Outer Loop
+### Milestone 3: Scoping & Discovery
 *Target: Apr 8, 2026*
 
-How a team manages work across sprints and projects.
+Direction-setting and team coordination across sprints.
 
-| Issue | Type | Priority | Description |
-|-------|------|----------|-------------|
-| BRI-1623 | command | High | **sprint-planning** — Linear-integrated sprint planning and prioritization |
-| BRI-1624 | command | Medium | **architecture-decision** — ADR generator for technology decisions |
-| BRI-1625 | command | Medium | **retrospective** — Sprint retro facilitation using Linear data |
-| BRI-1626 | infrastructure | High | **Linear sync hook** — Auto-update Linear from git activity |
+| Issue | Type | Priority | Status |
+|-------|------|----------|--------|
+| BRI-1641 | command | High | **scope** — collaborative creative scoping + Linear issues ✅ |
+| BRI-1624 | command | Medium | **architecture-decision** — ADR generator |
+| BRI-1626 | infrastructure | High | **Linear sync hook** — auto-status from git |
 
 ### Milestone 4: Orchestration
 *Target: May 6, 2026*
@@ -77,41 +92,33 @@ Multi-agent coordination and automation.
 
 | Issue | Type | Priority | Description |
 |-------|------|----------|-------------|
-| BRI-1352 | agent | Medium | **Onboarding agent** — Interactive setup wizard for new developers |
+| BRI-1352 | agent | Medium | **Onboarding agent** — Interactive setup wizard |
 | BRI-1627 | enhancement | Low | Enhanced parallel review agents with scoring |
 
 ### Milestone 5: Plugin Ecosystem
 *Target: Jun 3, 2026*
 
-Tooling and templates for spinning up domain-specific plugins.
+Tooling and templates for domain-specific plugins.
 
 | Issue | Type | Priority | Description |
 |-------|------|----------|-------------|
 | BRI-1628 | infrastructure | High | Domain plugin template and `/create-plugin` generator |
-| BRI-1629 | spike | Medium | Scaffold first domain plugin (Shopify or Data Engineering) |
+| BRI-1629 | spike | Medium | Scaffold first domain plugin |
+
+## What Makes This Different from Superpowers
+
+1. **Linear integration at every step** — Issues inform brainstorming, branch names include issue IDs, ship updates status, scoping creates issues
+2. **Compound methodology** — System gets smarter after every session via CLAUDE.md + memory
+3. **Best-practices enforcement** — Auto-audit CLAUDE.md against Anthropic's guidelines, auto-fix, enforce `@import` structure
+4. **Security hooks** — Two-layer regex + haiku protection
+5. **Org conventions** — Brite-Nites-specific standards, onboarding, deployment
 
 ## Domain Plugin Strategy
 
-Domain-specific knowledge lives in **separate plugins**, not this one:
+Domain-specific knowledge lives in **separate plugins**:
 
-- `britenites-shopify` — Shopify Plus / Liquid patterns for Brite Supply
-- `britenites-data` — dbt, BigQuery, Prefect patterns for data team
+- `britenites-shopify` — Shopify Plus / Liquid patterns
+- `britenites-data` — dbt, BigQuery, Prefect patterns
 - `britenites-hubspot` — HubSpot CRM integration patterns
 
-Each domain plugin is its own repo with its own Linear project, scaffolded from the template in Milestone 5.
-
-## Competitive Context
-
-The Claude Code plugin ecosystem (834+ plugins, 43 marketplaces) is organizing into three archetypes:
-
-| Type | Examples | Focus |
-|------|----------|-------|
-| **Process** | superpowers, compound-engineering | How you work |
-| **Domain** | marketingskills (32 marketing skills) | What you know |
-| **Org** | Enterprise internal plugins | How your team works |
-
-This plugin is **Process + Org**. Our differentiators:
-1. **Linear integration** — Tight PM integration (session-start, ship, sprint-planning)
-2. **Security-first hooks** — Two-layer regex + haiku, injection prevention
-3. **Compound methodology** — Knowledge compounds across sessions via CLAUDE.md and memory
-4. **Org conventions** — Tech stack, onboarding, deployment standards
+Each domain plugin is its own repo, scaffolded from the template in Milestone 5.

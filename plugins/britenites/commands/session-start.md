@@ -1,37 +1,36 @@
 ---
-description: Start a work session — pull latest, pick a Linear issue, create an execution plan
+description: Start a work session — pull latest, pick a Linear issue, brainstorm, plan, execute
 ---
 
-# Session Start (Phase 3)
+# Session Start
 
-You are beginning a focused work session. Your job is to get the developer oriented, pick the next issue to work on, and produce an execution plan they approve before any code is written.
+You are beginning a focused work session. Your job is to orient the developer, pick the next issue, and guide them through the inner loop: brainstorm → plan → worktree → execute.
 
 ## Step 0: Verify Prerequisites
 
-Before starting the session, confirm critical dependencies are reachable:
+Before starting, confirm critical dependencies:
 
-1. **Linear MCP** — Call the Linear MCP to list projects (just 1 result). This confirms auth and connectivity.
-2. **Sequential-thinking MCP** — Send a trivial thought (e.g., "Planning session start"). This confirms the MCP server is running.
+1. **Linear MCP** — Call the Linear MCP to list projects (just 1 result). Confirms auth and connectivity.
+2. **Sequential-thinking MCP** — Send a trivial thought (e.g., "Planning session start"). Confirms the MCP server is running.
 
 If either fails:
-- Stop immediately with a clear error: "Cannot reach [Linear/sequential-thinking]. Run `/britenites:smoke-test` to diagnose."
-- Do NOT proceed to environment setup or issue querying.
-
-If both succeed, continue to Step 1.
+- Stop with: "Cannot reach [Linear/sequential-thinking]. Run `/britenites:smoke-test` to diagnose."
+- Do NOT proceed.
 
 ## Step 1: Environment Setup
 
-1. **Check git status** — Ensure working directory is clean. If there are uncommitted changes, warn the user and ask how to proceed.
-2. **Pull latest from main** — Run `git pull origin main` (or the project's default branch).
-3. **Create a working branch** — After the user picks an issue (Step 3), create a branch: `git checkout -b <issue-id>/<short-description>` (e.g., `BN-42/add-auth-endpoint`).
+1. **Check git status** — Ensure working directory is clean. If dirty, warn and ask how to proceed.
+2. **Pull latest** — `git pull origin main` (or the default branch).
+3. **Read project CLAUDE.md** — Load architecture context, conventions, previous learnings.
+4. **Read auto-memory** — Check for session summaries and follow-ups from previous sessions.
 
 ## Step 2: Query Linear for Open Issues
 
 Use the Linear MCP tools to find actionable work:
 
 1. **List open issues** assigned to the current user or unassigned in the active project.
-2. **Sort by priority** — P0/P1 first, then by cycle if applicable.
-3. **Present the top 5** issues in a concise table:
+2. **Sort by priority** — Urgent/High first, then by cycle.
+3. **Present the top 5** in a table:
 
 ```
 | # | ID    | Title                        | Priority | Labels      |
@@ -41,66 +40,66 @@ Use the Linear MCP tools to find actionable work:
 | ...
 ```
 
-4. **Suggest which to pick** based on priority and dependencies (e.g., "BN-42 is urgent and has no blockers — I'd start there").
-5. **Ask the user** which issue to work on using the AskUserQuestion tool.
+4. **Suggest which to pick** based on priority, dependencies, and any follow-ups from auto-memory.
+5. **Ask the user** which issue to work on using AskUserQuestion.
 
-If `$ARGUMENTS` already contains an issue ID or URL, skip the table and go directly to that issue.
+If `$ARGUMENTS` contains an issue ID or URL, skip the table and go directly to that issue.
 
 ## Step 3: Read Issue Details
 
 Once an issue is selected:
 
-1. **Fetch full issue details** from Linear — description, acceptance criteria, labels, linked issues, comments.
-2. **Read project CLAUDE.md** for architectural context, coding conventions, and patterns.
-3. **Read any linked docs** referenced in the issue (PRD, design specs, etc.).
-4. **Identify related code** — Use the issue description and labels to find relevant files in the codebase. Read them.
+1. **Fetch full issue details** — description, acceptance criteria, labels, linked issues, comments.
+2. **Read linked docs** referenced in the issue (PRDs, design specs, etc.).
+3. **Identify related code** — Find relevant files from the issue description and labels. Read them.
 
-## Step 4: Create Execution Plan
+## Step 4: Brainstorm (Non-Trivial Issues)
 
-Use the sequential-thinking MCP to work through the plan:
+**Assess complexity**: Is this issue non-trivial? (Multi-step feature, architectural change, ambiguous requirements, multiple valid approaches)
 
-1. **Decompose the issue** into concrete implementation steps. Each step should be:
-   - Specific (which file, which function, what change)
-   - Ordered (dependencies explicit)
-   - Testable (how to verify it works)
+- **If non-trivial**: The `brainstorming` skill activates. Engage in Socratic discovery — ask clarifying questions, explore alternatives, produce a design document for approval.
+- **If trivial** (simple bug fix, config change, single-file edit): Skip brainstorming and proceed to planning.
 
-2. **Identify risks** — What could go wrong? What assumptions are you making? What needs clarification?
+Ask the developer if unsure: "This looks straightforward — should we brainstorm approaches or jump to planning?"
 
-3. **Present the plan** to the user:
+## Step 5: Write Plan
 
-```
-## Execution Plan: [Issue Title]
+The `writing-plans` skill activates to create a detailed execution plan:
 
-**Issue**: [ID] — [Title]
-**Branch**: [branch-name]
-**Estimated steps**: N
+1. Break the work into bite-sized tasks (2-5 minutes each)
+2. Each task has exact file paths, implementation details, verification steps
+3. Plan is saved to `docs/plans/[issue-id]-plan.md`
+4. Plan references the project's actual test/build/lint commands from CLAUDE.md
 
-### Steps
-1. [Specific change] — [file(s)] — [verification]
-2. [Specific change] — [file(s)] — [verification]
-...
+**Present the plan** and ask for approval: "Does this plan look right? Any tasks to add, remove, or reorder?"
 
-### Risks & Assumptions
-- [Risk or assumption that needs confirmation]
+## Step 6: Set Up Worktree
 
-### Out of Scope
-- [Anything explicitly excluded]
-```
+After the plan is approved, the `git-worktrees` skill activates:
 
-4. **Ask for approval** using AskUserQuestion: "Does this plan look right? Any changes before I start executing?"
+1. Create an isolated worktree with branch `[issue-id]/[short-description]`
+2. Install dependencies
+3. Verify clean test/build/lint baseline
 
-## Step 5: Handoff to Execution
+If the developer prefers not to use worktrees, fall back to a simple branch: `git checkout -b [issue-id]/[short-description]`
 
-Once the plan is approved:
+## Step 7: Execute
 
-1. Confirm the working branch is created and checked out.
-2. State clearly: "Plan approved. Starting execution. I'll work through the steps and let you know when ready for review."
-3. Begin executing the plan steps sequentially.
+The `executing-plans` skill activates:
+
+1. Execute each task via subagent-per-task (fresh context per task)
+2. TDD enforcement: red → green → refactor per task
+3. Checkpoint after each task — `verification-before-completion` activates at each checkpoint (build, tests, acceptance criteria, integration)
+4. Parallelize independent tasks
+
+State clearly: "Plan approved. Starting execution. I'll checkpoint after each task and let you know when ready for review."
 
 ## Rules
 
-- Never start writing code before the user approves the plan.
-- If an issue is vague, ask clarifying questions before planning — don't guess.
+- Never start writing code before the plan is approved.
+- If an issue is vague, brainstorm first — don't guess.
 - If the codebase doesn't have a CLAUDE.md, note it and proceed with what you can infer.
-- Keep the plan concise. 3-8 steps is typical. If it's more than 12, suggest splitting the issue.
-- If Linear isn't accessible (MCP error), ask the user to provide the issue details manually.
+- If the plan exceeds 12 tasks, suggest splitting the issue into multiple PRs.
+- If Linear isn't accessible, ask the user to provide issue details manually.
+- The inner loop is: brainstorm → plan → worktree → execute → review → ship. Each step hands off to the next.
+- Skills activate automatically in sequence — the developer only needs to run `session-start`, then `review`, then `ship`.
