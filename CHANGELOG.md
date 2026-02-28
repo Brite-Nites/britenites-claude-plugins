@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.7.0] - 2026-02-28
+
+### Added
+- `/workflows:architecture-decision` command — interactive ADR generator using sequential-thinking for structured options analysis. Writes to `docs/decisions/NNN-kebab-title.md`, auto-appends `@` import to CLAUDE.md (BRI-1624)
+- ADR generation step in `/workflows:project-start` — after interview and plan, extracts every major tech decision and generates ADRs (BRI-1624)
+- `## ADR Convention` section in CLAUDE.md documenting the `@` import pattern
+
+### Changed
+- Path A (non-technical) in project-start now creates ADRs in `docs/decisions/` instead of a TECHNICAL.md file
+
 ## [3.6.0] - 2026-02-28
 
 ### Added

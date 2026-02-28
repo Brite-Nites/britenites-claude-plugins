@@ -162,6 +162,10 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
 - `docs/testing-guide.md` — comprehensive testing guide (51 tests across 7 layers).
 
+## ADR Convention
+
+Architecture Decision Records live in `docs/decisions/NNN-kebab-title.md`. They are imported into CLAUDE.md via individual `@` imports (directory imports are not supported). The `/workflows:architecture-decision` command generates ADRs and auto-appends the import. `/workflows:project-start` generates ADRs for all major tech decisions made during the interview.
+
 ## Known Issues
 
 - **PreToolUse/PostToolUse hooks don't fire from plugins** — upstream Claude Code bug ([#6305](https://github.com/anthropics/claude-code/issues/6305)). Our hook definitions in `hooks/hooks.json` are correct; no changes needed on our side. SessionStart hooks work fine. Track the issue for updates.
