@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-02-27
+
+### Added
+- `/britenites:sprint-planning` command — pull backlog, review team velocity, interactively select issues, assign to Linear cycles (BRI-1623)
+- Sprint-planning added to SessionStart banner key commands
+
 ## [3.2.0] - 2026-02-27
 
 ### Changed
@@ -171,7 +177,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.2.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.3.0...HEAD
+[3.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.1...v3.1.0
 [3.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.0...v3.0.1
