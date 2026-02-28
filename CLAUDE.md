@@ -38,7 +38,7 @@ plugins/
 
 - **marketplace.json**: Registers plugins for distribution. Each plugin's `source` is a path relative to the repo root (e.g., `./plugins/britenites`).
 - **plugin.json**: Each plugin has metadata defining name, description, version, and author. See **plugin.json Schema** below — this is critical.
-- **Commands**: Markdown files in `commands/` become slash commands (e.g., `project-start.md` → `/project-start`).
+- **Commands**: Markdown files in `commands/` become slash commands (e.g., `sprint-planning.md` → `/sprint-planning`).
 - **Auto-discovery**: `agents/`, `hooks/hooks.json`, and `.mcp.json` are discovered by convention from the plugin root. Do NOT declare them in `plugin.json`.
 
 ## Adding New Commands

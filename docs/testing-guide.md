@@ -34,7 +34,7 @@ Run these outside Claude, from a regular terminal or CI.
 | T0.1 Structural validation | `bash scripts/validate.sh` | 0 errors (3 warnings for orphan agents are expected) |
 | T0.2 Hook regex tests | `bash scripts/test-hooks.sh` | 37/37 pass |
 | T0.3 Prerequisites check | `bash scripts/check-prereqs.sh` | All PASS (or explained SKIPs) |
-| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 13 commands found |
+| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 14 commands found |
 | T0.5 CI workflow | Push to branch, check GitHub Actions | All steps green |
 
 ---
@@ -43,7 +43,7 @@ Run these outside Claude, from a regular terminal or CI.
 
 | Test | Steps | Expected |
 |------|-------|----------|
-| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/britenites`, type `/britenites:` | 13 commands in autocomplete: `bug-report`, `code-review`, `deployment-checklist`, `onboarding-checklist`, `project-start`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `tech-stack` |
+| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/britenites`, type `/britenites:` | 14 commands in autocomplete: `bug-report`, `code-review`, `deployment-checklist`, `onboarding-checklist`, `project-start`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `sprint-planning`, `tech-stack` |
 | T1.2 SessionStart hook | Observe session start output | Environment banner with git/node/gh/npx status + key commands listed |
 | T1.3 Smoke test | Run `/britenites:smoke-test` | Summary table with PASS/FAIL/SKIP/KNOWN ISSUE for 8 checks (env, MCP, hooks, agents) |
 
@@ -206,7 +206,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 13 | T1.1, T3.1–T3.14 |
+| Commands | 14 | T1.1, T3.1–T3.14 |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
