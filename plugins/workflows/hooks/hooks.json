@@ -1,5 +1,5 @@
 {
-  "description": "Britenites plugin hooks — security guardrails, post-edit validation, and session context",
+  "description": "Brite plugin hooks — security guardrails, post-edit validation, and session context",
   "hooks": {
     "PreToolUse": [
       {
@@ -13,7 +13,7 @@
           },
           {
             "type": "prompt",
-            "prompt": "You are a security reviewer. Analyze this tool call for dangerous patterns. The tool input is: $ARGUMENTS\n\nCheck for:\n1. Destructive commands: rm -rf, git push --force, DROP TABLE, kill -9, chmod 777, mkfs, dd, format\n2. Piped downloads: curl|bash, wget|sh, or any pipe from a URL into a shell\n3. Credential exposure: commands that echo/print/log secrets, API keys, passwords, or tokens\n4. Unsafe network operations: downloading and executing unknown scripts\n\nIf ANY dangerous pattern is found, respond with {\"ok\": false, \"reason\": \"<specific risk description>\"}.\nIf the command is safe, respond with {\"ok\": true}.",
+            "prompt": "You are a security reviewer. Evaluate whether the Bash command in this tool call contains dangerous patterns.\n\nCheck for:\n1. Destructive commands: rm -rf, git push --force, DROP TABLE, kill -9, chmod 777, mkfs, dd, format\n2. Piped downloads: curl|bash, wget|sh, or any pipe from a URL into a shell\n3. Credential exposure: commands that echo/print/log secrets, API keys, passwords, or tokens\n4. Unsafe network operations: downloading and executing unknown scripts\n\nIf ANY dangerous pattern is found, respond with {\"ok\": false, \"reason\": \"<specific risk description>\"}.\nIf the command is safe, respond with {\"ok\": true}.",
             "model": "haiku",
             "timeout": 10,
             "statusMessage": "Security check..."
@@ -37,7 +37,7 @@
           },
           {
             "type": "prompt",
-            "prompt": "You are a security reviewer. Analyze this file write/edit for secrets or vulnerabilities. The tool input is: $ARGUMENTS\n\nCheck for:\n1. Hardcoded secrets: API keys, passwords, tokens, private keys, connection strings with credentials\n2. Patterns like: AKIA (AWS keys), sk- (Stripe/OpenAI keys), ghp_ (GitHub tokens), Bearer <token>, password=, secret=, key= followed by actual values\n3. .env file contents being written to non-.env files\n4. Dangerous code patterns: dynamic code execution with user input, innerHTML with unsanitized data, SQL string concatenation, shell command injection via string interpolation\n\nIf ANY security issue is found, respond with {\"ok\": false, \"reason\": \"<specific risk description>\"}.\nIf the content is safe, respond with {\"ok\": true}.",
+            "prompt": "You are a security reviewer. Evaluate whether the file content in this tool call contains secrets or vulnerabilities.\n\nCheck for:\n1. Hardcoded secrets: API keys, passwords, tokens, private keys, connection strings with credentials\n2. Patterns like: AKIA (AWS keys), sk- (Stripe/OpenAI keys), ghp_ (GitHub tokens), Bearer <token>, password=, secret=, key= followed by actual values\n3. .env file contents being written to non-.env files\n4. Dangerous code patterns: dynamic code execution with user input, innerHTML with unsanitized data, SQL string concatenation, shell command injection via string interpolation\n\nIf ANY security issue is found, respond with {\"ok\": false, \"reason\": \"<specific risk description>\"}.\nIf the content is safe, respond with {\"ok\": true}.",
             "model": "haiku",
             "timeout": 10,
             "statusMessage": "Security check..."
@@ -64,9 +64,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "printf '🔧 Britenites Session Context\\n\\n'; git_ok='✗'; node_ok='✗'; gh_ok='✗'; npx_ok='✗'; git_ver=''; node_ver=''; gh_user=''; if command -v git >/dev/null 2>&1; then git_ok='✓'; git_ver=\" ($(git --version 2>&1 | sed 's/git version //'))\"; fi; if command -v node >/dev/null 2>&1; then node_ok='✓'; node_ver=\" ($(node --version 2>&1))\"; fi; if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then gh_ok='✓'; gh_user=\" ($(gh api user --jq '.login' 2>/dev/null || echo 'authed'))\"; elif command -v gh >/dev/null 2>&1; then gh_ok='⚠'; gh_user=' (not authenticated — run gh auth login)'; fi; if command -v npx >/dev/null 2>&1; then npx_ok='✓'; fi; printf 'Environment:\\n  git ........... %s%s\\n  node .......... %s%s\\n  gh ............ %s%s\\n  npx ........... %s\\n\\n' \"$git_ok\" \"$git_ver\" \"$node_ok\" \"$node_ver\" \"$gh_ok\" \"$gh_user\" \"$npx_ok\"; printf 'Key commands:\\n  /britenites:sprint-planning — Plan sprint & assign to cycle\\n  /britenites:session-start — Pick issue & create execution plan\\n  /britenites:review — Run review agents in parallel\\n  /britenites:ship — Create PR & compound learnings\\n  /britenites:code-review — Quick code review\\n  /britenites:smoke-test — Diagnose plugin environment\\n\\nConventions: Check /britenites:tech-stack for the project stack. Use react-best-practices skill for React/Next.js work.\\n'",
+            "command": "printf '🔧 Brite Session Context\\n\\n'; git_ok='✗'; node_ok='✗'; gh_ok='✗'; npx_ok='✗'; git_ver=''; node_ver=''; gh_user=''; if command -v git >/dev/null 2>&1; then git_ok='✓'; git_ver=\" ($(git --version 2>&1 | sed 's/git version //'))\"; fi; if command -v node >/dev/null 2>&1; then node_ok='✓'; node_ver=\" ($(node --version 2>&1))\"; fi; if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then gh_ok='✓'; gh_user=\" ($(gh api user --jq '.login' 2>/dev/null || echo 'authed'))\"; elif command -v gh >/dev/null 2>&1; then gh_ok='⚠'; gh_user=' (not authenticated — run gh auth login)'; fi; if command -v npx >/dev/null 2>&1; then npx_ok='✓'; fi; printf 'Environment:\\n  git ........... %s%s\\n  node .......... %s%s\\n  gh ............ %s%s\\n  npx ........... %s\\n\\n' \"$git_ok\" \"$git_ver\" \"$node_ok\" \"$node_ver\" \"$gh_ok\" \"$gh_user\" \"$npx_ok\"; printf 'Key commands:\\n  /workflows:sprint-planning — Plan sprint & assign to cycle\\n  /workflows:session-start — Pick issue & create execution plan\\n  /workflows:review — Run review agents in parallel\\n  /workflows:ship — Create PR & compound learnings\\n  /workflows:code-review — Quick code review\\n  /workflows:smoke-test — Diagnose plugin environment\\n\\nConventions: Check /workflows:tech-stack for the project stack. Use react-best-practices for React/Next.js, python-best-practices for FastAPI/Python.\\n'",
             "timeout": 5,
-            "statusMessage": "Loading Britenites context..."
+            "statusMessage": "Loading Brite context..."
           }
         ]
       }

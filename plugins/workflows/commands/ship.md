@@ -84,7 +84,7 @@ The `best-practices-audit` skill activates to keep CLAUDE.md healthy:
 5. **Hook candidates** — Are there advisory rules that should be deterministic hooks?
 6. **Auto-fix** structural issues, flag content questions for the developer.
 
-Skip this step if CLAUDE.md wasn't modified in Step 4.
+Skip this step if the compound-learnings skill (Step 4) reported no CLAUDE.md changes.
 
 ## Step 6: Worktree Cleanup
 

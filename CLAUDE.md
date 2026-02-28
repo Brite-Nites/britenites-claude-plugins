@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Superpowers methodology + compound engineering + Linear integration.** A Process + Org plugin for the Britenites organization — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
+**Superpowers methodology + compound engineering + Linear integration.** A Process + Org plugin for the Brite organization — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
 ## Linear Project
 
-Project: Brite Claude Code Plugin
+Project: Brite Plugin Marketplace
 
 ## Plugin Philosophy
 
@@ -22,7 +22,7 @@ Project: Brite Claude Code Plugin
 .claude-plugin/marketplace.json    # Plugin registry - defines available plugins
 .github/workflows/                 # CI/CD validation
 plugins/
-  britenites/
+  workflows/
     .claude-plugin/plugin.json     # Plugin metadata (name, version, author)
     commands/
       *.md                         # Command definitions (markdown format)
@@ -36,14 +36,14 @@ plugins/
 
 ## How the Plugin System Works
 
-- **marketplace.json**: Registers plugins for distribution. Each plugin's `source` is a path relative to the repo root (e.g., `./plugins/britenites`).
+- **marketplace.json**: Registers plugins for distribution. Each plugin's `source` is a path relative to the repo root (e.g., `./plugins/workflows`).
 - **plugin.json**: Each plugin has metadata defining name, description, version, and author. See **plugin.json Schema** below — this is critical.
 - **Commands**: Markdown files in `commands/` become slash commands (e.g., `sprint-planning.md` → `/sprint-planning`).
 - **Auto-discovery**: `agents/`, `hooks/hooks.json`, and `.mcp.json` are discovered by convention from the plugin root. Do NOT declare them in `plugin.json`.
 
 ## Adding New Commands
 
-1. Create a new `.md` file in `plugins/britenites/commands/`
+1. Create a new `.md` file in `plugins/workflows/commands/`
 2. Add YAML frontmatter with `description` field
 3. Write the command instructions in markdown
 
@@ -82,7 +82,7 @@ Rules:
 
 ## Hooks
 
-The plugin includes hooks in `plugins/britenites/hooks/hooks.json` (auto-loaded by Claude Code — do NOT add a `hooks` field to `plugin.json`):
+The plugin includes hooks in `plugins/workflows/hooks/hooks.json` (auto-loaded by Claude Code — do NOT add a `hooks` field to `plugin.json`):
 
 - **PreToolUse (Bash)**: Two-layer security — regex command hook (deterministic, blocks `rm -rf`, `--force`, `DROP`, `chmod 777`, piped downloads) runs first, then Haiku prompt hook as fallback
 - **PreToolUse (Bash)**: Pre-commit quality — intercepts `git commit` commands, detects project type (`package.json` → JS/TS, `pyproject.toml`/`setup.py` → Python), runs linters on staged files only (ESLint, `tsc --noEmit`, Ruff). Degrades gracefully if no linters installed. Note: inactive from plugins until upstream [#6305](https://github.com/anthropics/claude-code/issues/6305) is fixed.
@@ -159,8 +159,8 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/test-hooks.sh` — tests security and quality hook regex patterns against 37 known inputs. Run in CI.
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
-- `/britenites:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
-- `docs/testing-guide.md` — comprehensive testing guide (49 tests across 7 layers).
+- `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
+- `docs/testing-guide.md` — comprehensive testing guide (51 tests across 7 layers).
 
 ## Known Issues
 
