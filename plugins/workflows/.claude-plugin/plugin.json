@@ -1,0 +1,26 @@
+{
+  "name": "workflows",
+  "description": "Process + Org plugin — structured workflow methodology with Linear integration",
+  "author": {
+    "name": "Brite"
+  },
+  "homepage": "https://github.com/brite-nites/brite-claude-plugins",
+  "repository": "https://github.com/brite-nites/brite-claude-plugins",
+  "license": "MIT",
+  "version": "3.5.0",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "process",
+    "workflow",
+    "linear",
+    "code-review",
+    "hooks",
+    "tdd",
+    "compound-engineering",
+    "session-workflow",
+    "review-agents"
+  ],
+  "commands": "./commands/",
+  "skills": "./skills/"
+}

@@ -1,8 +1,8 @@
 # Getting Started
 
-Developer setup for working on the Britenites Claude Plugins repo itself.
+Developer setup for working on the Brite Claude Plugins repo itself.
 
-> **Not what you're looking for?** If you want to set up a project that *uses* these plugins, run `/britenites:onboarding-checklist` instead. This guide is for people modifying the plugin bundle.
+> **Not what you're looking for?** If you want to set up a project that *uses* these plugins, run `/workflows:onboarding-checklist` instead. This guide is for people modifying the plugin bundle.
 
 ## Prerequisites
 
@@ -18,8 +18,8 @@ Developer setup for working on the Britenites Claude Plugins repo itself.
 ## Clone and Setup
 
 ```bash
-git clone https://github.com/Brite-Nites/britenites-claude-plugins.git
-cd britenites-claude-plugins
+git clone https://github.com/Brite-Nites/brite-claude-plugins.git
+cd brite-claude-plugins
 ```
 
 That's it. There is no `npm install`, no build step, no dependencies to install. The plugin is pure markdown and JSON.
@@ -40,8 +40,8 @@ Add to `~/.claude/settings.json`:
 {
   "plugins": [
     {
-      "source": "/absolute/path/to/britenites-claude-plugins",
-      "plugins": ["britenites"]
+      "source": "/absolute/path/to/brite-claude-plugins",
+      "plugins": ["workflows"]
     }
   ]
 }
@@ -55,7 +55,7 @@ Add to `~/.claude/settings.json`:
    claude
    ```
 
-2. **Check commands**: Type `/britenites:` — you should see:
+2. **Check commands**: Type `/workflows:` — you should see:
    - `session-start` — pick a Linear issue and plan the work
    - `review` — run review agents and fix P1s
    - `ship` — create PR, update Linear, compound learnings
@@ -66,9 +66,9 @@ Add to `~/.claude/settings.json`:
    - `setup-claude-md` — generate a CLAUDE.md for the current project
    - `smoke-test` — run in-session diagnostics (env, MCP, hooks, agents)
 
-3. **Check SessionStart hook**: On session start, you should see "Loading Britenites context..." as a status message.
+3. **Check SessionStart hook**: On session start, you should see "Loading Brite context..." as a status message.
 
-4. **Test a command**: Run `/britenites:tech-stack` and verify it responds with the Britenites tech stack.
+4. **Test a command**: Run `/workflows:tech-stack` and verify it responds with the Brite tech stack.
 
 ## MCP Server Verification
 
@@ -90,7 +90,7 @@ If the Linear server isn't connecting, check that you have a Linear account and 
 
 ## Testing Changes
 
-1. **Edit** any markdown or JSON file in `plugins/britenites/`
+1. **Edit** any markdown or JSON file in `plugins/workflows/`
 2. **Restart** your Claude Code session (changes are loaded at session start)
 3. **Verify** the change took effect:
    - Commands: check the slash menu
@@ -102,8 +102,8 @@ If the Linear server isn't connecting, check that you have a Linear account and 
 
 ```bash
 python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
-python3 -m json.tool plugins/britenites/.claude-plugin/plugin.json > /dev/null
-python3 -m json.tool plugins/britenites/hooks/hooks.json > /dev/null
+python3 -m json.tool plugins/workflows/.claude-plugin/plugin.json > /dev/null
+python3 -m json.tool plugins/workflows/hooks/hooks.json > /dev/null
 ```
 
 ### Run validation scripts
@@ -118,7 +118,7 @@ bash scripts/check-prereqs.sh  # Runtime prerequisites
 
 ```
 .claude-plugin/marketplace.json    # Plugin registry
-plugins/britenites/
+plugins/workflows/
   .claude-plugin/plugin.json       # Plugin metadata (name, version, author)
   commands/*.md                    # 9 slash commands
   skills/*/SKILL.md                # 10 skills (6 user-invocable, 4 internal)

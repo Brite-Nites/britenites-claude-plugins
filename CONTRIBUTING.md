@@ -16,27 +16,27 @@ If you're unsure whether something belongs here, ask: "Is this about *how* we wo
 
 ### Add a command
 
-1. Create `plugins/britenites/commands/my-command.md`
+1. Create `plugins/workflows/commands/my-command.md`
 2. Add YAML frontmatter with `description`
 3. Write instructions in markdown — use `$ARGUMENTS` for user input
 
 ### Add a skill
 
-1. Create `plugins/britenites/skills/my-skill/SKILL.md`
+1. Create `plugins/workflows/skills/my-skill/SKILL.md`
 2. Add frontmatter matching the [standard](#skillmd-frontmatter-standard) below
 3. Ensure `name` matches the directory name exactly
 4. Write skill instructions in markdown
 
 ### Add an agent
 
-1. Create `plugins/britenites/agents/my-agent.md`
+1. Create `plugins/workflows/agents/my-agent.md`
 2. Add frontmatter: `name`, `description`, `model`, `tools`
 3. Write system prompt with role and principles
 4. Reference from a skill via `agent: my-agent` in the skill's frontmatter
 
 ### Add a hook
 
-1. Edit `plugins/britenites/hooks/hooks.json`
+1. Edit `plugins/workflows/hooks/hooks.json`
 2. Add to the appropriate event (`PreToolUse`, `PostToolUse`, `SessionStart`)
 3. Choose type: `prompt` (LLM-evaluated) or `command` (shell script)
 4. Set a `matcher` regex for which tools trigger the hook
@@ -146,7 +146,7 @@ To run validation automatically before every push:
 
 ### Manual testing
 
-After `./scripts/validate.sh` passes, see [`docs/testing-guide.md`](docs/testing-guide.md) for the full interactive testing checklist (49 tests across 7 layers). For quick validation, use the **Quick Smoke Subset** section (~10 min).
+After `./scripts/validate.sh` passes, see [`docs/testing-guide.md`](docs/testing-guide.md) for the full interactive testing checklist (51 tests across 7 layers). For quick validation, use the **Quick Smoke Subset** section (~10 min).
 
 ## Versioning
 

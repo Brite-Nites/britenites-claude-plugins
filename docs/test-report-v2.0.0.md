@@ -1,4 +1,4 @@
-# Live Test Report — Britenites Plugin v2.0.0
+# Live Test Report — Brite Plugin v2.0.0
 
 **Date**: 2026-02-24 (updated after session restart)
 **Tester**: Claude Opus 4.6 (automated)
@@ -29,7 +29,7 @@ After the session restart, the plugin loads correctly:
 
 **What**: The britenites plugin was registered as a marketplace in `known_marketplaces.json` but was NOT present in `installed_plugins.json` or `settings.json` `enabledPlugins`.
 
-**Fix Applied**: Added `britenites@britenites-claude-plugins` to both config files. **Verified working after restart.**
+**Fix Applied**: Added `britenites@brite-claude-plugins` to both config files. **Verified working after restart.**
 
 ### Issue 2: v2.0.0 Files Not Committed (FIXED — Session 1)
 
@@ -71,7 +71,7 @@ This gives deterministic blocking for known patterns, with Haiku as a second-lay
 
 | Test | Status | Notes |
 |------|--------|-------|
-| T1.1 SessionStart Hook | PASS | Hook configured with `"Loading Britenites context..."` status. Plugin loaded and enabled in this session. |
+| T1.1 SessionStart Hook | PASS | Hook configured with `"Loading Brite context..."` status. Plugin loaded and enabled in this session. |
 | T1.2 All 7 Commands | PASS | All 7 commands visible: project-start, tech-stack, code-review, onboarding-checklist, session-start, review, ship |
 | T1.3 Safe Bash Command | PASS | `echo hello` executed successfully, passed security check |
 | T1.4 Dangerous Bash Command | FAIL | `rm -rf /tmp/test-dangerous` NOT blocked — Haiku false negative (see Issue 3) |
@@ -82,10 +82,10 @@ This gives deterministic blocking for known patterns, with Haiku as a second-lay
 
 | Test | Status | Notes |
 |------|--------|-------|
-| T2.1 `/britenites:tech-stack` | PASS | Full stack displayed with all sections |
-| T2.2 `/britenites:code-review` (no args) | PASS | Checked git diff, correct empty-state behavior |
-| T2.3 `/britenites:code-review` (with args) | PARTIAL | Command loads. No live PR available for full test. |
-| T2.4 `/britenites:onboarding-checklist` | PASS | Interactive checklist started, tool checks ran |
+| T2.1 `/workflows:tech-stack` | PASS | Full stack displayed with all sections |
+| T2.2 `/workflows:code-review` (no args) | PASS | Checked git diff, correct empty-state behavior |
+| T2.3 `/workflows:code-review` (with args) | PARTIAL | Command loads. No live PR available for full test. |
+| T2.4 `/workflows:onboarding-checklist` | PASS | Interactive checklist started, tool checks ran |
 
 ### Tier 3: New Commands (Smoke Tests)
 
@@ -141,7 +141,7 @@ All 3 agents confirmed: dispatch in parallel, respond with correct identity, hav
 | `AskUserQuestion` | Available |
 | Plugin hooks (PreToolUse) | Firing — but Haiku false negatives |
 | Plugin hooks (PostToolUse) | Firing — linter runs on .ts/.js writes |
-| Plugin hooks (SessionStart) | Configured — loads Britenites context |
+| Plugin hooks (SessionStart) | Configured — loads Brite context |
 
 ---
 
@@ -149,10 +149,10 @@ All 3 agents confirmed: dispatch in parallel, respond with correct identity, hav
 
 ### Session 1 (pre-restart)
 1. **Created** `release/v2.0.0` branch with all v2.0.0 changes committed
-2. **Synced** marketplace cache (`~/.claude/plugins/marketplaces/britenites-claude-plugins/`) with local files
-3. **Created** v2.0.0 cache entry (`~/.claude/plugins/cache/britenites-claude-plugins/britenites/2.0.0/`)
-4. **Added** `britenites@britenites-claude-plugins` to `installed_plugins.json`
-5. **Enabled** `britenites@britenites-claude-plugins: true` in `settings.json`
+2. **Synced** marketplace cache (`~/.claude/plugins/marketplaces/brite-claude-plugins/`) with local files
+3. **Created** v2.0.0 cache entry (`~/.claude/plugins/cache/brite-claude-plugins/workflows/2.0.0/`)
+4. **Added** `britenites@brite-claude-plugins` to `installed_plugins.json`
+5. **Enabled** `britenites@brite-claude-plugins: true` in `settings.json`
 
 ### Session 2 (post-restart)
 6. **Verified** all Session 1 fixes took effect

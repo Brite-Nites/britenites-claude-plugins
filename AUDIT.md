@@ -1,8 +1,8 @@
-# Plugin Best Practices Audit — Britenites Claude Plugins
+# Plugin Best Practices Audit — Brite Claude Plugins
 
 ## Context
 
-Compared the full britenites-claude-plugins codebase against the official Claude Code plugin reference docs (plugins-reference, plugins, plugin-marketplaces, skills, sub-agents). The goal is to identify deviations from best practices and spec compliance issues.
+Compared the full brite-claude-plugins codebase against the official Claude Code plugin reference docs (plugins-reference, plugins, plugin-marketplaces, skills, sub-agents). The goal is to identify deviations from best practices and spec compliance issues.
 
 ---
 
@@ -28,15 +28,15 @@ Compared the full britenites-claude-plugins codebase against the official Claude
 ### 1. ~~`pluginRoot` + `source` may cause double-pathing~~ RESOLVED
 **Files:** `.claude-plugin/marketplace.json`
 
-**Resolution:** `pluginRoot` removed from marketplace.json metadata. Source path `./plugins/britenites` is the full relative path. Fixed in v2.0.0.
+**Resolution:** `pluginRoot` removed from marketplace.json metadata. Source path `./plugins/workflows` is the full relative path. Fixed in v2.0.0.
 
 ### 2. ~~`agents/` directory not declared in plugin.json~~ RESOLVED
-**Files:** `plugins/britenites/.claude-plugin/plugin.json`
+**Files:** `plugins/workflows/.claude-plugin/plugin.json`
 
 **Resolution:** Added `"agents": "./agents/"` to plugin.json. 7 agents now declared and discoverable. Fixed in v2.0.0.
 
 ### 3. ~~`argument-hint` is nested under `metadata` instead of being top-level~~ RESOLVED
-**Files:** `plugins/britenites/skills/web-design-guidelines/SKILL.md`
+**Files:** `plugins/workflows/skills/web-design-guidelines/SKILL.md`
 
 **Resolution:** `argument-hint` is already at top-level in the current file. Verified in v2.0.0.
 
@@ -55,7 +55,7 @@ Compared the full britenites-claude-plugins codebase against the official Claude
 ## WARNINGS (works but doesn't follow best practice)
 
 ### 1. Version set in plugin.json instead of marketplace.json
-**Files:** `plugins/britenites/.claude-plugin/plugin.json`
+**Files:** `plugins/workflows/.claude-plugin/plugin.json`
 **Reference:** Plugin marketplaces docs — "For relative-path plugins, set version in marketplace entry"
 
 Version `1.5.0` is in plugin.json. For relative-path plugins (which this is), the docs recommend setting version in the marketplace entry instead. If someone later adds a version to marketplace.json, plugin.json silently wins, causing confusion.
@@ -74,7 +74,7 @@ CI checks for `name`, `description`, `version`, AND `author` as required. This i
 
 ### 4. ~~No `LICENSE` file at plugin root~~ RESOLVED
 
-LICENSE file exists at `plugins/britenites/LICENSE`.
+LICENSE file exists at `plugins/workflows/LICENSE`.
 
 ---
 
@@ -91,7 +91,7 @@ LICENSE file exists at `plugins/britenites/LICENSE`.
 6. **Move version to marketplace.json** — Open: version is in both plugin.json and marketplace.json. Low priority.
 
 ### P2 — Address when convenient
-7. ~~**Add LICENSE file**~~ — Resolved: exists at `plugins/britenites/LICENSE`
+7. ~~**Add LICENSE file**~~ — Resolved: exists at `plugins/workflows/LICENSE`
 8. **Consider migrating commands to skills** — Open: `code-review` and `tech-stack` are candidates
 9. **Document CI over-validation** — Open: add comment noting stricter-than-spec validation is intentional
 
@@ -101,9 +101,9 @@ LICENSE file exists at `plugins/britenites/LICENSE`.
 
 After making changes:
 1. Run `claude plugin validate .` from the repo root
-2. Test with `claude --plugin-dir ./plugins/britenites` and verify:
+2. Test with `claude --plugin-dir ./plugins/workflows` and verify:
    - All skills appear in `/help`
    - Agents appear in `/agents`
-   - Try invoking `/britenites:post-plan-setup` to test agent delegation
-   - Try invoking `/britenites:agent-browser` to test allowed-tools
+   - Try invoking `/workflows:post-plan-setup` to test agent delegation
+   - Try invoking `/workflows:agent-browser` to test allowed-tools
 3. Run the CI workflow to ensure validation passes

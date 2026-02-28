@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues and solutions when developing or using the Britenites Claude Plugins.
+Common issues and solutions when developing or using the Brite Claude Plugins.
 
 ## Skills Not Triggering
 
@@ -8,7 +8,7 @@ Common issues and solutions when developing or using the Britenites Claude Plugi
 
 **Check these:**
 
-1. **Plugin not loaded** — Start a new Claude Code session and type `/britenites:`. If no commands appear, the plugin isn't installed. See [Getting Started](getting-started.md).
+1. **Plugin not loaded** — Start a new Claude Code session and type `/workflows:`. If no commands appear, the plugin isn't installed. See [Getting Started](getting-started.md).
 
 2. **Description mismatch** — Skills are matched by their `description` field. If your prompt doesn't align with the skill's description, Claude won't select it. Check the skill's `SKILL.md` frontmatter for the exact trigger language.
 
@@ -67,19 +67,19 @@ Common issues and solutions when developing or using the Britenites Claude Plugi
 
 ## Plugin Not Loading
 
-**Symptom:** `/britenites:` shows nothing in the slash menu.
+**Symptom:** `/workflows:` shows nothing in the slash menu.
 
 **Check these:**
 
 1. **Malformed JSON** — Validate all JSON files:
    ```bash
    python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
-   python3 -m json.tool plugins/britenites/.claude-plugin/plugin.json > /dev/null
+   python3 -m json.tool plugins/workflows/.claude-plugin/plugin.json > /dev/null
    ```
 
 2. **Missing required fields** — `plugin.json` must have `name`, `description`, `version`, and `author`.
 
-3. **Source path** — The plugin `source` in `marketplace.json` must be the full relative path (e.g., `./plugins/britenites`). Do not use a separate `pluginRoot` field.
+3. **Source path** — The plugin `source` in `marketplace.json` must be the full relative path (e.g., `./plugins/workflows`). Do not use a separate `pluginRoot` field.
 
 4. **Installation method** — If installed via `settings.json`, the `source` path must be absolute. Relative paths may not resolve correctly.
 
@@ -92,7 +92,7 @@ Each command now verifies its critical dependencies before running:
 - **review**: Checks agent dispatch (Task tool) with a trivial ping
 - **ship**: Checks `gh auth status` and GitHub repo connectivity
 
-**Fix:** Run `/britenites:smoke-test` for a full diagnostic. It will identify exactly which dependency is failing and suggest remediation.
+**Fix:** Run `/workflows:smoke-test` for a full diagnostic. It will identify exactly which dependency is failing and suggest remediation.
 
 ## Stale Plugin Cache After Update
 
@@ -103,9 +103,9 @@ Each command now verifies its critical dependencies before running:
 **Fix:**
 1. Delete the old cache directory:
    ```bash
-   rm -rf ~/.claude/plugins/cache/britenites-claude-plugins/britenites/<old-version>
+   rm -rf ~/.claude/plugins/cache/brite-claude-plugins/workflows/<old-version>
    ```
-2. Run `claude plugins update britenites@britenites-claude-plugins`
+2. Run `claude plugins update workflows@brite-claude-plugins`
 3. Start a new session
 
 **Prevention:** Always bump the version in both `plugin.json` and `marketplace.json` when making changes that need to reach installed users.
@@ -156,7 +156,7 @@ Checking hooks.json is valid JSON... ERROR
 
 Run locally to see the specific error:
 ```bash
-python3 -m json.tool plugins/britenites/hooks/hooks.json
+python3 -m json.tool plugins/workflows/hooks/hooks.json
 ```
 
 Common causes: trailing commas, missing quotes, unescaped characters in prompt strings.

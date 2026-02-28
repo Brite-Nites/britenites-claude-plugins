@@ -1,6 +1,6 @@
 # Roadmap
 
-Development plan for the Britenites Claude Plugins bundle.
+Development plan for the Brite Claude Plugins bundle.
 
 For detailed issue tracking, see the [Linear project](https://linear.app/brite-nites/project/brite-claude-code-plugin-402b57908532).
 
@@ -18,7 +18,7 @@ Influenced by [superpowers](https://github.com/obra/superpowers) and [compound-e
 
 ## The Three Workflows
 
-### 1. Greenfield: `/britenites:project-start`
+### 1. Greenfield: `/workflows:project-start`
 Runs once per project. Creates everything from scratch.
 ```
 project-start → post-plan-setup (refine → issues → CLAUDE.md) → ready for sessions
@@ -31,7 +31,7 @@ session-start → brainstorm → plan → [worktree] → execute (subagent-per-t
 ```
 **User runs 3 commands**: session-start, review, ship. Everything else is skills that activate in sequence.
 
-### 3. Direction-Setting: `/britenites:scope`
+### 3. Direction-Setting: `/workflows:scope`
 Collaborative creative session for deciding *what to build next*. Produces Linear issues.
 ```
 scope → [Socratic discovery] → [ideation] → [Linear issue creation] → [prioritization]
@@ -117,8 +117,8 @@ Tooling and templates for domain-specific plugins.
 
 Domain-specific knowledge lives in **separate plugins**:
 
-- `britenites-shopify` — Shopify Plus / Liquid patterns
-- `britenites-data` — dbt, BigQuery, Prefect patterns
-- `britenites-hubspot` — HubSpot CRM integration patterns
+- `brite-shopify` — Shopify Plus / Liquid patterns
+- `brite-data` — dbt, BigQuery, Prefect patterns
+- `brite-hubspot` — HubSpot CRM integration patterns
 
 Each domain plugin is its own repo, scaffolded from the template in Milestone 5.

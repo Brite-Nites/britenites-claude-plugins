@@ -1,17 +1,17 @@
 {
-  "name": "britenites-claude-plugins",
+  "name": "brite-claude-plugins",
   "owner": {
-    "name": "Britenites"
+    "name": "Brite"
   },
   "metadata": {
-    "description": "Claude Code plugins for the Britenites organization"
+    "description": "Claude Code plugins for the Brite organization"
   },
   "plugins": [
     {
-      "name": "britenites",
-      "source": "./plugins/britenites",
+      "name": "workflows",
+      "source": "./plugins/workflows",
       "description": "Process + Org plugin — structured workflow methodology with Linear integration",
-      "version": "3.3.0"
+      "version": "3.5.0"
     }
   ]
 }

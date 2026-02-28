@@ -1,6 +1,6 @@
 # Comprehensive Testing Guide
 
-Complete testing reference for the Britenites Claude Code plugin. Covers automated validation, interactive skill/command testing, end-to-end flows, hooks, and agent dispatch.
+Complete testing reference for the Brite Claude Code plugin. Covers automated validation, interactive skill/command testing, end-to-end flows, hooks, and agent dispatch.
 
 Use this guide when working on the plugin itself or when verifying behavior after changes.
 
@@ -34,7 +34,7 @@ Run these outside Claude, from a regular terminal or CI.
 | T0.1 Structural validation | `bash scripts/validate.sh` | 0 errors (3 warnings for orphan agents are expected) |
 | T0.2 Hook regex tests | `bash scripts/test-hooks.sh` | 37/37 pass |
 | T0.3 Prerequisites check | `bash scripts/check-prereqs.sh` | All PASS (or explained SKIPs) |
-| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 14 commands found |
+| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 15 commands found |
 | T0.5 CI workflow | Push to branch, check GitHub Actions | All steps green |
 
 ---
@@ -43,9 +43,9 @@ Run these outside Claude, from a regular terminal or CI.
 
 | Test | Steps | Expected |
 |------|-------|----------|
-| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/britenites`, type `/britenites:` | 14 commands in autocomplete: `bug-report`, `code-review`, `deployment-checklist`, `onboarding-checklist`, `project-start`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `sprint-planning`, `tech-stack` |
+| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/workflows`, type `/workflows:` | 15 commands in autocomplete: `bug-report`, `code-review`, `create-plugin`, `deployment-checklist`, `onboarding-checklist`, `project-start`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `sprint-planning`, `tech-stack` |
 | T1.2 SessionStart hook | Observe session start output | Environment banner with git/node/gh/npx status + key commands listed |
-| T1.3 Smoke test | Run `/britenites:smoke-test` | Summary table with PASS/FAIL/SKIP/KNOWN ISSUE for 8 checks (env, MCP, hooks, agents) |
+| T1.3 Smoke test | Run `/workflows:smoke-test` | Summary table with PASS/FAIL/SKIP/KNOWN ISSUE for 8 checks (env, MCP, hooks, agents) |
 
 ---
 
@@ -90,40 +90,42 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Test | Command | Steps | Expected |
 |------|---------|-------|----------|
-| T3.1 | `/britenites:tech-stack` | Run it | Technology stack tables displayed (no external deps) |
-| T3.2 | `/britenites:onboarding-checklist` | Run, answer first 2 prompts, then abort | Interactive checklist with `[x]` tracking |
+| T3.1 | `/workflows:tech-stack` | Run it | Technology stack tables displayed (no external deps) |
+| T3.2 | `/workflows:onboarding-checklist` | Run, answer first 2 prompts, then abort | Interactive checklist with `[x]` tracking |
 
 ### Requires Linear MCP
 
 | Test | Command | Steps | Expected |
 |------|---------|-------|----------|
-| T3.3 | `/britenites:session-start` | Run → Step 0 passes → issue table shows → select issue → plan generated | Abort after plan is presented (before worktree/execution). Verify: MCP check passes, issues load, plan has tasks with file paths |
-| T3.4 | `/britenites:scope` | Run → Step 0 passes → answer 2-3 interview questions → themes presented | Abort after themes. Verify: MCP check passes, Socratic questions asked via AskUserQuestion, themes use sequential-thinking |
-| T3.5 | `/britenites:bug-report` | Run with a test bug title → fill in details → approve draft | Verify: Linear issue created with Bug label, structured description, environment table. **Cleanup:** delete the test issue in Linear |
+| T3.3 | `/workflows:session-start` | Run → Step 0 passes → issue table shows → select issue → plan generated | Abort after plan is presented (before worktree/execution). Verify: MCP check passes, issues load, plan has tasks with file paths |
+| T3.4 | `/workflows:scope` | Run → Step 0 passes → answer 2-3 interview questions → themes presented | Abort after themes. Verify: MCP check passes, Socratic questions asked via AskUserQuestion, themes use sequential-thinking |
+| T3.5 | `/workflows:bug-report` | Run with a test bug title → fill in details → approve draft | Verify: Linear issue created with Bug label, structured description, environment table. **Cleanup:** delete the test issue in Linear |
+| T3.16 | `/workflows:sprint-planning` | Run → Step 0 passes → project resolved → velocity shown → backlog displayed → select issues via sequential-thinking | Abort after selection. Verify: MCP prereqs pass, cycle data loads, backlog shows Todo + Backlog issues, velocity calculation uses completed cycles only |
 
 ### Requires Changes on a Branch
 
 | Test | Command | Setup | Steps | Expected |
 |------|---------|-------|-------|----------|
-| T3.6 | `/britenites:code-review` | Make a small code change | Run without args | Quick review with P1/P2/P3 findings on current diff |
-| T3.7 | `/britenites:code-review --deep` | Same branch | Run with `--deep` | 3 review agents dispatched in parallel, merged report |
-| T3.8 | `/britenites:review` | Same branch | Run → Step 0 agent dispatch check → self-verify → 3 agents → report | Full review report with verdict |
-| T3.9 | `/britenites:security-audit` | Any project | Run | Automated checks (deps, secrets, env) + agent review + health grade (A–F) |
-| T3.10 | `/britenites:security-audit --quick` | Any project | Run with `--quick` | Automated checks only (no agent dispatch), faster |
+| T3.6 | `/workflows:code-review` | Make a small code change | Run without args | Quick review with P1/P2/P3 findings on current diff |
+| T3.7 | `/workflows:code-review --deep` | Same branch | Run with `--deep` | 3 review agents dispatched in parallel, merged report |
+| T3.8 | `/workflows:review` | Same branch | Run → Step 0 agent dispatch check → self-verify → 3 agents → report | Full review report with verdict |
+| T3.9 | `/workflows:security-audit` | Any project | Run | Automated checks (deps, secrets, env) + agent review + health grade (A–F) |
+| T3.10 | `/workflows:security-audit --quick` | Any project | Run with `--quick` | Automated checks only (no agent dispatch), faster |
 
 ### Requires gh CLI + Committed Changes
 
 | Test | Command | Setup | Steps | Expected |
 |------|---------|-------|-------|----------|
-| T3.11 | `/britenites:ship` | Committed changes on a branch | Run → gh auth check → pre-ship checks → PR created → Linear updated → compound learnings → session summary | PR URL returned, Linear issue moved to "In Review". **Cleanup:** delete test PR |
-| T3.12 | `/britenites:deployment-checklist` | Any project with package.json | Run | Deployment Confidence Report table with READY/CAUTION/BLOCKED |
+| T3.11 | `/workflows:ship` | Committed changes on a branch | Run → gh auth check → pre-ship checks → PR created → Linear updated → compound learnings → session summary | PR URL returned, Linear issue moved to "In Review". **Cleanup:** delete test PR |
+| T3.12 | `/workflows:deployment-checklist` | Any project with package.json | Run | Deployment Confidence Report table with READY/CAUTION/BLOCKED |
 
 ### Creates Files (use temp directory)
 
 | Test | Command | Setup | Steps | Expected |
 |------|---------|-------|-------|----------|
-| T3.13 | `/britenites:project-start` | `mkdir /tmp/test-project && cd /tmp/test-project` | Run → select "Technical collaborator" → answer 2-3 questions | Abort before file creation. Verify: interview follows Path B |
-| T3.14 | `/britenites:setup-claude-md` | Any project | Run | CLAUDE.md generated/updated with required sections. Agent dispatched |
+| T3.13 | `/workflows:create-plugin` | In the plugin repo | Run with `test-plugin` → provide description → scaffold created → validate.sh passes | Verify: `plugins/test-plugin/` created, marketplace.json updated, validation passes. **Cleanup:** remove `plugins/test-plugin/`, revert marketplace.json |
+| T3.14 | `/workflows:project-start` | `mkdir /tmp/test-project && cd /tmp/test-project` | Run → select "Technical collaborator" → answer 2-3 questions | Abort before file creation. Verify: interview follows Path B |
+| T3.15 | `/workflows:setup-claude-md` | Any project | Run | CLAUDE.md generated/updated with required sections. Agent dispatched |
 
 ---
 
@@ -133,14 +135,14 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 **Prerequisites:** Linear project with an open issue, gh authenticated, test repo
 
-1. `/britenites:session-start` → select an issue
+1. `/workflows:session-start` → select an issue
 2. Observe `brainstorming` activates (if non-trivial) → approve design doc
 3. Observe `writing-plans` activates → review plan with tasks → approve
 4. Observe `git-worktrees` activates → worktree created with issue ID branch
 5. Observe `executing-plans` activates → subagents dispatched per task → TDD enforced
 6. Observe `verification-before-completion` runs at checkpoints
-7. `/britenites:review` → 3 agents run → P1s fixed → verdict
-8. `/britenites:ship` → PR created → Linear updated → `compound-learnings` runs → `best-practices-audit` runs (if CLAUDE.md changed) → session summary
+7. `/workflows:review` → 3 agents run → P1s fixed → verdict
+8. `/workflows:ship` → PR created → Linear updated → `compound-learnings` runs → `best-practices-audit` runs (if CLAUDE.md changed) → session summary
 
 **Cleanup:** Delete test PR, remove worktree, clean up generated files.
 
@@ -148,9 +150,9 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 **Prerequisites:** Empty directory, Linear MCP
 
-1. `/britenites:project-start` → complete full interview
+1. `/workflows:project-start` → complete full interview
 2. Verify: CLAUDE.md created, `docs/project-plan-v1.md` created, Linear project created
-3. `/britenites:post-plan-setup` → refine-plan runs → approve → create-issues runs → approve → setup-claude-md runs → approve
+3. `/workflows:post-plan-setup` → refine-plan runs → approve → create-issues runs → approve → setup-claude-md runs → approve
 4. Verify: `docs/project-plan-refined.md` exists, Linear issues created with dependencies, CLAUDE.md updated
 
 **Cleanup:** Delete test Linear project and issues.
@@ -159,7 +161,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 **Prerequisites:** Linear project with existing issues
 
-1. `/britenites:scope` → answer interview questions → themes generated → select items → issues created → prioritization table
+1. `/workflows:scope` → answer interview questions → themes generated → select items → issues created → prioritization table
 2. Verify: Linear issues created with acceptance criteria, relationships set, deferred ideas in memory
 
 **Cleanup:** Delete test issues.
@@ -192,13 +194,13 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Test | Agent | How to trigger | Expected output |
 |------|-------|----------------|-----------------|
-| T6.1 | `code-reviewer` | `/britenites:review` or `/britenites:code-review --deep` | P1/P2/P3 findings with file:line references |
-| T6.2 | `security-reviewer` | `/britenites:review` or `/britenites:security-audit` | Security findings with Attack/Impact/Fix + Risk Level |
-| T6.3 | `typescript-reviewer` | `/britenites:review` | TypeScript/React/Next.js findings |
-| T6.4 | `claude-md-generator` | `/britenites:setup-claude-md` | CLAUDE.md generated with required sections |
-| T6.5 | `plan-refiner` | `/britenites:post-plan-setup` Phase 1 | Refined plan with agent-ready tasks |
-| T6.6 | `issue-creator` | `/britenites:post-plan-setup` Phase 2 | Linear issues created with structured descriptions |
-| T6.7 | `post-plan-orchestrator` | `/britenites:post-plan-setup` | Orchestrates phases 1–3 with review gates |
+| T6.1 | `code-reviewer` | `/workflows:review` or `/workflows:code-review --deep` | P1/P2/P3 findings with file:line references |
+| T6.2 | `security-reviewer` | `/workflows:review` or `/workflows:security-audit` | Security findings with Attack/Impact/Fix + Risk Level |
+| T6.3 | `typescript-reviewer` | `/workflows:review` | TypeScript/React/Next.js findings |
+| T6.4 | `claude-md-generator` | `/workflows:setup-claude-md` | CLAUDE.md generated with required sections |
+| T6.5 | `plan-refiner` | `/workflows:post-plan-setup` Phase 1 | Refined plan with agent-ready tasks |
+| T6.6 | `issue-creator` | `/workflows:post-plan-setup` Phase 2 | Linear issues created with structured descriptions |
+| T6.7 | `post-plan-orchestrator` | `/workflows:post-plan-setup` | Orchestrates phases 1–3 with review gates |
 
 ---
 
@@ -206,7 +208,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 14 | T1.1, T3.1–T3.14 |
+| Commands | 15 | T1.1, T3.1–T3.16 |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
@@ -229,11 +231,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/12
-Layer 3 (Commands):   __/14
+Layer 3 (Commands):   __/16
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/7
 
-Total:  __/49
+Total:  __/51
 Notes:  ____
 ```
