@@ -1,10 +1,10 @@
 ---
-description: Standardized code review for Britenites projects
+description: Standardized code review for Brite projects
 ---
 
 # Code Review
 
-Perform a thorough code review following Britenites standards. Reference the tech stack established in `/britenites:tech-stack` for technology-specific expectations.
+Perform a thorough code review following Brite standards. Reference the tech stack established in `/workflows:tech-stack` for technology-specific expectations.
 
 ## Determine Review Scope
 
@@ -24,7 +24,7 @@ This command supports two modes:
 Perform a direct review yourself, working through the checklists below. Best for quick spot-checks and PR reviews.
 
 ### Deep Mode (use when `$ARGUMENTS` contains "deep" or "--deep")
-Dispatch the three specialized review agents in parallel for comprehensive coverage. This is what `/britenites:review` does during the session loop. Use it for thorough pre-merge reviews.
+Dispatch the three specialized review agents in parallel for comprehensive coverage. This is what `/workflows:review` does during the session loop. Use it for thorough pre-merge reviews.
 
 **To run deep mode:** Launch the `code-reviewer`, `security-reviewer`, and `typescript-reviewer` agents in parallel via the Task tool, passing the diff context. Collect and merge their findings into a single P1/P2/P3 report.
 

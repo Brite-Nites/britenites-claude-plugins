@@ -11,7 +11,7 @@ You are auditing a project's CLAUDE.md to ensure it follows Anthropic's official
 ## When to Activate
 
 - Invoked by the `ship` command after compound-learnings
-- The `/britenites:setup-claude-md` command includes similar audit logic
+- The `/workflows:setup-claude-md` command includes similar audit logic
 - After significant CLAUDE.md changes
 
 ## Reference

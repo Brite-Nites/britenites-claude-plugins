@@ -1,6 +1,6 @@
 ## Standard Output Formats
 
-Reusable output formatting templates for Britenites skills. Reference this file when producing structured output.
+Reusable output formatting templates for Brite skills. Reference this file when producing structured output.
 
 ### Severity Classification
 

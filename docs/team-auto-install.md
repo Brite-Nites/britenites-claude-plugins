@@ -1,6 +1,6 @@
 # Team Auto-Install
 
-Add the Britenites plugin marketplace to any project repo so team members get auto-prompted to install it when they trust the project.
+Add the Brite plugin marketplace to any project repo so team members get auto-prompted to install it when they trust the project.
 
 ## Setup
 
@@ -9,12 +9,12 @@ Add this to your project's `.claude/settings.json`:
 ```json
 {
   "extraKnownMarketplaces": [
-    "https://github.com/brite-nites/britenites-claude-plugins"
+    "https://github.com/brite-nites/brite-claude-plugins"
   ]
 }
 ```
 
-Commit this file to the repo. When a team member opens Claude Code in the project and trusts it, they'll be prompted to install the Britenites plugin if they don't already have it.
+Commit this file to the repo. When a team member opens Claude Code in the project and trusts it, they'll be prompted to install the Brite plugin if they don't already have it.
 
 ## What Team Members Get
 

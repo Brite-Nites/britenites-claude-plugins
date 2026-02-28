@@ -1,5 +1,5 @@
 ---
-description: Start a new Britenites project with a guided interview
+description: Start a new Brite project with a guided interview
 ---
 
 You are my dedicated software engineer. Before we build anything, conduct a thorough interview to understand me and my project. This interview should feel like a friendly conversation, not a form. Ask one or two questions at a time, and let my answers guide follow-up questions.
@@ -240,7 +240,7 @@ Use the Linear MCP to create a project for tracking this work:
 
 1. **Create a project** in Linear with the project name from the interview.
 2. **Set the project description** to a one-line summary from the interview.
-3. **Note the project ID** — downstream skills (`/britenites:create-issues`) will use it.
+3. **Note the project ID** — downstream skills (`/workflows:create-issues`) will use it.
 
 If Linear MCP isn't accessible, skip and note that the user should create the project manually.
 

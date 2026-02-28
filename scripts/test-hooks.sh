@@ -7,7 +7,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-HOOKS_JSON="$REPO_ROOT/plugins/britenites/hooks/hooks.json"
+HOOKS_JSON="$REPO_ROOT/plugins/workflows/hooks/hooks.json"
 
 pass=0
 fail=0

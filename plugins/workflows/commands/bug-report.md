@@ -15,7 +15,7 @@ Confirm Linear MCP is reachable:
 1. **Linear MCP** — Call `list_projects` (limit 1). This confirms auth and connectivity.
 
 If it fails:
-- Stop immediately: "Cannot reach Linear MCP. Run `/britenites:smoke-test` to diagnose."
+- Stop immediately: "Cannot reach Linear MCP. Run `/workflows:smoke-test` to diagnose."
 - Do NOT proceed.
 
 ## Step 1: Gather Bug Details
@@ -113,7 +113,7 @@ If the search returns no results, skip the duplicate prompt and proceed directly
 Determine where to file the issue:
 
 1. **Team** — If the project's CLAUDE.md or context makes the team obvious, suggest it. Otherwise, list available teams using `list_teams` and ask.
-2. **Project** — Optional. If the developer is working within a known project context (e.g., "Brite Claude Code Plugin"), suggest it. Otherwise, ask if they want to assign it to a project or leave it unassigned.
+2. **Project** — Optional. If the developer is working within a known project context (e.g., "Brite Plugin Marketplace"), suggest it. Otherwise, ask if they want to assign it to a project or leave it unassigned.
 
 ## Step 5: Review Draft
 

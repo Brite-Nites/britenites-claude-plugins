@@ -1,8 +1,8 @@
 ---
-description: Display Britenites technology stack for tech decisions
+description: Display Brite technology stack for tech decisions
 ---
 
-# Britenites Technology Stack
+# Brite Technology Stack
 
 When making technology decisions, use the following established stack. Prefer these technologies over alternatives unless there's a compelling reason to deviate.
 

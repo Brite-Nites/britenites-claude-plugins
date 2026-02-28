@@ -14,7 +14,7 @@ Before starting, confirm critical dependencies:
 2. **Sequential-thinking MCP** — Send a trivial thought (e.g., "Planning scope session"). This confirms the MCP server is running.
 
 If either fails:
-- Stop with: "Cannot reach [Linear/sequential-thinking]. Run `/britenites:smoke-test` to diagnose."
+- Stop with: "Cannot reach [Linear/sequential-thinking]. Run `/workflows:smoke-test` to diagnose."
 - Do NOT proceed.
 
 ## Step 1: Interview Phase
@@ -81,7 +81,7 @@ For each item the developer wants to pursue, create a Linear issue:
 
 ### Issue Template
 
-Use `mcp__plugin_britenites_linear-server__save_issue` with:
+Use `mcp__plugin_workflows_linear-server__save_issue` with:
 
 - **Title**: Clear, imperative, under 70 characters
 - **Description**: Structured markdown with:
@@ -126,7 +126,7 @@ After creating issues, present the full list and prioritize together:
 
 Ask: "Does this ordering make sense? Want to adjust priorities or dependencies?"
 
-If the developer wants to start working immediately, suggest: "Ready for `/britenites:session-start` to pick up the top issue."
+If the developer wants to start working immediately, suggest: "Ready for `/workflows:session-start` to pick up the top issue."
 
 ## Step 6: Session Summary
 

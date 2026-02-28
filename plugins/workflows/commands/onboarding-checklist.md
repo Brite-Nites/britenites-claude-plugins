@@ -1,10 +1,10 @@
 ---
-description: Guide for setting up a new Britenites dev environment
+description: Guide for setting up a new Brite dev environment
 ---
 
-# Britenites Developer Onboarding
+# Brite Developer Onboarding
 
-Walk the user through setting up their development environment for Britenites projects. Verify each step succeeds before moving to the next. If a step fails, help troubleshoot before continuing.
+Walk the user through setting up their development environment for Brite projects. Verify each step succeeds before moving to the next. If a step fails, help troubleshoot before continuing.
 
 ## Step 1: System Prerequisites
 
@@ -30,7 +30,7 @@ Help the user clone the project repository:
 3. Clone the repository the user specifies
 4. Verify the clone succeeded
 
-If the user doesn't specify a repo, ask which Britenites project they're joining.
+If the user doesn't specify a repo, ask which Brite project they're joining.
 
 ## Step 3: Environment Configuration
 
@@ -96,13 +96,13 @@ Check if `.vscode/settings.json` or `.vscode/extensions.json` exists in the repo
 
 ## Step 7: Claude Code Plugin Setup
 
-Install the Britenites Claude Code plugins:
+Install the Brite Claude Code plugins:
 
 ```bash
-claude plugins add https://github.com/Brite-Nites/britenites-claude-plugins
+claude plugins add https://github.com/Brite-Nites/brite-claude-plugins
 ```
 
-Verify the plugin is loaded by checking that `/britenites:tech-stack` is available.
+Verify the plugin is loaded by checking that `/workflows:tech-stack` is available.
 
 ## Step 8: Verification
 
@@ -136,5 +136,5 @@ Once everything passes, suggest:
 
 1. Read the project's README and CLAUDE.md
 2. Check the current sprint in Linear for assigned issues
-3. Run `/britenites:tech-stack` to review the technology stack
+3. Run `/workflows:tech-stack` to review the technology stack
 4. Make a small test change to verify the full workflow (edit, commit, push)

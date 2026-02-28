@@ -1,8 +1,8 @@
-# Britenites Claude Plugins
+# Brite Claude Plugins
 
 A **Process + Org** plugin for Claude Code. Superpowers methodology + compound engineering + Linear integration — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
-**Current version:** 3.0.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 3.5.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
 ## Philosophy
 
@@ -30,7 +30,7 @@ Influenced by [superpowers](https://github.com/obra/superpowers) and [compound-e
 Install the plugin bundle:
 
 ```bash
-claude plugins add https://github.com/Brite-Nites/britenites-claude-plugins
+claude plugins add https://github.com/Brite-Nites/brite-claude-plugins
 ```
 
 Or manually add to your `.claude/settings.json`:
@@ -39,14 +39,14 @@ Or manually add to your `.claude/settings.json`:
 {
   "plugins": [
     {
-      "source": "https://github.com/Brite-Nites/britenites-claude-plugins",
-      "plugins": ["britenites"]
+      "source": "https://github.com/Brite-Nites/brite-claude-plugins",
+      "plugins": ["workflows"]
     }
   ]
 }
 ```
 
-Verify installation by typing `/britenites:` in Claude Code — you should see the available commands in the slash menu.
+Verify installation by typing `/workflows:` in Claude Code — you should see the available commands in the slash menu.
 
 ## Available Commands
 
@@ -54,29 +54,29 @@ Verify installation by typing `/britenites:` in Claude Code — you should see t
 
 | Command | Description |
 |---------|-------------|
-| `/britenites:session-start` | Start a work session — pick a Linear issue, brainstorm, plan, execute |
-| `/britenites:review` | Run review agents in parallel, fix P1s, report findings |
-| `/britenites:ship` | Create PR, update Linear, compound learnings, best-practices audit |
+| `/workflows:session-start` | Start a work session — pick a Linear issue, brainstorm, plan, execute |
+| `/workflows:review` | Run review agents in parallel, fix P1s, report findings |
+| `/workflows:ship` | Create PR, update Linear, compound learnings, best-practices audit |
 
 **Direction-setting:**
 
 | Command | Description |
 |---------|-------------|
-| `/britenites:scope` | Collaborative scoping session — discover what to build, create Linear issues |
-| `/britenites:project-start` | Start a new project with a guided interview |
+| `/workflows:scope` | Collaborative scoping session — discover what to build, create Linear issues |
+| `/workflows:project-start` | Start a new project with a guided interview |
 
 **Utilities:**
 
 | Command | Description |
 |---------|-------------|
-| `/britenites:code-review` | Standardized code review for Britenites projects |
-| `/britenites:security-audit` | Comprehensive project security audit |
-| `/britenites:bug-report` | Standardized bug reporting with Linear integration |
-| `/britenites:deployment-checklist` | Pre-deployment validation checklist |
-| `/britenites:tech-stack` | Display the Britenites technology stack |
-| `/britenites:onboarding-checklist` | Guide for setting up a new dev environment |
-| `/britenites:setup-claude-md` | Generate best-practices CLAUDE.md for a project |
-| `/britenites:smoke-test` | Diagnostic checks on plugin environment |
+| `/workflows:code-review` | Standardized code review for Brite projects |
+| `/workflows:security-audit` | Comprehensive project security audit |
+| `/workflows:bug-report` | Standardized bug reporting with Linear integration |
+| `/workflows:deployment-checklist` | Pre-deployment validation checklist |
+| `/workflows:tech-stack` | Display the Brite technology stack |
+| `/workflows:onboarding-checklist` | Guide for setting up a new dev environment |
+| `/workflows:setup-claude-md` | Generate best-practices CLAUDE.md for a project |
+| `/workflows:smoke-test` | Diagnostic checks on plugin environment |
 
 ## Skill Coverage Matrix
 
@@ -111,7 +111,7 @@ Skills activate automatically when Claude detects relevant context.
 
 | Skill | Category | Trigger |
 |-------|----------|---------|
-| `post-plan-setup` | Workflow | After `/britenites:project-start` produces a v1 plan (orchestrates 3 phases) |
+| `post-plan-setup` | Workflow | After `/workflows:project-start` produces a v1 plan (orchestrates 3 phases) |
 | `refine-plan` | Workflow | Decomposes v1 plans into agent-ready tasks (internal) |
 | `create-issues` | Workflow | Creates Linear issues from refined plans (internal) |
 | `setup-claude-md` | Workflow | Generates best-practices CLAUDE.md for a project (internal) |
@@ -137,7 +137,7 @@ The Linear MCP server provides tools for managing issues, projects, milestones, 
 .claude-plugin/
   marketplace.json          # Plugin registry (required for bundles)
 plugins/
-  britenites/
+  workflows/
     .claude-plugin/
       plugin.json           # Plugin metadata
     commands/               # Slash commands
@@ -153,12 +153,12 @@ Each plugin requires `.claude-plugin/plugin.json`:
 
 ```json
 {
-  "name": "britenites",
+  "name": "workflows",
   "description": "Process + Org plugin — structured workflow methodology with Linear integration",
   "version": "3.0.0",
-  "author": { "name": "Britenites" },
-  "homepage": "https://github.com/brite-nites/britenites-claude-plugins",
-  "repository": "https://github.com/brite-nites/britenites-claude-plugins",
+  "author": { "name": "Brite" },
+  "homepage": "https://github.com/brite-nites/brite-claude-plugins",
+  "repository": "https://github.com/brite-nites/brite-claude-plugins",
   "license": "MIT",
   "keywords": ["claude-code", "plugin", "process", "workflow", "linear"],
   "commands": "./commands/",
@@ -176,7 +176,7 @@ Commands are slash commands that users invoke directly. Create a markdown file i
 
 ```
 commands/
-  my-command.md      # Becomes /britenites:my-command
+  my-command.md      # Becomes /workflows:my-command
 ```
 
 ### Command Format
@@ -275,7 +275,7 @@ Create `.mcp.json` at the plugin root:
 
 ```
 plugins/
-  britenites/
+  workflows/
     .mcp.json           # MCP configuration
 ```
 
@@ -286,7 +286,7 @@ plugins/
   "mcpServers": {
     "database": {
       "command": "npx",
-      "args": ["@britenites/mcp-database"],
+      "args": ["@brite/mcp-database"],
       "env": {
         "DB_PATH": "${CLAUDE_PLUGIN_ROOT}/data"
       }
@@ -343,7 +343,7 @@ Create `hooks/hooks.json` or define inline in `plugin.json`:
 
 ```
 plugins/
-  britenites/
+  workflows/
     hooks/
       hooks.json
 ```
@@ -470,17 +470,17 @@ The root `marketplace.json` registers plugins for distribution:
 
 ```json
 {
-  "name": "britenites-claude-plugins",
+  "name": "brite-claude-plugins",
   "owner": {
-    "name": "Britenites"
+    "name": "Brite"
   },
   "metadata": {
-    "description": "Claude Code plugins for the Britenites organization"
+    "description": "Claude Code plugins for the Brite organization"
   },
   "plugins": [
     {
-      "name": "britenites",
-      "source": "./plugins/britenites",
+      "name": "workflows",
+      "source": "./plugins/workflows",
       "description": "Process + Org plugin — structured workflow methodology with Linear integration",
       "version": "3.0.0"
     }
@@ -518,4 +518,4 @@ MIT
 
 ## Issue Tracking
 
-Issues for this project are tracked in [Brite Claude Code Plugin](https://linear.app/brite-nites/project/brite-claude-code-plugin-402b57908532).
+Issues for this project are tracked in [Brite Plugin Marketplace](https://linear.app/brite-nites/project/brite-claude-code-plugin-402b57908532).

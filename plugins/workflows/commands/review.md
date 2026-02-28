@@ -100,7 +100,7 @@ Present the final state to the developer:
 **Verdict**: Ready to ship / Needs your input on P2s / Blocked on P1
 ```
 
-If all P1s are fixed and tests pass, suggest: "Ready for `/britenites:ship` when you are."
+If all P1s are fixed and tests pass, suggest: "Ready for `/workflows:ship` when you are."
 
 If P2s need decisions, ask the developer which to fix and which to accept.
 

@@ -7,7 +7,7 @@ set -euo pipefail
 # ─────────────────────────────────────────────────────────────────────
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PLUGIN_JSON="$REPO_ROOT/plugins/britenites/.claude-plugin/plugin.json"
+MARKETPLACE="$REPO_ROOT/.claude-plugin/marketplace.json"
 
 pass_count=0
 fail_count=0
@@ -18,7 +18,7 @@ fail() { printf "  \033[31mFAIL\033[0m  %s — %s\n" "$1" "$2"; fail_count=$((fa
 skip() { printf "  \033[33mSKIP\033[0m  %s — %s\n" "$1" "$2"; skip_count=$((skip_count + 1)); }
 section() { printf "\n\033[1m=== %s ===\033[0m\n" "$1"; }
 
-echo "Britenites Plugin — Prerequisites Check"
+echo "Brite Plugin — Prerequisites Check"
 echo "Repo root: $REPO_ROOT"
 
 # ══════════════════════════════════════════════════════════════════════
@@ -48,7 +48,7 @@ if command -v gh &>/dev/null; then
     fail "gh CLI" "installed but not authenticated — run \`gh auth login\`"
   fi
 else
-  skip "gh CLI" "not installed (needed for /britenites:ship)"
+  skip "gh CLI" "not installed (needed for /workflows:ship)"
 fi
 
 # node
@@ -108,21 +108,32 @@ else
 fi
 
 # ══════════════════════════════════════════════════════════════════════
-# Section 3 — Plugin JSON Validity
+# Section 3 — Plugin JSON Validity (all plugins from marketplace)
 # ══════════════════════════════════════════════════════════════════════
 section "3. Plugin JSON"
 
-if [ -f "$PLUGIN_JSON" ]; then
-  if python3 -m json.tool "$PLUGIN_JSON" > /dev/null 2>&1; then
-    pass "plugin.json is valid JSON"
-  else
-    fail "plugin.json" "invalid JSON"
-  fi
+if [ -f "$MARKETPLACE" ]; then
+  while IFS= read -r src; do
+    resolved=$(cd "$REPO_ROOT" && realpath "$src" 2>/dev/null || echo "$REPO_ROOT/$src")
+    plugin_name="$(basename "$resolved")"
+    plugin_json="$resolved/.claude-plugin/plugin.json"
 
-  # Check for disallowed fields (reuse validate.sh logic)
-  disallowed_check=$(python3 -c "
+    if [ ! -f "$plugin_json" ]; then
+      fail "$plugin_name/plugin.json" "file not found at $plugin_json"
+      continue
+    fi
+
+    if python3 -m json.tool "$plugin_json" > /dev/null 2>&1; then
+      pass "$plugin_name/plugin.json is valid JSON"
+    else
+      fail "$plugin_name/plugin.json" "invalid JSON"
+      continue
+    fi
+
+    # Check for disallowed fields (reuse validate.sh logic)
+    disallowed_check=$(python3 -c "
 import json, sys
-with open('$PLUGIN_JSON') as f:
+with open('$plugin_json') as f:
     data = json.load(f)
 allowed = {'name', 'description', 'author', 'version', 'homepage',
            'repository', 'license', 'keywords', 'commands', 'skills',
@@ -134,13 +145,20 @@ else:
     print('PASS')
 " 2>&1)
 
-  if [ "$disallowed_check" = "PASS" ]; then
-    pass "plugin.json has no disallowed fields"
-  else
-    fail "plugin.json" "${disallowed_check#FAIL:}"
-  fi
+    if [ "$disallowed_check" = "PASS" ]; then
+      pass "$plugin_name/plugin.json has no disallowed fields"
+    else
+      fail "$plugin_name/plugin.json" "${disallowed_check#FAIL:}"
+    fi
+  done < <(python3 -c "
+import json
+with open('$MARKETPLACE') as f:
+    data = json.load(f)
+for p in data.get('plugins', []):
+    print(p.get('source', ''))
+" 2>&1)
 else
-  fail "plugin.json" "file not found at $PLUGIN_JSON"
+  fail "marketplace.json" "not found at $MARKETPLACE"
 fi
 
 # ══════════════════════════════════════════════════════════════════════

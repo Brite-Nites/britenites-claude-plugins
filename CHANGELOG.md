@@ -1,10 +1,32 @@
 # Changelog
 
-All notable changes to the Britenites Claude Plugins bundle will be documented in this file.
+All notable changes to the Brite Claude Plugins bundle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+## [3.5.0] - 2026-02-27
+
+### Changed
+- **Rebrand from "Britenites" to "Brite"** — org/brand name simplified across all files
+- **Plugin renamed from `britenites` to `workflows`** — all commands now `/workflows:*` (e.g., `/workflows:session-start`)
+- **Repo renamed from `britenites-claude-plugins` to `brite-claude-plugins`** — GitHub auto-redirects old URLs
+- **Linear project renamed to "Brite Plugin Marketplace"**
+- MCP tool namespace updated from `mcp__plugin_britenites_*` to `mcp__plugin_workflows_*`
+
+## [3.4.0] - 2026-02-27
+
+### Added
+- `/britenites:create-plugin` command — scaffold new domain plugins from template with marketplace registration (BRI-1628)
+- `templates/domain-plugin/` — template directory with plugin.json, example command, example skill, hooks stub, README, CHANGELOG
+- Multi-plugin validation — `scripts/validate.sh` discovers plugins from marketplace.json and validates each independently
+
+### Changed
+- `scripts/validate.sh` refactored from single-plugin to multi-plugin: sections 3-11 extracted into `validate_plugin()` function, `agents/` and `hooks/` now optional warnings instead of failures
+- `.github/workflows/validate-plugin.yml` simplified — delegates to `scripts/validate.sh` instead of inline per-plugin steps
+- `scripts/check-prereqs.sh` iterates over marketplace.json plugin sources instead of hardcoded path
+- `scripts/test-plugin-load.sh` accepts `$1` for plugin directory, derives expected commands from `commands/` directory
 
 ## [3.3.0] - 2026-02-27
 
@@ -177,17 +199,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.3.0...HEAD
-[3.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.2.0...v3.3.0
-[3.2.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.1.0...v3.2.0
-[3.1.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.1...v3.1.0
-[3.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v3.0.0...v3.0.1
-[3.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.3.0...v3.0.0
-[2.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.1...v2.3.0
-[2.0.1]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v2.0.0...v2.0.1
-[2.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.5.0...v2.0.0
-[1.5.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.3.0...v1.5.0
-[1.3.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/Brite-Nites/britenites-claude-plugins/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/Brite-Nites/britenites-claude-plugins/releases/tag/v1.0.0
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.5.0...HEAD
+[3.5.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.4.0...v3.5.0
+[3.4.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.3.0...v3.4.0
+[3.3.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.2.0...v3.3.0
+[3.2.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.1.0...v3.2.0
+[3.1.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.0.1...v3.1.0
+[3.0.1]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v2.3.0...v3.0.0
+[2.3.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v2.0.1...v2.3.0
+[2.0.1]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v1.5.0...v2.0.0
+[1.5.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v1.3.0...v1.5.0
+[1.3.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/Brite-Nites/brite-claude-plugins/releases/tag/v1.0.0

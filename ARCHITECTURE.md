@@ -1,6 +1,6 @@
 # Architecture
 
-How the Britenites Claude Plugins bundle is structured, how it executes, and why it's built this way.
+How the Brite Claude Plugins bundle is structured, how it executes, and why it's built this way.
 
 ## System Overview
 
@@ -22,13 +22,13 @@ The plugin is a **single-plugin bundle**: one marketplace, one plugin. This keep
 When a user installs the bundle, Claude Code:
 
 1. Reads `.claude-plugin/marketplace.json` to discover available plugins
-2. Follows the `source` path (e.g., `./plugins/britenites`) to find the plugin directory
-3. Reads `plugins/britenites/.claude-plugin/plugin.json` for metadata and component paths
+2. Follows the `source` path (e.g., `./plugins/workflows`) to find the plugin directory
+3. Reads `plugins/workflows/.claude-plugin/plugin.json` for metadata and component paths
 4. Loads commands from `./commands/`, skills from `./skills/`, agents from `./agents/`
 5. Registers hooks from `./hooks/hooks.json` (auto-discovered, not declared in plugin.json)
 6. Configures MCP servers from `./.mcp.json`
 
-All paths in `plugin.json` are relative to the plugin root (`plugins/britenites/`).
+All paths in `plugin.json` are relative to the plugin root (`plugins/workflows/`).
 
 ## Runtime Flow
 
@@ -43,7 +43,7 @@ sequenceDiagram
 
     U->>CC: Input (message or /command)
     CC->>H: SessionStart (first message only)
-    H-->>CC: Britenites conventions reminder
+    H-->>CC: Brite conventions reminder
 
     alt Slash command
         CC->>CC: Load command markdown
@@ -110,7 +110,7 @@ flowchart LR
 ```
 
 **Flow:**
-1. User invokes `/britenites:post-plan-setup <plan-path>`
+1. User invokes `/workflows:post-plan-setup <plan-path>`
 2. **Phase 1 — Refine Plan**: `refine-plan` decomposes the v1 plan into agent-ready tasks with context, steps, and validation criteria. Outputs `docs/project-plan-refined.md`.
 3. *Pause for user review*
 4. **Phase 2 — Create Issues**: `create-issues` creates Linear issues from the refined plan via MCP. Updates the plan file with issue IDs.
@@ -165,7 +165,7 @@ Hooks use a **two-layer security architecture**: deterministic regex command hoo
 | `PreToolUse` | `Write\|Edit` | 1 (regex) | command | Blocks `sk-proj-`, `AKIA`, `ghp_`, `sk_live/test` patterns |
 | `PreToolUse` | `Write\|Edit` | 2 (fallback) | prompt | Haiku evaluates anything not caught by regex |
 | `PostToolUse` | `Write\|Edit` | — | command | Auto-lint: ESLint (JS/TS) or Ruff (Python) if installed |
-| `SessionStart` | `startup` | — | prompt | Reminds Claude of Britenites conventions |
+| `SessionStart` | `startup` | — | prompt | Reminds Claude of Brite conventions |
 
 **Why two layers?** Regex command hooks are deterministic and instant — they catch known-bad patterns without LLM latency or cost. The haiku prompt hook catches novel threats the regex misses.
 
@@ -222,7 +222,7 @@ Quick reference for finding things:
 
 ```
 .claude-plugin/marketplace.json       # Bundle registry
-plugins/britenites/
+plugins/workflows/
   .claude-plugin/plugin.json          # Plugin metadata (v2.0.0)
   commands/
     session-start.md                  # Pick a Linear issue, plan work

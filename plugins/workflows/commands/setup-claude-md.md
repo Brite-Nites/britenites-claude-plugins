@@ -19,14 +19,14 @@ You are auditing and improving the project's CLAUDE.md file against Claude Code 
 Read the best practices reference file:
 
 ```
-plugins/britenites/skills/setup-claude-md/claude-code-best-practices.md
+plugins/workflows/skills/setup-claude-md/claude-code-best-practices.md
 ```
 
 This contains the full reference for what a great CLAUDE.md includes.
 
 ### Step 3: Run Analysis
 
-Launch the `britenites:claude-md-generator` agent via the Task tool to:
+Launch the `workflows:claude-md-generator` agent via the Task tool to:
 
 1. Analyze the current project structure, package.json, tech stack, build commands
 2. Compare existing CLAUDE.md (if any) against the best practices reference

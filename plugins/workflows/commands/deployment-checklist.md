@@ -73,7 +73,7 @@ Run each applicable check and record the result. Show the actual command output 
   - `reviewDecision` is `APPROVED` (not `CHANGES_REQUESTED` or `REVIEW_REQUIRED`)
   - CI checks are passing (`statusCheckRollup` all successful)
   - `mergeable` is `MERGEABLE` (if `UNKNOWN`, record as WARN — GitHub is still computing; if `CONFLICTING`, record as FAIL)
-- If no PR exists, warn: "No open PR found for this branch. Create one with `/britenites:ship` before deploying."
+- If no PR exists, warn: "No open PR found for this branch. Create one with `/workflows:ship` before deploying."
 
 ### 2b. Environment Variables
 

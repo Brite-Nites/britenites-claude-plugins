@@ -4,7 +4,7 @@ description: Run diagnostic checks on the plugin environment — CLI tools, MCP 
 
 # Smoke Test
 
-Run a comprehensive health check of the Britenites plugin environment. This is a diagnostic tool for verifying everything is wired up correctly.
+Run a comprehensive health check of the Brite plugin environment. This is a diagnostic tool for verifying everything is wired up correctly.
 
 ## Step 1: Environment Checks
 
@@ -26,7 +26,7 @@ Test that MCP servers respond:
 
 Test that security hooks are active:
 
-1. **Attempt a Write** with content containing a known test secret pattern: `sk_test_SMOKETEST12345678`. The Write target should be a temporary path like `/tmp/britenites-smoke-test.txt`.
+1. **Attempt a Write** with content containing a known test secret pattern: `sk_test_SMOKETEST12345678`. The Write target should be a temporary path like `/tmp/brite-smoke-test.txt`.
 2. **If the Write is BLOCKED** by the PreToolUse hook → PASS (hooks are active and catching secrets).
 3. **If the Write SUCCEEDS** → KNOWN ISSUE ("PreToolUse hooks from plugins don't fire — upstream bug [#6305](https://github.com/anthropics/claude-code/issues/6305). Hook definitions are correct; no action needed on our side."). Clean up the temp file.
 

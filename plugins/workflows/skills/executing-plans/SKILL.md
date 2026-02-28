@@ -159,7 +159,7 @@ When all tasks are done:
 
 **Files changed**: [list]
 
-Ready for `/britenites:review` when you are.
+Ready for `/workflows:review` when you are.
 ```
 
 ## Rules
