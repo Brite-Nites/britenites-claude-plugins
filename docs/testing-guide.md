@@ -34,7 +34,7 @@ Run these outside Claude, from a regular terminal or CI.
 | T0.1 Structural validation | `bash scripts/validate.sh` | 0 errors (3 warnings for orphan agents are expected) |
 | T0.2 Hook regex tests | `bash scripts/test-hooks.sh` | 37/37 pass |
 | T0.3 Prerequisites check | `bash scripts/check-prereqs.sh` | All PASS (or explained SKIPs) |
-| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 15 commands found |
+| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 16 commands found |
 | T0.5 CI workflow | Push to branch, check GitHub Actions | All steps green |
 
 ---
@@ -43,7 +43,7 @@ Run these outside Claude, from a regular terminal or CI.
 
 | Test | Steps | Expected |
 |------|-------|----------|
-| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/workflows`, type `/workflows:` | 15 commands in autocomplete: `bug-report`, `code-review`, `create-plugin`, `deployment-checklist`, `onboarding-checklist`, `project-start`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `sprint-planning`, `tech-stack` |
+| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/workflows`, type `/workflows:` | 16 commands in autocomplete: `bug-report`, `code-review`, `create-plugin`, `deployment-checklist`, `onboarding-checklist`, `project-start`, `retrospective`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `sprint-planning`, `tech-stack` |
 | T1.2 SessionStart hook | Observe session start output | Environment banner with git/node/gh/npx status + key commands listed |
 | T1.3 Smoke test | Run `/workflows:smoke-test` | Summary table with PASS/FAIL/SKIP/KNOWN ISSUE for 8 checks (env, MCP, hooks, agents) |
 
@@ -101,6 +101,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T3.4 | `/workflows:scope` | Run → Step 0 passes → answer 2-3 interview questions → themes presented | Abort after themes. Verify: MCP check passes, Socratic questions asked via AskUserQuestion, themes use sequential-thinking |
 | T3.5 | `/workflows:bug-report` | Run with a test bug title → fill in details → approve draft | Verify: Linear issue created with Bug label, structured description, environment table. **Cleanup:** delete the test issue in Linear |
 | T3.16 | `/workflows:sprint-planning` | Run → Step 0 passes → project resolved → velocity shown → backlog displayed → select issues via sequential-thinking | Abort after selection. Verify: MCP prereqs pass, cycle data loads, backlog shows Todo + Backlog issues, velocity calculation uses completed cycles only |
+| T3.17 | `/workflows:retrospective` | Run → Step 0 passes → cycle resolved → delivery summary shown → retro discussion flows → status update draft presented | Abort before posting. Verify: MCP prereqs pass, cycle data loads, completed/carried-over tables render, sequential-thinking drives discussion, health indicator suggested |
 
 ### Requires Changes on a Branch
 
@@ -208,7 +209,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 15 | T1.1, T3.1–T3.16 |
+| Commands | 16 | T1.1, T3.1–T3.17 |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
@@ -231,11 +232,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/12
-Layer 3 (Commands):   __/16
+Layer 3 (Commands):   __/17
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/7
 
-Total:  __/51
+Total:  __/52
 Notes:  ____
 ```
