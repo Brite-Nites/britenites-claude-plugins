@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-02-28
+
+### Added
+- `/workflows:retrospective` command — review completed cycles, facilitate structured retro discussion (what went well, what needs improvement, action items), post Linear project status update with health indicator, optionally create follow-up issues. Supports mid-sprint mode via `current` argument (BRI-1625)
+
 ## [3.5.0] - 2026-02-27
 
 ### Changed
@@ -199,7 +204,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.5.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.6.0...HEAD
+[3.6.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.2.0...v3.3.0
