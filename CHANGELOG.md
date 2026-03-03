@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.12.0] - 2026-03-03
+
+### Added
+- 7 visual-explainer commands ported from [nicobailon/visual-explainer](https://github.com/nicobailon/visual-explainer) (MIT): `/workflows:generate-web-diagram`, `/workflows:generate-slides`, `/workflows:generate-visual-plan`, `/workflows:fact-check`, `/workflows:diff-review`, `/workflows:plan-review`, `/workflows:project-recap`. All adapted with `$ARGUMENTS` sanitization, absolute skill paths, and input validation (BRI-1730). Command total: 24
+
+### Changed
+- `visual-explainer/SKILL.md` — removed planned-feature note (added in 3.11.0 for BRI-1730), added `/workflows:` prefix to command references
+
 ## [3.11.0] - 2026-03-03
 
 ### Added
@@ -249,7 +257,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.9.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.12.0...HEAD
+[3.12.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.11.0...v3.12.0
+[3.11.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.10.0...v3.11.0
+[3.10.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.6.0...v3.7.0
