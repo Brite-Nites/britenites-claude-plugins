@@ -289,7 +289,7 @@ beforeEach(() => {
 });
 ```
 
-**Context:** `vi.restoreAllMocks()` in `afterEach` is the safest default — it undoes `vi.spyOn` and restores originals. `vi.resetAllMocks()` clears call history but keeps the mock in place. `vi.clearAllMocks()` only clears call history. Prefer `restoreAllMocks` unless you have a specific reason not to.
+**Context:** `vi.restoreAllMocks()` in `afterEach` is the safest default — it undoes `vi.spyOn` and restores originals. `vi.resetAllMocks()` clears call history AND removes mock implementations (`.mockReturnValue`, `.mockImplementation`). `vi.clearAllMocks()` clears call history only, preserving mock implementations. Prefer `restoreAllMocks` unless you have a specific reason not to.
 
 ---
 
@@ -328,7 +328,7 @@ test("returns user ID from valid token", () => {
 });
 ```
 
-**Context:** Ask: "If I change the code under test, will this test catch the bug?" If the answer is no because the mock replaces the relevant behavior, you're over-mocking.
+**Context:** Ask: "If I change the code under test, will this test catch the bug?" If the answer is no because the mock replaces the relevant behavior, you're over-mocking. For security-critical code (auth, tokens, permissions), always test the rejection path too — e.g., mock an expired token and verify your code rejects it.
 
 ---
 
@@ -490,7 +490,21 @@ if (import.meta.vitest) {
 }
 ```
 
-**Context:** Requires `define: { "import.meta.vitest": "undefined" }` in the production build config to tree-shake. Best for small, pure functions. Don't use for components, hooks, or anything needing complex setup.
+**Context:** Requires two config changes. In `vitest.config.ts`, add `test.includeSource` so Vitest discovers in-source test blocks:
+
+```typescript
+// vitest.config.ts
+export default defineConfig({
+  test: {
+    includeSource: ["src/**/*.ts"], // Required: tells Vitest to run in-source blocks
+  },
+  define: {
+    "import.meta.vitest": "undefined", // Required: tree-shakes tests from prod build
+  },
+});
+```
+
+Without `includeSource`, Vitest silently ignores all in-source tests — no error, they just don't run. Without the `define`, test code ships in production bundles. Best for small, pure functions. Don't use for components, hooks, or anything needing complex setup.
 
 ---
 
@@ -506,7 +520,7 @@ test("debounces search input", async () => {
   const onSearch = vi.fn();
   render(<SearchInput onSearch={onSearch} debounceMs={300} />);
 
-  const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  const user = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) });
   await user.type(screen.getByRole("searchbox"), "query");
 
   // Not called yet — still within debounce window
@@ -710,7 +724,7 @@ test("shows error message on API failure", async () => {
 });
 ```
 
-**Context:** Default handlers provide the happy path. `server.use()` overrides are per-test and automatically reset after `server.resetHandlers()`. This keeps tests focused on the specific scenario being tested.
+**Context:** Default handlers provide the happy path. `server.use()` overrides are per-test and automatically reset after `server.resetHandlers()`. This keeps tests focused on the specific scenario being tested. Use fictional data only (`example.com` domain, invented names) — never copy real user data from staging or production into test fixtures (see `fixture-realistic-data`).
 
 ---
 
@@ -1001,7 +1015,9 @@ export default defineConfig({
 ```typescript
 // For tests that need serial execution (shared database, port conflicts)
 // vitest.workspace.ts
-export default [
+import { defineWorkspace } from "vitest/config";
+
+export default defineWorkspace([
   {
     test: {
       include: ["src/**/*.test.ts"],
@@ -1016,7 +1032,7 @@ export default [
       poolOptions: { forks: { singleFork: true } },
     },
   },
-];
+]);
 ```
 
 **Context:** Parallel tests require isolation (see `struct-test-isolation`). If tests share resources like database ports, either isolate them with unique ports per worker or run them serially in a separate workspace project.
