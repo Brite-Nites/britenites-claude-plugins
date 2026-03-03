@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.8.0] - 2026-03-03
+
+### Added
+- `testing-strategy` skill — core testing patterns + Vitest guidance. 32 rules across 8 categories (test structure, mocking strategy, Vitest patterns, React Testing Library, MSW, fixtures, CI, snapshots). SKILL.md quick reference + AGENTS.md full compiled rules with code examples (BRI-1737)
+
 ## [3.7.0] - 2026-02-28
 
 ### Added
