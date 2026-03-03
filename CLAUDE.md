@@ -121,6 +121,12 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 | `ui-ux-pro-max` | "choose palette", "design system", "plan visual direction" | Design planning |
 | `web-design-guidelines` | "review", "audit", "check" existing UI | Compliance review |
 
+### Quality Skills
+
+| Skill | Triggers on | Purpose |
+|-------|-------------|---------|
+| `testing-strategy` | Writing, reviewing, or refactoring test code | Testing patterns (Vitest, RTL, MSW) |
+
 ## plugin.json Schema (STRICT — read before editing)
 
 **Claude Code validates plugin.json against a strict Zod schema. Any unrecognized field causes a silent hard failure — the entire plugin won't load (no commands, no skills, nothing). There is no error message shown to the user.**
