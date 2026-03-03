@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.9.0] - 2026-03-03
+
+### Added
+- Playwright E2E testing patterns in `testing-strategy` skill — 7 new rules across 2 categories (Playwright Fundamentals, Playwright CI & Advanced). Covers page objects, accessible selectors, test isolation, fixtures, network mocking, visual regression, and CI config. Skill now has 39 rules across 10 categories (BRI-1738)
+
 ## [3.8.0] - 2026-03-03
 
 ### Added
@@ -219,7 +224,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.6.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.9.0...HEAD
+[3.9.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.8.0...v3.9.0
+[3.8.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.7.0...v3.8.0
+[3.7.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.3.0...v3.4.0

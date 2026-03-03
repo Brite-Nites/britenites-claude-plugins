@@ -2,7 +2,7 @@
 
 A **Process + Org** plugin for Claude Code. Superpowers methodology + compound engineering + Linear integration — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
-**Current version:** 3.7.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 3.9.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
 ## Philosophy
 
@@ -109,6 +109,7 @@ Skills activate automatically when Claude detects relevant context.
 | `ui-ux-pro-max` | Design | Design tasks across 50 styles, 9 frameworks, 21 palettes |
 | `web-design-guidelines` | Design | Reviewing UI code for best practices and accessibility |
 | `code-quality` | Quality | ESLint, Prettier, Ruff, TypeScript strict enforcement |
+| `testing-strategy` | Quality | Testing patterns for Vitest, RTL, MSW, and Playwright |
 | `agent-browser` | Automation | Navigating websites, filling forms, taking screenshots |
 | `find-skills` | Discovery | Looking for new skills or capabilities to install |
 
@@ -160,7 +161,7 @@ Each plugin requires `.claude-plugin/plugin.json`:
 {
   "name": "workflows",
   "description": "Process + Org plugin — structured workflow methodology with Linear integration",
-  "version": "3.7.0",
+  "version": "3.9.0",
   "author": { "name": "Brite" },
   "homepage": "https://github.com/brite-nites/brite-claude-plugins",
   "repository": "https://github.com/brite-nites/brite-claude-plugins",

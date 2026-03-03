@@ -1,6 +1,6 @@
 # Testing Strategy — Full Reference
 
-Testing patterns and conventions for Vitest, React Testing Library, and MSW. 32 rules across 8 categories, prioritized by impact. Targets Vitest 3.x, React Testing Library 16.x, MSW 2.x, @testing-library/user-event 14.x.
+Testing patterns and conventions for Vitest, React Testing Library, MSW, and Playwright. 39 rules across 10 categories, prioritized by impact. Targets Vitest 3.x, React Testing Library 16.x, MSW 2.x, @testing-library/user-event 14.x, Playwright 1.45+.
 
 ## Table of Contents
 
@@ -12,6 +12,8 @@ Testing patterns and conventions for Vitest, React Testing Library, and MSW. 32 
 6. [Fixtures & Factories (MEDIUM)](#6-fixtures--factories-medium)
 7. [Coverage & CI (MEDIUM)](#7-coverage--ci-medium)
 8. [Snapshot Testing (LOW-MEDIUM)](#8-snapshot-testing-low-medium)
+9. [Playwright Fundamentals (HIGH)](#9-playwright-fundamentals-high)
+10. [Playwright CI & Advanced (MEDIUM)](#10-playwright-ci--advanced-medium)
 
 ---
 
@@ -1160,3 +1162,434 @@ Review every snapshot update in pull request diffs. Never run `vitest --update` 
 4. In PR review, check `__snapshots__/` diffs as carefully as source code
 
 **Context:** Blindly updating snapshots defeats their purpose. If a snapshot changed unexpectedly, it may indicate a real bug introduced by your code changes. Treat snapshot diffs like any other test failure — investigate before accepting.
+
+---
+
+## 9. Playwright Fundamentals (HIGH)
+
+Playwright provides cross-browser E2E testing with auto-waiting, network interception, and isolated browser contexts. These patterns ensure reliable, maintainable end-to-end tests.
+
+### `pw-page-objects`
+
+**Impact: HIGH**
+
+Encapsulate page interactions in page object classes. Expose behaviors (methods named after user actions), not raw selectors.
+
+**Incorrect:**
+
+```typescript
+// WRONG: selectors and interactions scattered across tests
+test("creates a new project", async ({ page }) => {
+  await page.click('[data-testid="new-project-btn"]');
+  await page.fill('[data-testid="project-name"]', "My Project");
+  await page.fill('[data-testid="project-description"]', "A test project");
+  await page.click('[data-testid="submit-btn"]');
+  await expect(page.locator('[data-testid="project-title"]')).toHaveText("My Project");
+});
+
+test("deletes a project", async ({ page }) => {
+  // Same selectors duplicated, breaks everywhere if UI changes
+  await page.click('[data-testid="project-title"]');
+  await page.click('[data-testid="delete-btn"]');
+  await page.click('[data-testid="confirm-delete"]');
+});
+```
+
+**Correct:**
+
+```typescript
+// pages/project.page.ts
+import { type Locator, type Page, expect } from "@playwright/test";
+
+export class ProjectPage {
+  private readonly nameInput: Locator;
+  private readonly descriptionInput: Locator;
+  private readonly submitButton: Locator;
+  private readonly projectTitle: Locator;
+
+  constructor(private readonly page: Page) {
+    this.nameInput = page.getByLabel("Project name");
+    this.descriptionInput = page.getByLabel("Description");
+    this.submitButton = page.getByRole("button", { name: "Create project" });
+    this.projectTitle = page.getByRole("heading", { level: 1 });
+  }
+
+  async create(name: string, description: string): Promise<void> {
+    await this.page.getByRole("button", { name: "New project" }).click();
+    await this.nameInput.fill(name);
+    await this.descriptionInput.fill(description);
+    await this.submitButton.click();
+  }
+
+  async expectTitle(title: string): Promise<void> {
+    await expect(this.projectTitle).toHaveText(title);
+  }
+}
+
+// In test
+test("creates a new project", async ({ page }) => {
+  const projectPage = new ProjectPage(page);
+
+  await projectPage.create("My Project", "A test project");
+
+  await projectPage.expectTitle("My Project");
+});
+```
+
+**Context:** Page objects centralize selectors so a UI change requires one update, not dozens. Name methods after user behaviors (`create`, `delete`, `search`), not DOM operations (`clickButton`, `fillInput`). Assertion helper methods (`expectTitle`, `expectVisible`) on page objects are acceptable and keep assertion logic DRY. Keep assertions out of action methods (`create`, `delete`) — those should only perform interactions.
+
+---
+
+### `pw-selectors`
+
+**Impact: HIGH**
+
+Prefer accessible selectors: `getByRole` > `getByLabel`/`getByText` > `getByTestId` > CSS selectors. This mirrors the RTL query priority (see `rtl-query-priority`) and catches accessibility issues.
+
+**Incorrect:**
+
+```typescript
+// WRONG: fragile CSS selectors tied to implementation
+await page.click(".sidebar > ul > li:nth-child(3) > a");
+await page.fill("#email-input", "jane@example.com");
+await page.locator("div.modal-footer > button.btn-primary").click();
+```
+
+**Correct:**
+
+```typescript
+// Accessible selectors — resilient and meaningful
+await page.getByRole("navigation").getByRole("link", { name: "Settings" }).click();
+await page.getByLabel("Email address").fill("jane@example.com");
+await page.getByRole("dialog").getByRole("button", { name: "Save" }).click();
+```
+
+**Context:** `getByRole` queries match how assistive technology sees the page — if the selector works, accessibility likely works too. `getByTestId` is a valid fallback for elements without semantic roles (e.g., canvas, custom widgets), but prefer semantic queries first. If you can't find an accessible selector, that often signals an accessibility bug in the component.
+
+---
+
+### `pw-test-isolation`
+
+**Impact: HIGH**
+
+Each Playwright test gets a fresh browser context by default. Don't share mutable state between tests — no shared variables, no assumptions about execution order.
+
+**Incorrect:**
+
+```typescript
+// WRONG: shared state between tests
+let projectId: string;
+
+test("creates a project", async ({ page }) => {
+  await page.goto("/projects/new");
+  await page.getByLabel("Name").fill("Test Project");
+  await page.getByRole("button", { name: "Create" }).click();
+  projectId = page.url().split("/").pop()!;
+});
+
+test("edits the project", async ({ page }) => {
+  // WRONG: depends on previous test's projectId
+  await page.goto(`/projects/${projectId}/edit`);
+  await page.getByLabel("Name").fill("Updated Project");
+  await page.getByRole("button", { name: "Save" }).click();
+});
+```
+
+**Correct:**
+
+```typescript
+test("creates and edits a project", async ({ page }) => {
+  // Self-contained: set up, act, verify in one test
+  await page.goto("/projects/new");
+  await page.getByLabel("Name").fill("Test Project");
+  await page.getByRole("button", { name: "Create" }).click();
+
+  await page.getByRole("button", { name: "Edit" }).click();
+  await page.getByLabel("Name").fill("Updated Project");
+  await page.getByRole("button", { name: "Save" }).click();
+
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Updated Project");
+});
+
+// Or use fixtures for shared setup (see pw-fixtures)
+```
+
+**Context:** Playwright runs tests in parallel by default — shared state causes race conditions. Each test starts with its own `BrowserContext` (isolated cookies, storage, cache). Use fixtures (`pw-fixtures`) for expensive setup that multiple tests need, not shared variables. The `!` non-null assertion on `pop()` in the incorrect example is a second smell — `split('/').pop()` returns `string | undefined` and the assertion discards that without a runtime check. Cross-ref: `struct-test-isolation`.
+
+---
+
+### `pw-fixtures`
+
+**Impact: HIGH**
+
+Use `test.extend` to create custom fixtures. Fixtures provide typed, reusable setup/teardown and compose cleanly.
+
+**Incorrect:**
+
+```typescript
+// WRONG: hardcoded credentials AND repeated setup in every test
+test("admin sees user list", async ({ page }) => {
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("admin@example.com"); // WRONG: hardcoded credential
+  await page.getByLabel("Password").fill("admin-password"); // WRONG: hardcoded credential
+  await page.getByRole("button", { name: "Log in" }).click();
+  await page.waitForURL("/dashboard");
+
+  await page.goto("/admin/users");
+  await expect(page.getByRole("table")).toBeVisible();
+});
+
+test("admin can disable user", async ({ page }) => {
+  // Same login boilerplate repeated
+  await page.goto("/login");
+  await page.getByLabel("Email").fill("admin@example.com"); // WRONG: hardcoded credential
+  await page.getByLabel("Password").fill("admin-password"); // WRONG: hardcoded credential
+  await page.getByRole("button", { name: "Log in" }).click();
+  await page.waitForURL("/dashboard");
+
+  // ...
+});
+```
+
+**Correct:**
+
+```typescript
+// fixtures.ts
+import { test as base, type Page } from "@playwright/test";
+
+type Fixtures = {
+  authenticatedPage: Page;
+  adminPage: Page;
+};
+
+export const test = base.extend<Fixtures>({
+  authenticatedPage: async ({ page }, use) => {
+    const email = process.env.TEST_USER_EMAIL;
+    const password = process.env.TEST_USER_PASSWORD;
+    if (!email || !password) {
+      throw new Error("TEST_USER_EMAIL and TEST_USER_PASSWORD must be set. See .env.test.example.");
+    }
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password").fill(password);
+    await page.getByRole("button", { name: "Log in" }).click();
+    await page.waitForURL("/dashboard");
+    await use(page);
+  },
+
+  adminPage: async ({ authenticatedPage }, use) => {
+    // Compose: reuse authenticatedPage, then elevate to admin context
+    await authenticatedPage.goto("/admin");
+    await use(authenticatedPage);
+  },
+});
+
+export { expect } from "@playwright/test";
+
+// In tests
+import { test, expect } from "./fixtures";
+
+test("admin sees user list", async ({ adminPage }) => {
+  await adminPage.goto("/admin/users");
+  await expect(adminPage.getByRole("table")).toBeVisible();
+});
+```
+
+**Context:** Fixtures compose — `adminPage` depends on `authenticatedPage` and adds admin-specific navigation. Use `{ scope: "worker" }` for expensive one-time setup shared across tests in the same worker (e.g., seeding a test database). Default scope is per-test, which is the safe choice for isolation. Never hardcode real credentials in fixture files — use environment variables (`.env.test`) or Playwright's `storageState` to log in once in `globalSetup` and reuse the session.
+
+---
+
+## 10. Playwright CI & Advanced (MEDIUM)
+
+Advanced Playwright patterns for network mocking, visual regression, and CI configuration.
+
+### `pw-network-mocking`
+
+**Impact: MEDIUM**
+
+Use `page.route()` to intercept and stub network requests for deterministic E2E tests. Mock the network when you need speed, stability, or to test error states.
+
+**Incorrect:**
+
+```typescript
+// WRONG: test depends on real API — slow, flaky, non-deterministic
+test("shows user profile", async ({ page }) => {
+  await page.goto("/profile/1");
+  // If the API is down or data changed, this test breaks
+  await expect(page.getByText("Jane Doe")).toBeVisible();
+});
+```
+
+**Correct:**
+
+```typescript
+test("shows user profile", async ({ page }) => {
+  // Intercept the API call and return a deterministic response
+  await page.route("**/api/users/1", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: 1,
+        name: "Jane Doe",
+        email: "jane@test.example",
+      }),
+    })
+  );
+
+  await page.goto("/profile/1");
+
+  await expect(page.getByText("Jane Doe")).toBeVisible();
+  await expect(page.getByText("jane@test.example")).toBeVisible();
+});
+
+test("shows error state on API failure", async ({ page }) => {
+  await page.route("**/api/users/1", (route) =>
+    route.fulfill({ status: 500, body: "Internal Server Error" })
+  );
+
+  await page.goto("/profile/1");
+
+  await expect(page.getByText("Something went wrong")).toBeVisible();
+});
+```
+
+**Context:** `page.route()` intercepts at the browser network level — the app code runs unchanged. Use glob patterns (`**/api/**`) for flexibility. Use `route.continue({ headers: {...} })` to let a request proceed with modified request headers. To intercept and modify the response, use `await route.fetch()` then `route.fulfill()` with the modified body. Unlike MSW (which mocks at the service-worker layer for unit/integration tests), `page.route()` is Playwright's native approach for E2E tests. Decide per-suite: mock for speed and stability, use real APIs for smoke/integration E2E suites.
+
+---
+
+### `pw-visual-regression`
+
+**Impact: MEDIUM**
+
+Use `toHaveScreenshot()` to catch unintended visual changes. Screenshot specific components, not full pages, and set explicit thresholds.
+
+**Incorrect:**
+
+```typescript
+// WRONG: full-page screenshot — any layout shift triggers failure
+test("dashboard looks correct", async ({ page }) => {
+  await page.goto("/dashboard");
+  await expect(page).toHaveScreenshot();
+});
+```
+
+**Correct:**
+
+```typescript
+test("metrics card renders correctly", async ({ page }) => {
+  await page.goto("/dashboard");
+
+  const metricsCard = page.getByTestId("metrics-card");
+  await expect(metricsCard).toBeVisible();
+
+  await expect(metricsCard).toHaveScreenshot("metrics-card.png", {
+    maxDiffPixelRatio: 0.01, // Allow 1% pixel difference
+  });
+});
+
+test("chart renders with data", async ({ page }) => {
+  // Mock data for deterministic rendering
+  await page.route("**/api/metrics", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ revenue: 50000, users: 1234 }),
+    })
+  );
+
+  await page.goto("/dashboard");
+
+  // CSS selector is acceptable here — recharts wrapper has no semantic role or testId
+  const chart = page.locator(".recharts-wrapper");
+  await expect(chart).toBeVisible();
+
+  await expect(chart).toHaveScreenshot("revenue-chart.png", {
+    maxDiffPixelRatio: 0.02,
+  });
+});
+```
+
+**Context:** First run generates baseline screenshots in a directory named after the test file (e.g., `e2e/dashboard.spec.ts-snapshots/`) colocated with the test — commit these to version control. Review screenshot diffs like you review snapshot diffs (see `snap-review-updates`). Use `maxDiffPixelRatio` over `maxDiffPixels` for responsive-safe thresholds. Mock data before screenshotting to avoid non-deterministic content. Run visual tests on a single browser/OS in CI to avoid cross-platform rendering differences.
+
+---
+
+### `pw-ci-config`
+
+**Impact: MEDIUM**
+
+Configure Playwright for CI: define browser projects, set retries, enable trace on first retry, upload artifacts, and shard for speed.
+
+**Incorrect:**
+
+```typescript
+// WRONG: no CI-specific config — slow, no artifacts, no retry insight
+// playwright.config.ts
+import { defineConfig } from "@playwright/test";
+
+export default defineConfig({
+  use: {
+    baseURL: "http://localhost:3000",
+  },
+});
+```
+
+**Correct:**
+
+```typescript
+// playwright.config.ts
+import { defineConfig, devices } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./e2e",
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI, // Fail CI if test.only is left in
+  retries: process.env.CI ? 2 : 0,
+  reporter: process.env.CI ? "html" : "list",
+
+  use: {
+    baseURL: "http://localhost:3000",
+    trace: "on-first-retry", // Capture trace only on failure — fast + debuggable
+    screenshot: "only-on-failure",
+  },
+
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } },
+  ],
+
+  webServer: {
+    command: "npm run dev",
+    url: "http://localhost:3000",
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+```yaml
+# GitHub Actions — Playwright CI
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium  # Install only browsers you need
+      - run: npx playwright test --project=chromium --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ matrix.shardIndex }}
+          path: playwright-report/
+          retention-days: 7
+```
+
+**Context:** `trace: "on-first-retry"` captures a full trace (DOM snapshots, network, console) only when a test fails and retries — zero overhead on passing tests, full debugging context on failures. Use `--shard` for parallelism across CI workers (cross-ref: `ci-test-splitting`). `forbidOnly` prevents `.only` from accidentally landing in CI. Upload the HTML report as an artifact so anyone can inspect failures without rerunning locally. Pin `playwright install` to only the browsers declared in your `projects` config (e.g., `chromium` instead of all browsers) to reduce install time and limit supply-chain surface. For production CI workflows, pin GitHub Actions to commit SHAs (e.g., `actions/checkout@<sha> # v4`) to guard against supply-chain tag mutation.
