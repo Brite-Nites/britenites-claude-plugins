@@ -2,7 +2,7 @@
 
 A **Process + Org** plugin for Claude Code. Superpowers methodology + compound engineering + Linear integration — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
-**Current version:** 3.5.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 3.7.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
 ## Philosophy
 
@@ -64,6 +64,8 @@ Verify installation by typing `/workflows:` in Claude Code — you should see th
 |---------|-------------|
 | `/workflows:scope` | Collaborative scoping session — discover what to build, create Linear issues |
 | `/workflows:project-start` | Start a new project with a guided interview |
+| `/workflows:sprint-planning` | Plan sprint and assign issues to a cycle |
+| `/workflows:retrospective` | Sprint retrospective with status update |
 
 **Utilities:**
 
@@ -76,6 +78,8 @@ Verify installation by typing `/workflows:` in Claude Code — you should see th
 | `/workflows:tech-stack` | Display the Brite technology stack |
 | `/workflows:onboarding-checklist` | Guide for setting up a new dev environment |
 | `/workflows:setup-claude-md` | Generate best-practices CLAUDE.md for a project |
+| `/workflows:architecture-decision` | Generate Architecture Decision Records |
+| `/workflows:create-plugin` | Scaffold a new domain plugin from template |
 | `/workflows:smoke-test` | Diagnostic checks on plugin environment |
 
 ## Skill Coverage Matrix
@@ -95,11 +99,12 @@ Skills activate automatically when Claude detects relevant context.
 | `best-practices-audit` | Quality | After compound learnings (via ship) |
 | `systematic-debugging` | Debugging | Bug investigation (anytime) |
 
-**Design & quality skills** (shipped):
+**Design, backend & quality skills** (shipped):
 
 | Skill | Category | Trigger |
 |-------|----------|---------|
 | `react-best-practices` | Frontend | Writing, reviewing, or optimizing React components |
+| `python-best-practices` | Backend | Writing, reviewing, or refactoring FastAPI/Python code |
 | `frontend-design` | Frontend | Building web components, pages, dashboards |
 | `ui-ux-pro-max` | Design | Design tasks across 50 styles, 9 frameworks, 21 palettes |
 | `web-design-guidelines` | Design | Reviewing UI code for best practices and accessibility |
@@ -155,7 +160,7 @@ Each plugin requires `.claude-plugin/plugin.json`:
 {
   "name": "workflows",
   "description": "Process + Org plugin — structured workflow methodology with Linear integration",
-  "version": "3.0.0",
+  "version": "3.7.0",
   "author": { "name": "Brite" },
   "homepage": "https://github.com/brite-nites/brite-claude-plugins",
   "repository": "https://github.com/brite-nites/brite-claude-plugins",
@@ -482,7 +487,7 @@ The root `marketplace.json` registers plugins for distribution:
       "name": "workflows",
       "source": "./plugins/workflows",
       "description": "Process + Org plugin — structured workflow methodology with Linear integration",
-      "version": "3.0.0"
+      "version": "3.7.0"
     }
   ]
 }
