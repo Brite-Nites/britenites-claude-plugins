@@ -1,12 +1,12 @@
 ---
 name: testing-strategy
-description: Use when writing, reviewing, or refactoring test code. Triggers on Vitest tests, React Testing Library usage, MSW handlers, Playwright E2E tests, test structure decisions, or coverage configuration. Contains 39 testing rules across 10 categories.
+description: Use when writing, reviewing, or refactoring test code. Triggers on Vitest tests, React Testing Library usage, MSW handlers, Playwright E2E tests, pytest fixtures, test structure decisions, or coverage configuration. Contains 46 testing rules across 12 categories.
 user-invocable: true
 ---
 
-# Testing Strategy — Core Patterns, Vitest & Playwright
+# Testing Strategy — Core Patterns, Vitest, Playwright & pytest
 
-Testing patterns and conventions for Vitest, React Testing Library, MSW, and Playwright. Contains 39 rules across 10 categories, prioritized by impact. Focuses on patterns that produce reliable, maintainable tests — test isolation, mock boundaries, query priorities, meaningful coverage, and E2E best practices.
+Testing patterns and conventions for Vitest, React Testing Library, MSW, Playwright, and pytest. Contains 46 rules across 12 categories, prioritized by impact. Focuses on patterns that produce reliable, maintainable tests — test isolation, mock boundaries, query priorities, meaningful coverage, E2E best practices, and Python testing fundamentals.
 
 ## When to Apply
 
@@ -19,6 +19,8 @@ Reference these guidelines when:
 - Refactoring flaky or brittle tests
 - Writing or reviewing Playwright E2E tests
 - Configuring Playwright for CI or visual regression
+- Writing pytest fixtures, parametrize tests, or conftest.py files
+- Reviewing pytest code for isolation, async patterns, or parallelism
 
 ## Target Versions
 
@@ -27,6 +29,10 @@ Reference these guidelines when:
 - MSW 2.x
 - @testing-library/user-event 14.x
 - Playwright 1.45+
+- pytest 8.x
+- anyio 4.x
+- pytest-mock 3.x
+- pytest-xdist 3.x
 
 ## Rule Categories by Priority
 
@@ -42,6 +48,8 @@ Reference these guidelines when:
 | 8 | Snapshot Testing | LOW-MEDIUM | `snap-` | 3 |
 | 9 | Playwright Fundamentals | HIGH | `pw-` | 4 |
 | 10 | Playwright CI & Advanced | MEDIUM | `pw-` (shared) | 3 |
+| 11 | pytest Fundamentals | HIGH | `pytest-` | 4 |
+| 12 | pytest Advanced Patterns | MEDIUM | `pytest-` (shared) | 3 |
 
 ## Quick Reference
 
@@ -113,6 +121,23 @@ Reference these guidelines when:
 - `pw-network-mocking` — Use `page.route()` to intercept/stub network requests for deterministic E2E tests
 - `pw-visual-regression` — Screenshot specific components with `toHaveScreenshot()` + explicit thresholds (cross-ref `snap-review-updates`)
 - `pw-ci-config` — Browser projects, retries, `trace: 'on-first-retry'`, artifact upload, `--shard` (cross-ref `ci-test-splitting`)
+
+### 11. pytest Fundamentals (HIGH)
+
+- `pytest-fixtures` — Fixture scope (function/class/module/session), yield for teardown, fixture composition, autouse sparingly
+- `pytest-parametrize` — `@pytest.mark.parametrize` for data-driven tests, indirect fixtures, `ids` for readable output
+- `pytest-conftest` — conftest.py layering and discovery rules, scope-appropriate placement, keep test-specific fixtures local
+- `pytest-mocking` — `monkeypatch` for env vars/attrs/dicts, `pytest-mock`'s `mocker` fixture, preference hierarchy vs raw `unittest.mock`
+
+### 12. pytest Advanced Patterns (MEDIUM)
+
+- `pytest-async` — anyio for async tests, `@pytest.mark.anyio`, async fixtures, strict mode. Cross-ref: python-best-practices `test-async-client` for FastAPI-specific patterns
+- `pytest-markers` — Custom markers, marker registration in `pyproject.toml`, `--strict-markers`, `filterwarnings`
+- `pytest-xdist` — Parallel execution with pytest-xdist, `--dist loadscope`/`loadfile`, worker-safe fixtures. Cross-ref: `ci-parallel-execution`
+
+## Python Testing Note
+
+For FastAPI-specific test patterns (async test clients, dependency overrides, database isolation), see the **python-best-practices** skill. The pytest rules here cover general patterns applicable to any Python project.
 
 ## Linting & Formatting
 

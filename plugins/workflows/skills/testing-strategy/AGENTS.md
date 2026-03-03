@@ -1,6 +1,6 @@
 # Testing Strategy — Full Reference
 
-Testing patterns and conventions for Vitest, React Testing Library, MSW, and Playwright. 39 rules across 10 categories, prioritized by impact. Targets Vitest 3.x, React Testing Library 16.x, MSW 2.x, @testing-library/user-event 14.x, Playwright 1.45+.
+Testing patterns and conventions for Vitest, React Testing Library, MSW, Playwright, and pytest. 46 rules across 12 categories, prioritized by impact. Targets Vitest 3.x, React Testing Library 16.x, MSW 2.x, @testing-library/user-event 14.x, Playwright 1.45+, pytest 8.x, anyio 4.x, pytest-mock 3.x, pytest-xdist 3.x.
 
 ## Table of Contents
 
@@ -14,6 +14,8 @@ Testing patterns and conventions for Vitest, React Testing Library, MSW, and Pla
 8. [Snapshot Testing (LOW-MEDIUM)](#8-snapshot-testing-low-medium)
 9. [Playwright Fundamentals (HIGH)](#9-playwright-fundamentals-high)
 10. [Playwright CI & Advanced (MEDIUM)](#10-playwright-ci--advanced-medium)
+11. [pytest Fundamentals (HIGH)](#11-pytest-fundamentals-high)
+12. [pytest Advanced Patterns (MEDIUM)](#12-pytest-advanced-patterns-medium)
 
 ---
 
@@ -1593,3 +1595,476 @@ jobs:
 ```
 
 **Context:** `trace: "on-first-retry"` captures a full trace (DOM snapshots, network, console) only when a test fails and retries — zero overhead on passing tests, full debugging context on failures. Use `--shard` for parallelism across CI workers (cross-ref: `ci-test-splitting`). `forbidOnly` prevents `.only` from accidentally landing in CI. Upload the HTML report as an artifact so anyone can inspect failures without rerunning locally. Pin `playwright install` to only the browsers declared in your `projects` config (e.g., `chromium` instead of all browsers) to reduce install time and limit supply-chain surface. For production CI workflows, pin GitHub Actions to commit SHAs (e.g., `actions/checkout@<sha> # v4`) to guard against supply-chain tag mutation.
+
+---
+
+## 11. pytest Fundamentals (HIGH)
+
+General pytest patterns for writing reliable, maintainable Python tests. For FastAPI-specific test patterns, see the **python-best-practices** skill.
+
+### `pytest-fixtures`
+
+**Impact: HIGH**
+
+Use fixtures for test setup and teardown. Choose the right scope — `function` (default) for per-test isolation, `session` for expensive shared resources. Use `yield` for teardown. Compose small fixtures instead of building monoliths. Use `autouse` sparingly — only for truly universal setup.
+
+**Incorrect:**
+
+```python
+# WRONG: Setup logic duplicated across tests, no teardown
+import tempfile
+import os
+
+def test_process_file():
+    path = tempfile.mktemp()
+    with open(path, "w") as f:
+        f.write("data")
+    result = process_file(path)
+    assert result == "processed"
+    # Forgot to clean up — temp file leaks
+
+def test_process_empty_file():
+    path = tempfile.mktemp()
+    with open(path, "w") as f:
+        f.write("")
+    result = process_file(path)
+    assert result == "empty"
+    # Same cleanup problem
+```
+
+**Correct:**
+
+```python
+# RIGHT: Fixture handles setup + teardown, composable, scoped appropriately
+import pytest
+from pathlib import Path
+
+@pytest.fixture
+def tmp_file(tmp_path: Path):
+    """Create a temp file with content. Cleanup handled by tmp_path fixture."""
+    file_path = tmp_path / "test_data.txt"
+    file_path.write_text("data")
+    return file_path
+
+@pytest.fixture(scope="session")
+def db_engine():
+    """Expensive resource — create once per session, teardown after all tests."""
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    yield engine
+    engine.dispose()
+
+@pytest.fixture  # function-scoped (default) — can request session-scoped db_engine
+def db_session(db_engine):
+    """Per-test session — fixture composition with automatic rollback."""
+    connection = db_engine.connect()
+    transaction = connection.begin()
+    session = Session(connection)  # SQLAlchemy 2.0 — positional, not bind=
+    yield session
+    session.close()
+    transaction.rollback()
+    connection.close()
+
+def test_process_file(tmp_file: Path):
+    result = process_file(tmp_file)
+    assert result == "processed"
+```
+
+**Context:** Fixture scope determines lifetime: `function` (default) runs per-test for full isolation, `class` runs once per test class, `module` once per file, `session` once per test run. Use `yield` to separate setup from teardown — pytest guarantees the teardown code runs even if the test fails. Compose fixtures by accepting other fixtures as parameters. Avoid `autouse=True` except for truly universal needs (like resetting a global config) — implicit setup hides dependencies and makes tests harder to understand.
+
+---
+
+### `pytest-parametrize`
+
+**Impact: HIGH**
+
+Use `@pytest.mark.parametrize` for data-driven tests instead of writing separate test functions or loops. Use `ids` for readable output. Use `indirect` to route parameters through fixtures.
+
+**Incorrect:**
+
+```python
+# WRONG: Separate test functions for each case — duplication
+def test_validate_email_valid():
+    assert validate_email("user@example.com") is True
+
+def test_validate_email_no_at():
+    assert validate_email("userexample.com") is False
+
+def test_validate_email_no_domain():
+    assert validate_email("user@") is False
+
+# WRONG: Loop inside a single test — first failure hides the rest
+def test_validate_email_all():
+    cases = [("user@example.com", True), ("bad", False), ("user@", False)]
+    for email, expected in cases:
+        assert validate_email(email) == expected
+```
+
+**Correct:**
+
+```python
+# RIGHT: Parametrize — each case runs independently with clear IDs
+import pytest
+
+@pytest.mark.parametrize(
+    ("email", "expected"),
+    [
+        ("user@example.com", True),
+        ("admin@test.org", True),
+        ("userexample.com", False),
+        ("user@", False),
+        ("", False),
+    ],
+    ids=["valid-basic", "valid-org", "missing-at", "missing-domain", "empty"],
+)
+def test_validate_email(email: str, expected: bool):
+    assert validate_email(email) == expected
+
+# RIGHT: indirect=True routes parameters through a fixture
+@pytest.fixture
+def user(request: pytest.FixtureRequest):
+    return create_user(role=request.param)
+
+@pytest.mark.parametrize("user", ["admin", "editor", "viewer"], indirect=True)
+def test_user_permissions(user):
+    assert user.can_access_dashboard() == (user.role in ("admin", "editor"))
+```
+
+**Context:** `@pytest.mark.parametrize` runs the test once per parameter set, reports each independently, and stops at the first failure per case (not per function). Use `ids` to label cases — pytest output shows `test_validate_email[valid-basic]` instead of `test_validate_email[user@example.com-True]`. Use `indirect=True` when parameters need fixture processing (e.g., creating objects from role names). Stack multiple `@pytest.mark.parametrize` decorators for combinatorial testing.
+
+---
+
+### `pytest-conftest`
+
+**Impact: HIGH**
+
+Place fixtures in `conftest.py` at the appropriate directory level. Keep test-specific fixtures in the test file. Don't create a single root conftest with everything.
+
+**Incorrect:**
+
+```python
+# WRONG: All fixtures in root conftest.py, even test-specific ones
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def admin_user():
+    return create_user(role="admin")
+
+@pytest.fixture
+def mock_stripe_webhook_payload():
+    """Only used in tests/billing/test_webhooks.py"""
+    return {"type": "invoice.paid", "data": {"amount": 1000}}
+
+@pytest.fixture
+def sample_csv_row():
+    """Only used in tests/importers/test_csv.py"""
+    return {"name": "Alice", "email": "alice@example.com"}
+```
+
+**Correct:**
+
+```python
+# RIGHT: Root conftest — only widely shared fixtures
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def admin_user():
+    """Used across multiple test directories."""
+    return create_user(role="admin")
+
+# RIGHT: Domain-specific conftest — scoped to its directory
+# tests/billing/conftest.py
+import pytest
+
+@pytest.fixture
+def mock_stripe_webhook_payload():
+    """Only used by billing tests."""
+    return {"type": "invoice.paid", "data": {"amount": 1000}}
+
+# RIGHT: Test-specific fixture stays in the test file
+# tests/importers/test_csv.py
+import pytest
+
+@pytest.fixture
+def sample_csv_row():
+    """Only used in this file — no reason for conftest."""
+    return {"name": "Alice", "email": "alice@example.com"}
+
+def test_import_csv_row(sample_csv_row):
+    result = import_row(sample_csv_row)
+    assert result.name == "Alice"
+```
+
+**Context:** pytest discovers `conftest.py` files by walking up the directory tree — a fixture in `tests/billing/conftest.py` is available to all tests under `tests/billing/` but not to `tests/api/`. Place fixtures at the narrowest scope possible: root conftest for cross-cutting concerns (DB sessions, auth helpers), directory conftest for domain-specific fixtures, and the test file itself for single-use fixtures. This keeps fixture discovery fast and makes dependencies explicit.
+
+---
+
+### `pytest-mocking`
+
+**Impact: HIGH**
+
+Use `monkeypatch` for env vars, attributes, and dict entries. Use `pytest-mock`'s `mocker` fixture for spy/stub patterns. Prefer these over raw `unittest.mock` — they auto-restore after each test.
+
+**Incorrect:**
+
+```python
+# WRONG: Raw unittest.mock with manual cleanup
+from unittest.mock import patch, MagicMock
+import os
+
+def test_config_reads_env():
+    original = os.environ.get("API_KEY")
+    os.environ["API_KEY"] = "test-key"
+    try:
+        config = load_config()
+        assert config.api_key == "test-key"
+    finally:
+        if original is None:
+            del os.environ["API_KEY"]
+        else:
+            os.environ["API_KEY"] = original
+
+# WRONG: Patching internal implementation details
+def test_process_order():
+    with patch("app.orders.service._calculate_subtotal") as mock_sub:
+        with patch("app.orders.service._apply_discount") as mock_disc:
+            mock_sub.return_value = 100
+            mock_disc.return_value = 90
+            result = process_order(order)
+            assert result.total == 90
+```
+
+**Correct:**
+
+```python
+# RIGHT: monkeypatch auto-restores after each test
+def test_config_reads_env(monkeypatch):
+    monkeypatch.setenv("API_KEY", "test-key")
+    config = load_config()
+    assert config.api_key == "test-key"
+
+def test_config_missing_env(monkeypatch):
+    monkeypatch.delenv("API_KEY", raising=False)
+    with pytest.raises(ConfigError, match="API_KEY"):
+        load_config()
+
+# RIGHT: mocker fixture for spy/stub (from pytest-mock)
+from unittest import mock
+
+def test_sends_notification(mocker):
+    mock_send = mocker.patch("app.notifications.email_client.send")
+    process_order(order)
+    mock_send.assert_called_once_with(
+        to="user@example.com",
+        subject=mock.ANY,
+    )
+
+# RIGHT: monkeypatch.setattr for replacing attributes
+def test_retry_with_backoff(monkeypatch):
+    monkeypatch.setattr("app.client.MAX_RETRIES", 1)
+    with pytest.raises(ConnectionError):
+        fetch_data()
+```
+
+**Context:** `monkeypatch` is a built-in pytest fixture that auto-restores patched values after each test — no `try/finally` or context managers needed. Use `monkeypatch.setenv`/`delenv` for environment variables, `monkeypatch.setattr` for module-level attributes and class methods, `monkeypatch.setitem`/`delitem` for dictionary entries. `pytest-mock`'s `mocker` fixture wraps `unittest.mock.patch` with automatic cleanup. Use `unittest.mock.ANY` (not `mocker.ANY`) for argument matchers. Prefer `mocker.patch("app.notifications.email_client.send")` (mock at the boundary) over patching internal helpers. Never use real-looking credential formats (e.g., `sk-`, `AKIA`) as test values — use opaque strings like `"test-key"` or `"fake-value"`.
+
+---
+
+## 12. pytest Advanced Patterns (MEDIUM)
+
+Advanced pytest patterns for async testing, custom markers, and parallel execution.
+
+### `pytest-async`
+
+**Impact: MEDIUM**
+
+Use anyio for async tests. Mark with `@pytest.mark.anyio`. Use `anyio` strict mode to enforce marker usage. For FastAPI-specific async test patterns, see `test-async-client` in the python-best-practices skill.
+
+**Incorrect:**
+
+```python
+# WRONG: Using asyncio.run or event loop manipulation
+import asyncio
+
+def test_fetch_user():
+    result = asyncio.run(fetch_user(1))
+    assert result.name == "Alice"
+
+# WRONG: Missing marker — async test silently runs as sync (returns coroutine, no await)
+import pytest
+
+async def test_create_user():
+    user = await create_user(name="Bob")
+    assert user.id is not None  # Never reached — no runner awaits this coroutine
+```
+
+**Correct:**
+
+```python
+# RIGHT: anyio with strict mode — all async tests must have marker
+# pyproject.toml
+# [tool.pytest.ini_options]
+# anyio_mode = "strict"
+
+import pytest
+
+@pytest.mark.anyio
+async def test_fetch_user():
+    result = await fetch_user(1)
+    assert result.name == "Alice"
+
+@pytest.mark.anyio
+async def test_create_user():
+    user = await create_user(name="Bob")
+    assert user.id is not None
+
+# RIGHT: Async fixture with anyio
+@pytest.fixture
+async def async_client():
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
+
+@pytest.mark.anyio
+async def test_api_endpoint(async_client):
+    response = await async_client.get("/api/users")
+    assert response.status_code == 200
+```
+
+**Context:** `anyio` includes a pytest plugin that supports `@pytest.mark.anyio` — no separate `pytest-anyio` package needed. Enable `anyio_mode = "strict"` in `pyproject.toml` to ensure every async test has a marker — without it, unmarked async tests silently don't run as async. Unlike `pytest-asyncio` (which requires `@pytest_asyncio.fixture` for async fixtures), anyio works with the standard `@pytest.fixture` decorator on async functions. Prefer anyio over `pytest-asyncio` for new projects — it's backend-agnostic (asyncio and trio) and aligns with modern Python async best practices. For FastAPI apps, combine with `httpx.AsyncClient` (see `test-async-client` in python-best-practices).
+
+---
+
+### `pytest-markers`
+
+**Impact: MEDIUM**
+
+Register custom markers in `pyproject.toml`. Use `--strict-markers` to catch typos. Use `filterwarnings` to control warning behavior in tests.
+
+**Incorrect:**
+
+```python
+# WRONG: Unregistered markers — no error, silently ignored with --strict-markers
+@pytest.mark.slow
+def test_full_pipeline():
+    result = run_pipeline(large_dataset)
+    assert result.success
+
+@pytest.mark.integation  # Typo! No error without --strict-markers
+def test_external_api():
+    response = call_external_api()
+    assert response.ok
+
+# WRONG: Warnings spam test output, no filterwarnings config
+def test_deprecated_function():
+    result = old_function()  # DeprecationWarning clutters output
+    assert result == 42
+```
+
+**Correct:**
+
+```python
+# RIGHT: Register markers in pyproject.toml
+# [tool.pytest.ini_options]
+# markers = [
+#     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+#     "integration: marks tests requiring external services",
+# ]
+# addopts = "--strict-markers -m 'not integration'"  # exclude integration by default
+# filterwarnings = [
+#     "error",
+#     "ignore::DeprecationWarning:third_party_lib.*",
+# ]
+
+import pytest
+
+@pytest.mark.slow
+def test_full_pipeline():
+    result = run_pipeline(large_dataset)
+    assert result.success
+
+@pytest.mark.integration
+def test_external_api():
+    response = call_external_api()
+    assert response.ok
+
+# Run subsets: pytest -m "not slow" or pytest -m integration
+# In CI, pass -m integration in a separate job with network access
+```
+
+**Context:** `--strict-markers` makes unregistered markers a hard error — catches typos like `@pytest.mark.integation` at collection time instead of silently running the test. Register markers in `pyproject.toml` under `[tool.pytest.ini_options]` with descriptions. Use `filterwarnings = ["error"]` to promote all warnings to errors (catches deprecation issues early), then add `ignore` entries for third-party warnings you can't fix — scope `ignore` entries as narrowly as possible (prefer `ignore::DeprecationWarning:specific_module` over broad globs to avoid silencing warnings from security-relevant libraries). Run marker subsets with `-m "not slow"` for fast local iteration, full suite in CI.
+
+---
+
+### `pytest-xdist`
+
+**Impact: MEDIUM**
+
+Use pytest-xdist for parallel test execution. Use `--dist loadscope` or `--dist loadfile` to group related tests on the same worker. Ensure fixtures are worker-safe. Cross-ref: `ci-parallel-execution` for general CI parallelism guidance.
+
+**Incorrect:**
+
+```python
+# WRONG: Shared mutable state across tests — breaks under parallel execution
+# conftest.py
+_cache = {}
+
+@pytest.fixture
+def shared_cache():
+    return _cache  # Same dict shared across workers — race conditions
+
+def test_add_to_cache(shared_cache):
+    shared_cache["key"] = "value"
+    assert shared_cache["key"] == "value"
+
+def test_cache_empty(shared_cache):
+    assert len(shared_cache) == 0  # Fails even serially — shared mutable state is the root cause
+
+# WRONG: Tests depend on execution order
+def test_create_user():
+    create_user("alice")
+
+def test_user_exists():
+    assert get_user("alice") is not None  # Depends on test_create_user running first
+```
+
+**Correct:**
+
+```python
+# RIGHT: Worker-safe fixtures — each worker gets its own resources
+# conftest.py
+import pytest
+
+@pytest.fixture
+def isolated_cache():
+    """Fresh cache per test — safe for parallel execution."""
+    return {}
+
+# RIGHT: Use tmp_path (per-test) or tmp_path_factory (per-session) for file isolation
+@pytest.fixture
+def worker_db(tmp_path):
+    """Each worker gets its own SQLite database."""
+    db_path = tmp_path / "test.db"
+    engine = create_engine(f"sqlite:///{db_path}")
+    Base.metadata.create_all(engine)
+    yield engine
+    engine.dispose()
+
+def test_add_to_cache(isolated_cache):
+    isolated_cache["key"] = "value"
+    assert isolated_cache["key"] == "value"
+
+def test_cache_starts_empty(isolated_cache):
+    assert len(isolated_cache) == 0  # Always true — fresh dict each test
+```
+
+```toml
+# pyproject.toml — xdist configuration
+[tool.pytest.ini_options]
+addopts = "-n auto --dist loadscope"
+# -n auto: spawn one worker per CPU core
+# --dist loadscope: group tests by module/class on same worker
+```
+
+**Context:** `pytest-xdist` distributes tests across multiple processes. `--dist loadscope` groups tests by module (or class) onto the same worker — reduces fixture setup overhead and avoids cross-test interference. `--dist loadfile` is similar but groups by file. `--dist load` (default) distributes individual tests for maximum parallelism but can break tests with shared state. Use `-n auto` to match CPU cores, or `-n 4` for a fixed count. Ensure all fixtures create per-test or per-worker resources — no module-level mutable state. For databases, use `tmp_path` to give each worker its own SQLite file, or use transactions with rollback for shared Postgres (cross-ref: `test-db-isolation` in python-best-practices).

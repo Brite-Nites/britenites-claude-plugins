@@ -125,7 +125,7 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 
 | Skill | Triggers on | Purpose |
 |-------|-------------|---------|
-| `testing-strategy` | Writing, reviewing, or refactoring test code | Testing patterns (Vitest, RTL, MSW, Playwright) |
+| `testing-strategy` | Writing, reviewing, or refactoring test code | Testing patterns (Vitest, RTL, MSW, Playwright, pytest) |
 | `code-quality` | Setting up or reviewing ESLint, Prettier, Ruff, mypy | Linting/formatting config |
 
 ## plugin.json Schema (STRICT — read before editing)
