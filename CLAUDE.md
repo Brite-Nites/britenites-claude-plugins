@@ -119,6 +119,7 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 |-------|-------------|---------|
 | `frontend-design` | "build", "create", "implement" UI | Write production code |
 | `ui-ux-pro-max` | "choose palette", "design system", "plan visual direction" | Design planning |
+| `visual-explainer` | "diagram", "architecture overview", "visual explanation", complex tables | Generate styled HTML pages |
 | `web-design-guidelines` | "review", "audit", "check" existing UI | Compliance review |
 
 ### Quality Skills

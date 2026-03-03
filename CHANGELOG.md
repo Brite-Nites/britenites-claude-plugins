@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.11.0] - 2026-03-03
+
+### Added
+- `visual-explainer` skill — generates styled, self-contained HTML pages for diagrams, architecture overviews, data tables, and slide decks. Ported from [nicobailon/visual-explainer](https://github.com/nicobailon/visual-explainer) (MIT). Includes 4 HTML reference templates (architecture, data-table, mermaid-flowchart, slide-deck) and 4 reference docs (css-patterns, libraries, responsive-nav, slide-patterns). Anti-slop design guidelines prevent generic AI output (BRI-1729). Skill total: 22
+
+### Fixed
+- Pin CDN versions to exact patches in libraries.md and templates: mermaid@11.12.3, @mermaid-js/layout-elk@0.2.0, chart.js@4.5.1 (BRI-1729)
+- Add nodeLabel/edgeLabel color CSS overrides to mermaid-flowchart.html for dark/light mode correctness (BRI-1729)
+- Fix window listener leaks in mermaid-flowchart.html and slide-deck.html zoom/pan code — scope mousemove/mouseup inside mousedown (BRI-1729)
+- Fix SlideEngine cross-scope issue in slide-deck.html — use custom event bridge between module and classic scripts (BRI-1729)
+- Fix uninitialized touchY in slide-deck.html touchend handler (BRI-1729)
+- Add aria-label and focus-visible styles to zoom control buttons in both Mermaid templates (BRI-1729)
+- Convert SlideEngine from prototype-based to ES class syntax in slide-deck.html (BRI-1729)
+- Replace emoji with styled monospace abbreviations in architecture.html source pills (BRI-1729)
+- Add cross-browser summary::marker reset in data-table.html collapsible sections (BRI-1729)
+- Add NaN guard to parseInt(el.dataset.count) in libraries.md anime.js example (BRI-1729)
+- Fix hardcoded /tmp path in slide-patterns.md image generation — use mktemp (BRI-1729)
+- Add ID sanitization comment in responsive-nav.md (BRI-1729)
+- Add planned-feature note for /generate-slides and --slides flag in SKILL.md (BRI-1729)
+
 ## [3.10.0] - 2026-03-03
 
 ### Added
