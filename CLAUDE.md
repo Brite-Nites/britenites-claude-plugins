@@ -119,7 +119,7 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 |-------|-------------|---------|
 | `frontend-design` | "build", "create", "implement" UI | Write production code |
 | `ui-ux-pro-max` | "choose palette", "design system", "plan visual direction" | Design planning |
-| `visual-explainer` | "diagram", "architecture overview", "visual explanation", complex tables | Generate styled HTML pages |
+| `visual-explainer` | "diagram", "architecture overview", "visual explanation", complex tables | Generate styled HTML pages. Commands: `/workflows:generate-web-diagram`, `/workflows:generate-slides`, `/workflows:generate-visual-plan`, `/workflows:diff-review`, `/workflows:plan-review`, `/workflows:project-recap`, `/workflows:fact-check` |
 | `web-design-guidelines` | "review", "audit", "check" existing UI | Compliance review |
 
 ### Quality Skills
@@ -168,7 +168,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
-- `docs/testing-guide.md` — comprehensive testing guide (51 tests across 7 layers).
+- `docs/testing-guide.md` — comprehensive testing guide (60 tests across 7 layers).
 
 ## ADR Convention
 

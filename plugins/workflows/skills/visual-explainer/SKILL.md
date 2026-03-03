@@ -294,9 +294,9 @@ Use these sparingly within visual pages to highlight key points or provide breat
 
 ## Slide Deck Mode
 
-> **Note:** The `/generate-slides` command and `--slides` flag referenced below are planned for BRI-1730. Until then, slide decks can be requested via natural language (e.g., "present this as a slide deck").
+Entry points: `/workflows:generate-slides`, the `--slides` flag on other visual commands, or natural language.
 
-An alternative output format for presenting content as a magazine-quality slide presentation instead of a scrollable page. **Opt-in only** — the agent generates slides when the user invokes `/generate-slides`, passes `--slides` to an existing prompt (e.g., `/diff-review --slides`), or explicitly asks for a slide deck. Never auto-select slide format.
+An alternative output format for presenting content as a magazine-quality slide presentation instead of a scrollable page. **Opt-in only** — the agent generates slides when the user invokes `/workflows:generate-slides`, passes `--slides` to an existing prompt (e.g., `/workflows:diff-review --slides`), or explicitly asks for a slide deck. Never auto-select slide format.
 
 **Before generating slides**, read `./references/slide-patterns.md` (engine CSS, slide types, transitions, nav chrome, presets) and `./templates/slide-deck.html` (reference template showing all 10 types). Also read `./references/css-patterns.md` for shared patterns and `./references/libraries.md` for Mermaid/Chart.js theming.
 
@@ -312,7 +312,7 @@ An alternative output format for presenting content as a magazine-quality slide 
 
 **Curated presets:** Four slide-specific presets as starting points (Midnight Editorial, Warm Signal, Terminal Mono, Swiss Clean) plus the existing 8 aesthetic directions adapted for slides. Pick one and commit. See `slide-patterns.md` for preset CSS values.
 
-**`--slides` flag on existing prompts:** When a user passes `--slides` to `/diff-review`, `/plan-review`, `/project-recap`, or other prompts, the agent gathers data using the prompt's normal data-gathering instructions, then presents the content as a slide deck instead of a scrollable page. The slide version tells the same story with different structure and pacing — but the same breadth of coverage. Don't use the slide format as an excuse to summarize or skip sections that the scrollable version would have included.
+**`--slides` flag on existing prompts:** When a user passes `--slides` to `/workflows:diff-review`, `/workflows:plan-review`, `/workflows:project-recap`, or other prompts, the agent gathers data using the prompt's normal data-gathering instructions, then presents the content as a slide deck instead of a scrollable page. The slide version tells the same story with different structure and pacing — but the same breadth of coverage. Don't use the slide format as an excuse to summarize or skip sections that the scrollable version would have included.
 
 ## File Structure
 
