@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.10.0] - 2026-03-03
+
+### Added
+- pytest testing patterns in `testing-strategy` skill — 7 new rules across 2 categories (pytest Fundamentals, pytest Advanced Patterns). Covers fixtures, parametrize, conftest layering, mocking, async testing, markers, and parallel execution with xdist. Cross-references python-best-practices for FastAPI-specific patterns. Skill now has 46 rules across 12 categories (BRI-1739)
+
 ## [3.9.0] - 2026-03-03
 
 ### Added
