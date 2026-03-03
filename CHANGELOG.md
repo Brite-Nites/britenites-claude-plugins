@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.13.0] - 2026-03-03
+
+### Changed
+- `review` command — auto-generates a visual HTML review page (Step 5) after agents complete (BRI-1733)
+  - 6 sections: executive summary, KPI dashboard, module architecture (Mermaid), agent findings (P1/P2/P3 cards with severity + agent badges), file map, test suite status
+  - Delegates styling to visual-explainer skill (reads SKILL.md + architecture.html template). Falls back to plain semantic HTML when skill files are unavailable
+  - Terminal final report (Step 6) retains P1 summary and adds the HTML file path
+
 ## [3.12.0] - 2026-03-03
 
 ### Added
@@ -257,7 +265,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.12.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.13.0...HEAD
+[3.13.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.12.0...v3.13.0
 [3.12.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.11.0...v3.12.0
 [3.11.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.10.0...v3.11.0
 [3.10.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.9.0...v3.10.0
