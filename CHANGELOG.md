@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.14.0] - 2026-03-03
+
+### Changed
+- `writing-plans` skill — Plan Approval section replaced with Visual Plan Approval: 4-step flow that generates visual HTML artifacts (visual plan + plan-review) before asking for approval (BRI-1732)
+  - Step 1: Complexity check — plans with < 4 tasks skip visual steps (optional offer via AskUserQuestion)
+  - Steps 2-3: Render `generate-visual-plan` (Step 2) and `plan-review` (Step 3) HTML pages using visual-explainer skill, write to `~/.agent/diagrams/`. Step 3 is higher-priority — if skipping one for speed, skip Step 2
+  - Issue ID sanitization (dots removed from regex), untrusted title paraphrasing with surf guard, file path announcements, re-save on iteration
+  - Distinct output filenames (`<id>-visual-plan.html`, `<id>-plan-review.html`) prevent artifact collision
+  - Plan file existence fallback, visual-explainer read-once optimization
+  - Step 4: Approval with iteration support (regenerates visuals on plan changes)
+
 ## [3.13.0] - 2026-03-03
 
 ### Changed
@@ -265,7 +276,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.13.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.14.0...HEAD
+[3.14.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.12.0...v3.13.0
 [3.12.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.11.0...v3.12.0
 [3.11.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.10.0...v3.11.0

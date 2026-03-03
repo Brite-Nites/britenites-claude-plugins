@@ -69,14 +69,13 @@ Ask the developer if unsure: "This looks straightforward — should we brainstor
 
 ## Step 5: Write Plan
 
-The `writing-plans` skill activates to create a detailed execution plan:
+The `writing-plans` skill activates to create a detailed execution plan and run the Visual Plan Approval flow:
 
 1. Break the work into bite-sized tasks (2-5 minutes each)
 2. Each task has exact file paths, implementation details, verification steps
 3. Plan is saved to `docs/plans/[issue-id]-plan.md`
 4. Plan references the project's actual test/build/lint commands from CLAUDE.md
-
-**Present the plan** and ask for approval: "Does this plan look right? Any tasks to add, remove, or reorder?"
+5. For plans with 4+ tasks: visual HTML artifacts are generated (visual plan + plan review) and opened in the browser before asking for approval. Smaller plans get an optional offer via AskUserQuestion
 
 ## Step 6: Set Up Worktree
 
