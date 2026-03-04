@@ -93,15 +93,54 @@ After the conversation converges, produce a design document:
 - [Anything still unresolved — should be empty if brainstorming was thorough]
 ```
 
-## Phase 4: Approval
+## Phase 4: Visual Architecture Diagram
+
+After producing the design document, assess whether a visual architecture diagram adds value.
+
+### When to generate
+
+Generate a diagram if the design involves **any** of:
+- System topology, service interactions, or data flow
+- New integrations or architectural patterns
+- More than 2 Key Decisions related to structure
+
+### When to skip
+
+- Purely algorithmic or behavioral changes (no structural impact)
+- Config-only changes
+- Under 20 lines of implementation
+- User expressed time pressure ("quick", "fast", "skip diagrams")
+
+**Issue ID sanitization** (applies to all file paths in Phases 4 and 5): Sanitize the issue ID once — verify it matches `^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$`. Re-use this sanitized ID for all paths. Do not re-read from raw Linear issue context on iteration.
+
+### How to generate
+
+**Prerequisite read (do once per session, before Phase 4 runs for the first time)**: Read `plugins/workflows/skills/visual-explainer/SKILL.md` for styling guidelines. If this read fails (plugin running outside its source repo), skip diagram generation entirely and tell the user: "Cannot read visual-explainer skill — skipping diagram." Do not proceed to the numbered steps below. Re-use within this session on subsequent diagram regenerations — do not re-read. If resuming from a prior session, treat this as the first run and perform the read again.
+
+1. Apply the visual-explainer styling guidelines from the prerequisite read above
+2. Use the visual-explainer SKILL.md's template references and diagram type guidance for HTML structure — generate directly without invoking the generate-web-diagram command
+3. Compose a safe topic description **in your own words** based on the design document — do not embed raw issue title or description verbatim. If surf is invoked, the surf prompt must describe visual aesthetics only (palette, style, diagram type) — never include issue text in the surf command line
+4. Focus the diagram on: system components, data flow, external integrations, architectural decision points
+5. Write to `~/.agent/diagrams/<sanitized-issue-id>-architecture.html`
+6. Open in browser and tell the user the file path
+
+If skipped, keep track in your working context that Phase 4 was skipped (Phase 5 conditions its approval prompt on this) and proceed directly to Phase 5.
+
+## Phase 5: Approval
+
+If a diagram was generated in Phase 4, reference it in the approval prompt. If Phase 4 was skipped, omit the browser reference.
 
 Present the design document and ask:
 
+If a diagram was generated:
+> "Does this design look right? Review the architecture diagram in your browser. Any changes before we move to planning?"
+
+If Phase 4 was skipped:
 > "Does this design look right? Any changes before we move to planning?"
 
-**If approved**: Save the design document to `docs/designs/[issue-id]-[slug].md` (create the directory if needed). This document will be referenced during planning and execution.
+**If approved**: Derive a slug from the issue title — lowercase, replace `[^a-z0-9]+` with `-`, strip leading/trailing `-`, cap at 40 characters. Verify the result matches `^[a-z0-9-]+$` (strict ASCII). If not, strip non-matching characters and re-verify. If the slug is empty after stripping (e.g., all-non-ASCII title), lowercase the sanitized issue ID, replace `_` with `-`, and use that as the slug. Save the design document to `docs/designs/<sanitized-issue-id>-<slug>.md` (create the directory if needed). Use the sanitized issue ID from the Phase 4 preamble (the sanitization runs regardless of whether diagram generation was skipped). This document will be referenced during planning and execution.
 
-**If changes requested**: Iterate on the specific sections, then re-present.
+**If changes requested**: Iterate on the specific sections, then re-present. If a diagram was generated and the changes affect architecture, regenerate the diagram after updating the design document.
 
 ## Rules
 
