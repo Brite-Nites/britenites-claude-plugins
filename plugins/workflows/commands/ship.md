@@ -67,9 +67,10 @@ If Linear MCP isn't accessible, provide manual steps.
 
 The `compound-learnings` skill activates to capture what was learned:
 
-1. **CLAUDE.md updates** — Add durable learnings (new patterns, conventions, gotchas). Prune stale entries.
-2. **Session summary to memory** — What was built, what was learned, what's next.
-3. **Documentation updates** — Update `docs/` if architecture or API changed.
+1. **Accuracy pass** — Verify existing CLAUDE.md claims (file paths, commands, function refs) against the codebase. Auto-remove confirmed-gone references; flag moved or ambiguous paths for review.
+2. **CLAUDE.md updates** — Add durable learnings (new patterns, conventions, gotchas). Prune stale entries.
+3. **Session summary to memory** — What was built, what was learned, what's next.
+4. **Documentation updates** — Update `docs/` if architecture or API changed.
 
 Only durable knowledge gets recorded. No session-specific noise.
 
@@ -82,9 +83,10 @@ The `best-practices-audit` skill activates to keep CLAUDE.md healthy:
 3. **Auto-exclude** — Flag generic advice, stale references, bloat.
 4. **Command accuracy** — Do listed commands match `package.json` scripts?
 5. **Hook candidates** — Are there advisory rules that should be deterministic hooks?
-6. **Auto-fix** structural issues, flag content questions for the developer.
+6. **Accuracy validation** — Verify file paths, commands, and named references against the codebase. Flag stale claims.
+7. **Auto-fix** structural issues, flag content questions for the developer.
 
-Skip this step if the compound-learnings skill (Step 4) reported no CLAUDE.md changes.
+Skip this step if the compound-learnings skill (Step 4) reported no CLAUDE.md changes of any kind (no entries added, updated, pruned, and no stale claims auto-removed or flagged).
 
 ## Step 6: Worktree Cleanup
 

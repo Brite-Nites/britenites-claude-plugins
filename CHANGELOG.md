@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.15.0] - 2026-03-04
+
+### Changed
+- `compound-learnings` skill — new Phase 2 "Verify Existing CLAUDE.md Accuracy" inserted before CLAUDE.md updates. Fast grep-and-stat pass verifies file paths, commands, function refs, and config values against the codebase. Auto-removes confirmed-stale entries, flags ambiguous cases. Phase 6 report includes fact-check results (BRI-1734)
+- `best-practices-audit` skill — new Dimension 8 "Accuracy Validation" complements Dimension 7 staleness check with surgical claim verification. Flags stale references as "Needs your input" (no auto-fix). Optional visual HTML audit report when visual-explainer skill is available (BRI-1734)
+- `ship` command — Steps 4 and 5 descriptions updated to reflect new accuracy pass and Dimension 8
+
 ## [3.14.0] - 2026-03-03
 
 ### Changed
