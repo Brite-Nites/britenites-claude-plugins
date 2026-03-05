@@ -513,6 +513,25 @@ exit(1)
     fi
   done
 
+  # Also collect agent references from commands (agents dispatched via Agent tool)
+  # Note: referenced_agents may contain duplicates (one entry per command×agent match).
+  # The orphan check only needs existence, so deduplication is unnecessary.
+  for file in "$PLUGIN_ROOT"/commands/*.md; do
+    [ -f "$file" ] || continue
+    for agent_file in "$PLUGIN_ROOT"/agents/*.md; do
+      [ -f "$agent_file" ] || continue
+      agent_name="$(basename "$agent_file" .md)"
+      # Guard: skip agent names with regex metacharacters
+      if [[ ! "$agent_name" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$ ]]; then
+        warn "Agent filename '$agent_name' contains unexpected characters — skipping reference scan"
+        continue
+      fi
+      if grep -qE "(^|[^a-zA-Z0-9_-])${agent_name}([^a-zA-Z0-9_-]|$)" "$file" 2>/dev/null; then
+        referenced_agents+=("$agent_name")
+      fi
+    done
+  done
+
   # Check for orphan agents
   for file in "$PLUGIN_ROOT"/agents/*.md; do
     [ -f "$file" ] || continue
@@ -525,9 +544,9 @@ exit(1)
       fi
     done
     if [ "$found" = true ]; then
-      pass "Agent '$base' is referenced by a skill"
+      pass "Agent '$base' is referenced by a skill or command"
     else
-      warn "Agent '$base' is not referenced by any skill (orphan)"
+      warn "Agent '$base' is not referenced by any skill or command (orphan)"
     fi
   done
 
