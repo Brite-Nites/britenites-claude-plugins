@@ -126,7 +126,7 @@ if [ ${#plugin_dirs[@]} -eq 0 ]; then
 fi
 
 # ══════════════════════════════════════════════════════════════════════
-# validate_plugin() — runs per-plugin validation (sections 3-13)
+# validate_plugin() — runs per-plugin validation (sections 3-14)
 # ══════════════════════════════════════════════════════════════════════
 validate_plugin() {
   local PLUGIN_ROOT="$1"
@@ -770,6 +770,146 @@ for e in errors:
     warn "No files with step sequences found"
   fi
 
+  # ── Trigger Registry Validation ──────────────────────────────────
+  section "14. Trigger Registry ($plugin_name)"
+
+  local trigger_registry="$PLUGIN_ROOT/skills/_shared/trigger-registry.json"
+  if [ ! -f "$trigger_registry" ]; then
+    warn "trigger-registry.json not found (optional)"
+  else
+    if ! python3 -m json.tool "$trigger_registry" > /dev/null 2>&1; then
+      fail "trigger-registry.json is not valid JSON"
+    else
+      pass "trigger-registry.json valid JSON"
+
+      tr_result=$(TRIGGER_REGISTRY="$trigger_registry" PLUGIN_ROOT_VAR="$PLUGIN_ROOT" python3 << 'PYEOF'
+import json, os, re
+
+registry_path = os.environ["TRIGGER_REGISTRY"]
+plugin_root = os.environ["PLUGIN_ROOT_VAR"]
+
+with open(registry_path) as f:
+    registry = json.load(f)
+
+errors = []
+skills_data = registry.get('skills', [])
+precedence = registry.get('precedence', [])
+test_cases = registry.get('test_cases', [])
+registry_names = {s['name'] for s in skills_data}
+
+# Tier allowlist
+valid_tiers = {'inner-loop', 'design', 'backend-quality', 'post-plan', 'utility'}
+
+# Safe directory name pattern (matches Section 13 guard)
+safe_name_re = re.compile(r'^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$')
+
+# 1. Collect actual skill directories (excluding _shared)
+skills_dir = os.path.join(plugin_root, 'skills')
+actual_dirs = set()
+if os.path.isdir(skills_dir):
+    for d in os.listdir(skills_dir):
+        if d == '_shared':
+            continue
+        if os.path.isdir(os.path.join(skills_dir, d)):
+            actual_dirs.add(d)
+
+# 2. Every skill directory has a registry entry
+for d in sorted(actual_dirs - registry_names):
+    if safe_name_re.match(d):
+        errors.append(f'Skill directory "{d}" has no registry entry')
+    else:
+        errors.append('Skill directory (name contains unsafe chars) has no registry entry')
+
+# 3. Every registry entry has a skill directory
+for n in sorted(registry_names - actual_dirs):
+    errors.append(f'Registry entry "{n}" has no skill directory')
+
+# 4. Required fields per entry + tier allowlist
+for s in skills_data:
+    name = s.get('name', '<unnamed>')
+    for field in ['name', 'tier', 'user_invocable', 'keywords']:
+        if field not in s:
+            errors.append(f'{name}: missing required field "{field}"')
+    kw = s.get('keywords', [])
+    if isinstance(kw, list) and len(kw) == 0:
+        errors.append(f'{name}: keywords must be non-empty')
+    t = s.get('tier', '')
+    if t and t not in valid_tiers:
+        errors.append(f'{name}: unknown tier "{t}" (expected one of {sorted(valid_tiers)})')
+
+# 5. beats entries reference existing skill names
+for s in skills_data:
+    for b in s.get('beats', []):
+        if b not in registry_names:
+            errors.append(f'{s["name"]}: beats references unknown skill "{b}"')
+
+# 6. precedence entries reference existing skill names
+for p in precedence:
+    for role in ['winner', 'loser']:
+        val = p.get(role, '')
+        if val not in registry_names:
+            errors.append(f'precedence: {role} "{val}" is not a registered skill')
+
+# 7. Minimum test case count
+if len(test_cases) < 30:
+    errors.append(f'test_cases has {len(test_cases)} entries (minimum 30)')
+
+# 8. Each test case has required fields + skill name validation
+for i, tc in enumerate(test_cases):
+    for field in ['phrase', 'expected', 'description']:
+        if field not in tc:
+            errors.append(f'test_cases[{i}]: missing "{field}"')
+    for role in ['expected', 'not_expected']:
+        for name in tc.get(role, []):
+            if name not in registry_names:
+                errors.append(f'test_cases[{i}].{role}: "{name}" is not a registered skill')
+
+# 9. user_invocable matches SKILL.md frontmatter
+for s in skills_data:
+    name = s.get('name', '')
+    skill_md = os.path.join(skills_dir, name, 'SKILL.md')
+    if not os.path.isfile(skill_md):
+        continue
+    with open(skill_md) as f:
+        lines = f.readlines()
+    # Extract frontmatter
+    if not lines or lines[0].strip() != '---':
+        continue
+    fm_lines = []
+    for line in lines[1:]:
+        if line.strip() == '---':
+            break
+        fm_lines.append(line)
+    # Find user-invocable value
+    ui_val = None
+    for line in fm_lines:
+        m = re.match(r'^user-invocable:\s*(.+)', line)
+        if m:
+            ui_val = m.group(1).strip()
+            break
+    if ui_val is not None:
+        expected_bool = ui_val == 'true'
+        registry_bool = s.get('user_invocable')
+        if registry_bool != expected_bool:
+            errors.append(f'{name}: user_invocable={registry_bool} but SKILL.md has user-invocable: {ui_val}')
+
+for e in errors:
+    print(f'ERROR:{e}')
+if not errors:
+    print(f'OK:registry ({len(skills_data)} skills, {len(precedence)} precedence rules, {len(test_cases)} test cases)')
+PYEOF
+)
+
+      while IFS= read -r line; do
+        if [[ "$line" == OK:* ]]; then
+          pass "${line#OK:}"
+        elif [[ "$line" == ERROR:* ]]; then
+          fail "${line#ERROR:}"
+        fi
+      done <<< "$tr_result"
+    fi
+  fi
+
   # ── Plugin Summary ───────────────────────────────────────────────
   local cmd_count=0
   for f in "$PLUGIN_ROOT"/commands/*.md; do [ -f "$f" ] && cmd_count=$((cmd_count + 1)); done
@@ -797,7 +937,7 @@ for plugin_dir in "${plugin_dirs[@]}"; do
 done
 
 # ══════════════════════════════════════════════════════════════════════
-# Section 14 — Summary
+# Section 15 — Summary
 # ══════════════════════════════════════════════════════════════════════
 section "Summary"
 
