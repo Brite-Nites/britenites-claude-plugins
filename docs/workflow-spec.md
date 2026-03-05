@@ -797,6 +797,14 @@ steps:
     activates-skill: null
     visual-gating: false
   - id: 2
+    name: "Simplify Pass"
+    required: false
+    skip-condition: "$ARGUMENTS contains 'skip simplify' or 'no simplify'"
+    skip-target: 3
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 3
     name: "Launch Review Agents"
     required: true
     skip-condition: null
@@ -804,7 +812,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 3
+  - id: 4
     name: "Collect & Classify Findings"
     required: true
     skip-condition: null
@@ -812,15 +820,15 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 4
+  - id: 5
     name: "Fix Loop (P1s Only)"
     required: false
     skip-condition: "No P1 findings"
-    skip-target: 5
+    skip-target: 6
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 5
+  - id: 6
     name: "Visual Review Report"
     required: true
     skip-condition: null
@@ -828,7 +836,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: true
-  - id: 6
+  - id: 7
     name: "Final Report"
     required: true
     skip-condition: null
@@ -1278,6 +1286,7 @@ sequence:
   - from: "/workflows:review"
     to: "/workflows:ship"
     provides:
+      - "Simplify pass results (applied/suggestions/reverted)"
       - "Review findings (P1/P2/P3)"
       - "P1 fixes applied"
       - "Visual review report"
@@ -1499,7 +1508,7 @@ patterns:
   - id: degrade
     template: "Visual-explainer files not found. Generating plain HTML [artifact name]."
     trigger: "Visual-explainer files unavailable but plain HTML fallback exists"
-    scope: "review.md Step 5 only"
+    scope: "review.md Step 6 only"
     action: "Generate plain semantic HTML with same structure, no external CSS/templates/animations"
 
   - id: non-file-skip
@@ -1525,7 +1534,7 @@ visual-gating-files:
     artifact: "project recap HTML"
 
   - file: "commands/review.md"
-    step: "Step 5 (visual review report)"
+    step: "Step 6 (visual review report)"
     patterns: [degrade]
     artifact: "review report HTML"
 
@@ -1744,13 +1753,20 @@ error-handling:
   - failure-point: "Agent dispatch fails (Step 0)"
     action: STOP
     detail: "Agent dispatch failed. Cannot run review agents."
-  - failure-point: "Review agent fails to dispatch (Step 2)"
+  - failure-point: "Simplify agent fails to dispatch (Step 2)"
+    action: degrade
+    detail: "Skip simplify pass, proceed to Step 3"
+  - failure-point: "No test suite detected (Step 2 auto-fix)"
+    action: degrade
+    detail: "Report all simplify findings as suggestions only, skip auto-fix"
+    note: "Branch condition within Step 2, not a step-level failure"
+  - failure-point: "Review agent fails to dispatch (Step 3)"
     action: escalate
     detail: "AskUserQuestion: Retry failed agent / Continue with available results / Stop review"
-  - failure-point: "P1 persists after 3 fix attempts (Step 4)"
+  - failure-point: "P1 persists after 3 fix attempts (Step 5)"
     action: escalate
     detail: "Flag for human review with full context on what was tried"
-  - failure-point: "Visual-explainer files not found (Step 5)"
+  - failure-point: "Visual-explainer files not found (Step 6)"
     action: degrade
     detail: "Generate plain HTML review report"
 ```
