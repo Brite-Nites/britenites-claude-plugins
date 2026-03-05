@@ -15,6 +15,15 @@ Before creating a PR, confirm `gh` is available and authenticated:
 
 ## Step 1: Pre-Ship Checks
 
+### Context Anchor
+
+Before running checks, restate key context from prior phases by reading persisted files (not conversation memory):
+
+1. **Issue**: Read the issue ID from the branch name or conversation context
+2. **What was built**: Detect the base branch: `base_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main)`, then run `git log "$base_branch"..HEAD --oneline` for commit summary
+3. **Key decisions**: Use Glob to check for `docs/designs/<issue-id>-*.md` and `docs/plans/<issue-id>-plan.md`. If found, read and extract: chosen approach, key decisions
+4. **Review result**: Note whether `/workflows:review` was run and its outcome
+
 Before creating a PR:
 
 1. **Verify clean state** — `git status`. All changes committed. If not, ask the developer.
@@ -65,7 +74,7 @@ If Linear MCP isn't accessible, provide manual steps.
 
 ## Step 4: Compound Learnings
 
-The `compound-learnings` skill activates to capture what was learned:
+The `compound-learnings` skill activates to capture what was learned. It will verify its own preconditions (diff exists, CLAUDE.md exists) before proceeding.
 
 1. **Accuracy pass** — Verify existing CLAUDE.md claims (file paths, commands, function refs) against the codebase. Auto-remove confirmed-gone references; flag moved or ambiguous paths for review.
 2. **CLAUDE.md updates** — Add durable learnings (new patterns, conventions, gotchas). Prune stale entries.
@@ -76,7 +85,7 @@ Only durable knowledge gets recorded. No session-specific noise.
 
 ## Step 5: Best Practices Audit
 
-The `best-practices-audit` skill activates to keep CLAUDE.md healthy:
+The `best-practices-audit` skill activates to keep CLAUDE.md healthy. It will verify CLAUDE.md exists before proceeding.
 
 1. **Size check** — Is CLAUDE.md under ~100 lines? Extract to `docs/` with `@import` if needed.
 2. **Section structure** — Required sections present (Build & Test, Conventions, Architecture, Gotchas)?
