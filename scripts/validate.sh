@@ -522,7 +522,7 @@ exit(1)
       [ -f "$agent_file" ] || continue
       agent_name="$(basename "$agent_file" .md)"
       # Guard: skip agent names with regex metacharacters
-      if [[ ! "$agent_name" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*[a-zA-Z0-9]$ ]]; then
+      if [[ ! "$agent_name" =~ ^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$ ]]; then
         warn "Agent filename '$agent_name' contains unexpected characters — skipping reference scan"
         continue
       fi
@@ -615,6 +615,27 @@ for e in errors:
     done <<< "$hooks_result"
   else
     warn "hooks.json not found (optional)"
+  fi
+
+  # ── Visual Gating Message Consistency ────────────────────────────
+  # Every "Visual-explainer" file-unavailability message must use the
+  # standard prefix "Visual-explainer files not found." — not variants
+  # like "skill files not found" or "Cannot read visual-explainer".
+  local ve_bad=0
+  for file in "$PLUGIN_ROOT"/commands/*.md "$PLUGIN_ROOT"/skills/*/SKILL.md; do
+    [ -f "$file" ] || continue
+    # Match "Visual-explainer" or "visual-explainer" followed by skip/degrade
+    # text that does NOT use the standard prefix
+    if grep -qiE 'visual-explainer' "$file" 2>/dev/null; then
+      # Check for non-standard variants
+      if grep -qE '(Cannot read visual-explainer|skill files not found|skill files not available|Visual report skipped|visual-explainer not available)' "$file" 2>/dev/null; then
+        fail "$(basename "$file"): non-standard visual-explainer skip message (see _shared/observability.md Visual Gating)"
+        ve_bad=$((ve_bad + 1))
+      fi
+    fi
+  done
+  if [ "$ve_bad" -eq 0 ]; then
+    pass "Visual gating messages use standard prefix"
   fi
 
   # ── Plugin Summary ───────────────────────────────────────────────

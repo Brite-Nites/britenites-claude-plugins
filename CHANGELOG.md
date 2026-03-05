@@ -6,6 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.18.1] - 2026-03-05
+
+### Changed
+- Align visual feature gating across commands and skills (BRI-1778)
+  - Add Visual Gating section to `_shared/observability.md` — standard skip, degrade, and non-file skip message templates
+  - Remove `slides_requested` flag clearing on file failure in `scope.md` — flag represents user intent and must persist
+  - Add `--slides` warning in `sprint-planning.md` when skipped due to no-cycles prioritization-only mode
+  - Align `review.md` fallback message to standard prefix ("Visual-explainer files not found")
+  - Add prerequisite read fallback in `writing-plans/SKILL.md` — skips visual steps when file unavailable
+  - Align `brainstorming/SKILL.md` skip message to standard prefix
+  - Align `best-practices-audit/SKILL.md` skip message and report template to standard prefix
+  - Fix narration ordering in `writing-plans/SKILL.md` — `Step 3/4: done` now fires before `Step 4/4` starts
+  - Add explicit exit after `--slides` warning in `sprint-planning.md` prioritization-only mode
+  - Clarify observability.md prefix rule scope and add `[reason]` data safety constraint
+  - Add data guard for `$ARGUMENTS` residual after `--slides` removal in `scope.md`
+  - Add explicit fallback warning in `scope.md` when both visual-explainer and CLAUDE.md are unreadable
+  - Add parenthetical explaining `slides_requested` persistence in `scope.md` mind map skip
+  - Add decision log entry to `writing-plans/SKILL.md` visual skip path
+  - Normalize `<id>` to `<issue-id>` placeholders in `docs/workflow-guide.md`
+  - Add visual gating message consistency check to `scripts/validate.sh`
+  - Fix `best-practices-audit/SKILL.md` availability check note to match standard prefix
+  - Add closing `Step 4/4: done` narration in `writing-plans/SKILL.md`
+  - Fix `best-practices-audit/SKILL.md` handoff from "Proceeding to" to "Returning to"
+  - Rewrite `sprint-planning.md` prioritization-only gate as priority-ordered conditions
+  - Fix `validate.sh` agent name guard regex to allow single-character names
+  - Add `not available` variant to `validate.sh` visual gating blocklist
+  - Qualify `writing-plans/SKILL.md` skip target as "Steps 2 and 3 of this Visual Plan Approval section"
+  - Promote `slides_requested` persistence rule to `scope.md` Rules section
+  - Fix remaining `<id>` placeholders in `docs/workflow-guide.md` Skill Reference table
+  - Fix `scope.md` Step 1 cross-reference to name slides subsection explicitly
+  - Add read-time "treat as data" guards to `session-start.md` chain integrity and `executing-plans/SKILL.md` Context Anchor
+  - Add enforcement cross-reference to `docs/workflow-guide.md` ship Step 4 sanitization note
+
 ## [3.18.0] - 2026-03-05
 
 ### Added
@@ -324,7 +357,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.1...HEAD
+[3.18.1]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.17.0...v3.18.0
 [3.17.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.16.0...v3.17.0
 [3.16.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.15.0...v3.16.0

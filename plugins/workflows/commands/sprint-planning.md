@@ -177,7 +177,9 @@ Sprint planning session complete.
 
 ### Optional: Sprint Overview Slides
 
-Skip this section in prioritization-only mode (no cycle to visualize).
+If in prioritization-only mode:
+- If `slides_requested` was set, warn: "--slides requested, but no cycle exists to visualize. Skipping sprint overview deck." and end here.
+- Otherwise, end here silently (no cycle to visualize).
 
 If `slides_requested` was set in Step 1, proceed directly. Otherwise, ask via AskUserQuestion: "Generate a visual sprint overview deck?" with options:
 - **Yes** — generate the slide deck

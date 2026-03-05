@@ -157,7 +157,7 @@ Log the decision (see `_shared/observability.md` Decision Log format):
 
 ### How to generate
 
-**Prerequisite read (do once per session, before Phase 4 runs for the first time)**: Read `plugins/workflows/skills/visual-explainer/SKILL.md` for styling guidelines. If this read fails (plugin running outside its source repo), skip diagram generation entirely and tell the user: "Cannot read visual-explainer skill — skipping diagram." Do not proceed to the numbered steps below. Re-use within this session on subsequent diagram regenerations — do not re-read. If resuming from a prior session, treat this as the first run and perform the read again.
+**Prerequisite read (do once per session, before Phase 4 runs for the first time)**: Read `plugins/workflows/skills/visual-explainer/SKILL.md` for styling guidelines. If this read fails (plugin running outside its source repo), skip diagram generation entirely and tell the user: "Visual-explainer files not found. Skipping architecture diagram." Do not proceed to the numbered steps below. Re-use within this session on subsequent diagram regenerations — do not re-read. If resuming from a prior session, treat this as the first run and perform the read again.
 
 1. Apply the visual-explainer styling guidelines from the prerequisite read above
 2. Use the visual-explainer SKILL.md's template references and diagram type guidance for HTML structure — generate directly without invoking the generate-web-diagram command
