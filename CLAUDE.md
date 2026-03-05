@@ -163,7 +163,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 
 ## Testing & Validation
 
-- `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs). Run pre-push and in CI.
+- `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs, step sequences, visual gating). Run pre-push and in CI.
 - `scripts/test-hooks.sh` — tests security and quality hook regex patterns against 37 known inputs. Run in CI.
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
@@ -189,3 +189,5 @@ A GitHub Actions workflow (`.github/workflows/validate-plugin.yml`) runs on push
 - Required fields in plugin.json
 - Frontmatter in all commands and SKILL.md files
 - Skill name-to-directory matching
+- Step-sequence ordering (no gaps, duplicates, or bad skip references)
+- Visual gating message conformance
