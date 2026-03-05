@@ -15,6 +15,8 @@ Before creating a PR, confirm `gh` is available and authenticated:
 
 ## Step 1: Pre-Ship Checks
 
+Narrate: `Step 1/7: Pre-ship checks...`
+
 ### Context Anchor
 
 Before running checks, restate key context from prior phases by reading persisted files (not conversation memory):
@@ -31,9 +33,13 @@ Before creating a PR:
 3. **Verify build succeeds** — Run the build command one final time.
 4. **Check branch is up to date** — `git fetch origin main && git log main..HEAD --oneline` to confirm commits.
 
-If any check fails, stop and report.
+If any check fails, use error recovery: AskUserQuestion with options: "Fix the failing check / Skip this check (requires confirmation) / Stop." If the user selects "Skip", require a second confirmation: "Shipping with a failing [check name]. Type CONFIRM SKIP to proceed." Do not proceed without explicit confirmation.
+
+Narrate: `Step 1/7: Pre-ship checks... done`
 
 ## Step 2: Create Pull Request
+
+Narrate: `Step 2/7: Creating pull request...`
 
 Push the branch and create a PR:
 
@@ -62,7 +68,13 @@ Title: [concise imperative description, under 70 chars]
 
 3. **Present the PR URL** to the developer.
 
+If PR creation fails, use error recovery: AskUserQuestion with options: "Retry push and PR creation / Create PR manually / Stop."
+
+Narrate: `Step 2/7: Creating pull request... done`
+
 ## Step 3: Update Linear
+
+Narrate: `Step 3/7: Updating Linear...`
 
 Use the Linear MCP tools:
 
@@ -72,7 +84,11 @@ Use the Linear MCP tools:
 
 If Linear MCP isn't accessible, provide manual steps.
 
+Narrate: `Step 3/7: Updating Linear... done`
+
 ## Step 4: Compound Learnings
+
+Narrate: `Step 4/7: Compounding learnings...`
 
 The `compound-learnings` skill activates to capture what was learned. It will verify its own preconditions (diff exists, CLAUDE.md exists) before proceeding.
 
@@ -83,7 +99,11 @@ The `compound-learnings` skill activates to capture what was learned. It will ve
 
 Only durable knowledge gets recorded. No session-specific noise.
 
+Narrate: `Step 4/7: Compounding learnings... done`
+
 ## Step 5: Best Practices Audit
+
+Narrate: `Step 5/7: Running best-practices audit...`
 
 The `best-practices-audit` skill activates to keep CLAUDE.md healthy. It will verify CLAUDE.md exists before proceeding.
 
@@ -97,7 +117,11 @@ The `best-practices-audit` skill activates to keep CLAUDE.md healthy. It will ve
 
 Skip this step if the compound-learnings skill (Step 4) reported no CLAUDE.md changes of any kind (no entries added, updated, pruned, and no stale claims auto-removed or flagged).
 
+Narrate: `Step 5/7: Running best-practices audit... done`
+
 ## Step 6: Worktree Cleanup
+
+Narrate: `Step 6/7: Cleaning up worktree...`
 
 If working in a git worktree:
 
@@ -108,7 +132,11 @@ If working in a git worktree:
 
 If not in a worktree, skip this step.
 
+Narrate: `Step 6/7: Cleaning up worktree... done`
+
 ## Step 7: Session Close
+
+Narrate: `Step 7/7: Session summary...`
 
 Present a session summary:
 

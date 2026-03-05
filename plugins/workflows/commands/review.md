@@ -18,6 +18,8 @@ This catches the case where you'd wait for 3 parallel agents that all silently f
 
 ## Step 1: Self-Verification
 
+Narrate: `Step 1/6: Self-verification...`
+
 Before launching review agents, verify your own work against the execution plan:
 
 1. **Check each plan step** — Was it completed? Does the implementation match what was planned?
@@ -30,7 +32,11 @@ Before launching review agents, verify your own work against the execution plan:
 
 If self-verification reveals issues, fix them before proceeding to agent review.
 
+Narrate: `Step 1/6: Self-verification... done`
+
 ## Step 2: Launch Review Agents
+
+Narrate: `Step 2/6: Launching 3 review agents in parallel...`
 
 Dispatch three specialized review agents **in parallel** using the Task tool. Each agent reviews the current diff against the codebase.
 
@@ -48,7 +54,13 @@ Dispatch three specialized review agents **in parallel** using the Task tool. Ea
 
 Wait for all three to complete.
 
+If any agent fails to dispatch, use error recovery: AskUserQuestion with options: "Retry failed agent / Continue with available results / Stop review."
+
+Narrate: `Step 2/6: Launching 3 review agents... done`
+
 ## Step 3: Collect & Classify Findings
+
+Narrate: `Step 3/6: Merging findings...`
 
 Merge findings from all three agents into a single report, deduplicated and sorted by severity:
 
@@ -72,7 +84,11 @@ Merge findings from all three agents into a single report, deduplicated and sort
 **Sources**: code-reviewer (A findings), security-reviewer (B findings), typescript-reviewer (C findings)
 ```
 
+Narrate: `Step 3/6: Merging findings... done ([N] P1, [N] P2, [N] P3)`
+
 ## Step 4: Fix Loop (P1s Only)
+
+Narrate: `Step 4/6: Fixing P1s...` (or `Step 4/6: No P1s — skipping fix loop`)
 
 If there are P1 findings:
 
@@ -83,7 +99,11 @@ If there are P1 findings:
 
 If there are no P1 findings, skip to Step 5.
 
+Narrate: `Step 4/6: Fixing P1s... done` (or skipped)
+
 ## Step 5: Visual Review Report
+
+Narrate: `Step 5/6: Generating visual review report...`
 
 Generate a visual HTML review page using the visual-explainer skill. The agent findings from Step 3 are already available in the conversation — no additional data gathering is needed for that section.
 
@@ -152,7 +172,11 @@ Build a single self-contained HTML file. Follow visual-explainer SKILL.md rules 
 5. Open the file in the default browser: `open` on macOS, `xdg-open` on Linux.
 6. Tell the user the file path.
 
+Narrate: `Step 5/6: Generating visual review report... done`
+
 ## Step 6: Final Report
+
+Narrate: `Step 6/6: Final report...`
 
 Present the final state to the developer:
 

@@ -16,7 +16,21 @@ You are investigating a bug using a structured four-phase process. The goal is t
 - "It works on my machine" type problems
 - Any situation where the cause isn't immediately obvious
 
+## Activation
+
+After activation, print the banner (see `_shared/observability.md`):
+
+```
+---
+**Systematic Debugging** activated
+Trigger: [describe the symptom in your own words — e.g., "test failure in auth flow" or "unexpected 500 on endpoint"]
+Produces: root cause analysis, regression test, fix
+---
+```
+
 ## Phase 1: Reproduce
+
+Narrate: `Phase 1/4: Reproducing the problem...`
 
 Before anything else, reliably reproduce the problem.
 
@@ -40,7 +54,13 @@ Before anything else, reliably reproduce the problem.
 - Ask the reporter for more details
 - Do NOT proceed to fixing without reproduction — you'll likely fix the wrong thing
 
+If reproduction fails after reasonable effort, use error recovery (see `_shared/observability.md`). AskUserQuestion with options: "Add more logging and retry / Get more info from reporter / Proceed with best guess (risky)."
+
+Narrate: `Phase 1/4: Reproducing the problem... done`
+
 ## Phase 2: Isolate
+
+Narrate: `Phase 2/4: Isolating the bug...`
 
 Narrow down where the bug lives.
 
@@ -64,7 +84,11 @@ Narrowed from: [original scope] → [isolated location]
 Method: [how you narrowed it down]
 ```
 
+Narrate: `Phase 2/4: Isolating the bug... done`
+
 ## Phase 3: Analyze Root Cause
+
+Narrate: `Phase 3/4: Analyzing root cause...`
 
 Understand *why* the bug exists, not just *where*.
 
@@ -81,6 +105,12 @@ Understand *why* the bug exists, not just *where*.
 - Are there similar patterns elsewhere that work correctly? What's different?
 - Is this the only place this bug manifests, or is it a systemic issue?
 
+Log the root cause decision (see `_shared/observability.md` Decision Log format):
+
+> **Decision**: Root cause is [category] — [specific cause]
+> **Reason**: [evidence from isolation phase]
+> **Alternatives**: [other hypotheses that were ruled out]
+
 ### Defense in Depth
 After identifying the root cause, ask:
 - Why wasn't this caught by tests?
@@ -96,7 +126,11 @@ Why it wasn't caught: [gap in testing, types, or review]
 Related risks: [other places with similar patterns]
 ```
 
+Narrate: `Phase 3/4: Analyzing root cause... done`
+
 ## Phase 4: Fix
+
+Narrate: `Phase 4/4: Applying fix...`
 
 Fix the root cause and prevent regression.
 
@@ -107,6 +141,12 @@ Fix the root cause and prevent regression.
 4. **Verify the test passes** — The fix resolves the bug
 5. **Run the full test suite** — The fix doesn't break anything else
 6. **Check for related issues** — Fix similar patterns elsewhere if applicable
+
+Log defense-in-depth decisions:
+
+> **Decision**: [which defense-in-depth measures to add]
+> **Reason**: [what class of bug this prevents]
+> **Alternatives**: [other measures considered]
 
 ### Defense-in-Depth Fixes
 Beyond the immediate fix, consider:
@@ -130,6 +170,8 @@ Test: [the regression test that was added]
 Defense: [additional protective measures added]
 Related fixes: [similar patterns fixed elsewhere, or "none"]
 ```
+
+Narrate: `Phase 4/4: Applying fix... done`
 
 ## Completion
 
