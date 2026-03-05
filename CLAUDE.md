@@ -169,6 +169,8 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
 - `docs/testing-guide.md` — comprehensive testing guide (60 tests across 7 layers).
+- `docs/workflow-spec.md` — machine-parseable specification (52 YAML blocks) for trigger conditions, step sequences, contracts, visual gating, error handling. Extract blocks with `sed` using `<!-- spec:section:name -->` anchors.
+- `docs/workflow-guide.md` — user-facing workflow reference (inner loop, skills, visuals, commands).
 
 ## ADR Convention
 
