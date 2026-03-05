@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.18.0] - 2026-03-05
+
+### Added
+- Workflow observability across all inner loop skills and main commands (BRI-1777)
+  - Shared observability template (`_shared/observability.md`) — defines activation banner, narration, decision log, error recovery, phase transition summary, stuck detection, and context refresh patterns
+  - Activation banners on all 8 inner loop skills — print skill name, trigger reason, and expected artifacts immediately after preconditions pass
+  - Phase/step narration using Progress Format from `output-formats.md` — single-line status at boundaries, not every tool call
+  - Decision logs at key decision points: brainstorming diagram skip, writing-plans complexity gating, executing-plans TDD skip, compound-learnings doc updates, best-practices-audit auto-fix, systematic-debugging root cause and defense-in-depth
+  - Structured error recovery (AskUserQuestion with Retry/Skip/Stop) at: brainstorming approval failures, writing-plans review failures, git-worktrees dirty state and baseline failures, executing-plans max retries and stuck detection, verification-before-completion max retries, compound-learnings write failures, systematic-debugging reproduction failures
+  - TaskCreate integration in `executing-plans` — parent agent creates task entries before subagent launch, updates status on completion
+  - Stuck detection in `executing-plans` — 3+ tool calls without progress triggers pause and user intervention
+  - Context refresh in `executing-plans` — re-reads plan file after every 3rd task or when total exceeds 6
+  - Phase transition summaries in `session-start` between brainstorm→plan, plan→worktree, worktree→execute
+  - Step narration in `session-start` (7 steps), `review` (6 steps), `ship` (7 steps)
+  - Error recovery in `review` (agent dispatch failure) and `ship` (check failures, PR creation failures)
+
 ## [3.17.0] - 2026-03-04
 
 ### Changed
@@ -308,7 +324,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.16.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.0...HEAD
+[3.18.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.17.0...v3.18.0
+[3.17.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.16.0...v3.17.0
 [3.16.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.15.0...v3.16.0
 [3.15.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.14.0...v3.15.0
 [3.14.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.13.0...v3.14.0

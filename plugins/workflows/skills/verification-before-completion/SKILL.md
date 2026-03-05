@@ -15,9 +15,27 @@ You are verifying that a task is genuinely complete before it's marked as done. 
 - After fixing a bug (verify the fix, not just that the code compiles)
 - Before shipping — final pre-review verification
 
+## Preconditions
+
+This skill is invoked directly by `executing-plans` at each task checkpoint. No independent precondition checks are needed.
+
+## Activation
+
+After being invoked, print the activation banner (see `_shared/observability.md`):
+
+```
+---
+**Verification Before Completion** activated
+Trigger: Task checkpoint reached
+Produces: 4-level verification report
+---
+```
+
 ## Verification Protocol
 
 ### Level 1: Build Verification
+
+Narrate: `Level 1/4: Build verification...`
 
 Minimum bar — the project compiles and runs:
 
@@ -27,7 +45,11 @@ Minimum bar — the project compiles and runs:
 
 If Level 1 fails, the task is NOT complete. Stop and fix.
 
+Narrate: `Level 1/4: Build verification... [PASS/FAIL]`
+
 ### Level 2: Test Verification
+
+Narrate: `Level 2/4: Test verification...`
 
 Tests prove the behavior works:
 
@@ -41,7 +63,11 @@ Verify tests are genuine by checking:
 - Does the test cover the acceptance criteria from the issue?
 - Does the test cover edge cases mentioned in the plan?
 
+Narrate: `Level 2/4: Test verification... [PASS/FAIL]`
+
 ### Level 3: Acceptance Criteria
+
+Narrate: `Level 3/4: Acceptance criteria...`
 
 The issue's requirements are met:
 
@@ -55,7 +81,11 @@ The issue's requirements are met:
    ```
 3. **If any criterion is unmet**: The task is NOT complete
 
+Narrate: `Level 3/4: Acceptance criteria... [PASS/FAIL]`
+
 ### Level 4: Integration Verification
+
+Narrate: `Level 4/4: Integration verification...`
 
 The changes work in context:
 
@@ -81,6 +111,8 @@ The changes work in context:
 2. Performance is not degraded (if relevant)
 3. The refactored code is actually cleaner (not just different)
 
+Narrate: `Level 4/4: Integration verification... [PASS/FAIL]`
+
 ## Failure Handling
 
 When verification fails:
@@ -94,9 +126,12 @@ When verification fails:
    Actual: [what happened instead]
    ```
 
-2. **Don't retry blindly** — Analyze why it failed first
+2. **Don't retry blindly** — Analyze why it failed first. Log the decision:
+   > **Decision**: [Retry approach]
+   > **Reason**: [root cause analysis]
+   > **Alternatives**: [other fix strategies considered]
 3. **Fix the root cause**, then re-verify from Level 1
-4. **Max 3 retries** — After 3 failures, stop and report to developer with full context
+4. **Max 3 retries** — After 3 failures, use error recovery (see `_shared/observability.md`). AskUserQuestion with options: "Retry from Level 1 with different approach / Skip this verification level / Stop and report for manual review."
 
 ## Completion Report
 

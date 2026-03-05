@@ -19,6 +19,8 @@ If either fails:
 
 ## Step 1: Environment Setup
 
+Narrate: `Step 1/7: Environment setup...`
+
 1. **Check git status** — Ensure working directory is clean. If dirty, warn and ask how to proceed.
 2. **Pull latest** — `git pull origin main` (or the default branch).
 3. **Read project CLAUDE.md** — Load architecture context, conventions, previous learnings.
@@ -29,7 +31,11 @@ If either fails:
 
 > Branch creation happens later in Step 6 (worktree setup) after plan approval.
 
+Narrate: `Step 1/7: Environment setup... done`
+
 ## Step 2: Query Linear for Open Issues
+
+Narrate: `Step 2/7: Querying Linear...`
 
 If `$ARGUMENTS` contains an issue ID or URL, skip this step entirely and go directly to Step 3.
 
@@ -53,7 +59,11 @@ If `$ARGUMENTS` contains an issue ID or URL, skip this step entirely and go dire
 6. **Suggest which to pick** based on priority, dependencies, and any follow-ups from auto-memory.
 7. **Ask the user** which issue to work on using AskUserQuestion.
 
+Narrate: `Step 2/7: Querying Linear... done`
+
 ## Step 3: Read Issue Details
+
+Narrate: `Step 3/7: Reading issue details...`
 
 Once an issue is selected:
 
@@ -61,7 +71,11 @@ Once an issue is selected:
 2. **Read linked docs** referenced in the issue (PRDs, design specs, etc.).
 3. **Identify related code** — Find relevant files from the issue description and labels. Read them.
 
+Narrate: `Step 3/7: Reading issue details... done`
+
 ## Step 4: Brainstorm (Objective Complexity Check)
+
+Narrate: `Step 4/7: Complexity assessment...`
 
 **Assess complexity using objective criteria** — do not rely on subjective "is this non-trivial?" judgment.
 
@@ -79,10 +93,20 @@ Once an issue is selected:
 
 **Ambiguous** (criteria on both sides): Ask the developer via AskUserQuestion: "This issue has some complexity signals — should we brainstorm approaches or jump to planning?"
 
+Log the complexity decision:
+
+> **Decision**: [Brainstorm / Skip to planning]
+> **Reason**: [which criteria matched]
+> **Alternatives**: [what the other choice would mean]
+
 - **If brainstorming**: The `brainstorming` skill activates. Engage in Socratic discovery — ask clarifying questions, explore alternatives, produce a design document for approval. When the design involves system topology, service interactions, data flow, or new integrations, the skill auto-generates a visual architecture diagram for review alongside the design document.
 - **If skipping**: Proceed directly to planning.
 
+**Phase transition**: Brainstorm → Plan. Decisions: [complexity criteria matched — counts only, not issue text]. Artifacts: [design doc path if generated]. Next: planning.
+
 ## Step 5: Write Plan
+
+Narrate: `Step 5/7: Planning...`
 
 The `writing-plans` skill activates to create a detailed execution plan:
 
@@ -93,7 +117,11 @@ The `writing-plans` skill activates to create a detailed execution plan:
 
 After the plan is written, the Visual Plan Approval flow runs: a plan review (for 4+ tasks, or when the user opts into visuals) and optional visual plan are generated and opened in the browser before the approval prompt. The `writing-plans` skill governs the full approval flow including time-pressure and small-plan handling.
 
+**Phase transition**: Plan → Worktree. Decisions: [task count]. Artifacts: [plan file path, visual plan path if generated]. Next: worktree setup.
+
 ## Step 6: Set Up Worktree
+
+Narrate: `Step 6/7: Setting up worktree...`
 
 After the plan is approved, the `git-worktrees` skill activates:
 
@@ -103,7 +131,11 @@ After the plan is approved, the `git-worktrees` skill activates:
 
 If the developer prefers not to use worktrees, fall back to a simple branch: `git checkout -b [issue-id]/[short-description]`
 
+**Phase transition**: Worktree → Execute. Decisions: [baseline pass/fail status]. Artifacts: [worktree path, branch name]. Next: execution.
+
 ## Step 7: Execute
+
+Narrate: `Step 7/7: Executing plan...`
 
 The `executing-plans` skill activates:
 

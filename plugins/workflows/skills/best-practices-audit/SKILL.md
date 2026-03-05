@@ -20,11 +20,23 @@ Before auditing, validate inputs exist:
 
 1. **CLAUDE.md exists**: Use the Read tool to read the project root CLAUDE.md. If missing, stop with: "No CLAUDE.md found. Use `/workflows:setup-claude-md` to create one."
 
+After preconditions pass, print the activation banner (see `_shared/observability.md`):
+
+```
+---
+**Best Practices Audit** activated
+Trigger: Ship phase — ensuring CLAUDE.md health
+Produces: audit report, optional visual report, auto-fixes
+---
+```
+
 ## Reference
 
 Read the best-practices reference from `.claude/skills/setup-claude-md/claude-code-best-practices.md`. If the file is not accessible, use the audit checklist below as the authoritative guide.
 
 ## Audit Checklist
+
+Narrate at each dimension boundary: `Dimension [N]/8: [name]...`
 
 ### 1. Size Check
 
@@ -148,6 +160,12 @@ Surgical claim verification — complements the broad staleness detection above 
 - Fix command syntax if the correct command is clear from `package.json`
 - Extract sections over 10 lines to `docs/` with `@import` (create the file)
 
+Log each auto-fix decision:
+
+> **Decision**: [what was auto-fixed]
+> **Reason**: [why this is safe to auto-fix]
+> **Alternatives**: [could have flagged for review instead]
+
 ### Flag for Developer (ask before changing)
 - Removing content that might be intentional
 - Changing conventions that affect team workflow
@@ -190,6 +208,8 @@ Read these files — if **any** is missing, skip visual output entirely and note
 
 If all files are present, read `plugins/workflows/skills/visual-explainer/SKILL.md` for anti-slop design guidelines before generating. Apply strictly.
 
+If visual-explainer files are missing, narrate the skip reason: "Visual report skipped — visual-explainer skill files not available."
+
 ### HTML structure (4 sections)
 
 Follow visual-explainer SKILL.md rules strictly (no generic AI styling, no slop). Use the data-table.html template as a structural reference.
@@ -222,7 +242,7 @@ Artifacts:
 - CLAUDE.md: [N] auto-fixes applied
 - Visual report: [path to HTML file, or "skipped"]
 - Flagged items: [N] items need developer input
-Proceeding to → /workflows:ship (Step 6: worktree cleanup)
+Proceeding to → /workflows:ship
 ```
 
 ## Rules

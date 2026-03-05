@@ -29,7 +29,19 @@ Before brainstorming, validate inputs exist:
 1. **Issue ID available**: Confirm an issue ID is available from session-start or conversation context. If missing, ask the developer.
 2. **Issue readable**: Confirm the Linear issue can be read (or a description was provided directly). If Linear is inaccessible, proceed with whatever context is available.
 
+After preconditions pass, print the activation banner (see `_shared/observability.md`):
+
+```
+---
+**Brainstorming** activated
+Trigger: [which objective criteria matched — e.g., "spans 3 modules" or "4+ tasks estimated"]
+Produces: design document, optional architecture diagram
+---
+```
+
 ## Phase 1: Context Gathering
+
+Narrate: `Phase 1/5: Gathering context...`
 
 Before asking questions, silently gather context:
 
@@ -40,7 +52,11 @@ Before asking questions, silently gather context:
 
 Synthesize this into your understanding before engaging the developer.
 
+Narrate: `Phase 1/5: Gathering context... done`
+
 ## Phase 2: Socratic Discovery
+
+Narrate: `Phase 2/5: Socratic discovery...`
 
 Ask clarifying questions the developer might not have considered. Ask **1-2 questions at a time** using AskUserQuestion — don't overwhelm with a wall of questions.
 
@@ -75,6 +91,8 @@ Areas to probe:
 **Adapt your questions to the issue.** Don't ask about UI for a backend task. Don't ask about database schema for a CSS change. Be relevant.
 
 ## Phase 3: Design Document
+
+Narrate: `Phase 3/5: Writing design document...`
 
 After the conversation converges, produce a design document:
 
@@ -111,6 +129,8 @@ After the conversation converges, produce a design document:
 
 ## Phase 4: Visual Architecture Diagram
 
+Narrate: `Phase 4/5: Assessing architecture diagram...`
+
 After producing the design document, assess whether a visual architecture diagram adds value.
 
 ### When to generate
@@ -126,6 +146,12 @@ Generate a diagram if the design involves **any** of:
 - Config-only changes
 - Under 20 lines of implementation
 - User expressed time pressure ("quick", "fast", "skip diagrams")
+
+Log the decision (see `_shared/observability.md` Decision Log format):
+
+> **Decision**: [Generate diagram / Skip diagram]
+> **Reason**: [which criteria matched or why none did]
+> **Alternatives**: [what the other choice would have meant]
 
 **Issue ID sanitization** (applies to all file paths in Phases 4 and 5): Sanitize the issue ID once — verify it matches `^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$`. Re-use this sanitized ID for all paths. Do not re-read from raw Linear issue context on iteration.
 
@@ -144,6 +170,8 @@ If skipped, keep track in your working context that Phase 4 was skipped (Phase 5
 
 ## Phase 5: Approval
 
+Narrate: `Phase 5/5: Requesting approval...`
+
 If a diagram was generated in Phase 4, reference it in the approval prompt. If Phase 4 was skipped, omit the browser reference.
 
 Present the design document and ask:
@@ -154,11 +182,13 @@ If a diagram was generated:
 If Phase 4 was skipped:
 > "Does this design look right? Any changes before we move to planning?"
 
+**If changes requested**: Iterate on the specific sections, then re-present. If a diagram was generated and the changes affect architecture, regenerate the diagram after updating the design document.
+
+**If approval fails after 3 iterations**: Use error recovery (see `_shared/observability.md`). AskUserQuestion with options: "Approve as-is / Continue iterating / Stop brainstorming and proceed to planning with current state."
+
 **If approved**: Derive a slug from the issue title — lowercase, replace `[^a-z0-9]+` with `-`, strip leading/trailing `-`, cap at 40 characters. Verify the result matches `^[a-z0-9-]+$` (strict ASCII). If not, strip non-matching characters and re-verify. If the slug is empty after stripping (e.g., all-non-ASCII title), lowercase the sanitized issue ID, replace `_` with `-`, and use that as the slug. Save the design document to `docs/designs/<sanitized-issue-id>-<slug>.md` (create the directory if needed). Use the sanitized issue ID from the Phase 4 preamble (the sanitization runs regardless of whether diagram generation was skipped). This document will be referenced during planning and execution.
 
 After saving, use the Read tool to verify the file exists and contains the design document. If the read fails, retry once. If it still fails, report the error and do not print the completion marker below.
-
-**If changes requested**: Iterate on the specific sections, then re-present. If a diagram was generated and the changes affect architecture, regenerate the diagram after updating the design document.
 
 ## Handoff
 
