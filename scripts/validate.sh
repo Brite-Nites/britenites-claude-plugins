@@ -126,7 +126,7 @@ if [ ${#plugin_dirs[@]} -eq 0 ]; then
 fi
 
 # ══════════════════════════════════════════════════════════════════════
-# validate_plugin() — runs per-plugin validation (sections 3-10)
+# validate_plugin() — runs per-plugin validation (sections 3-13)
 # ══════════════════════════════════════════════════════════════════════
 validate_plugin() {
   local PLUGIN_ROOT="$1"
@@ -618,6 +618,7 @@ for e in errors:
   fi
 
   # ── Visual Gating Message Consistency ────────────────────────────
+  section "12. Visual Gating ($plugin_name)"
   # Every "Visual-explainer" file-unavailability message must use the
   # standard prefix "Visual-explainer files not found." — not variants
   # like "skill files not found" or "Cannot read visual-explainer".
@@ -636,6 +637,137 @@ for e in errors:
   done
   if [ "$ve_bad" -eq 0 ]; then
     pass "Visual gating messages use standard prefix"
+  fi
+
+  # ── Step Sequence Validation ──────────────────────────────────────
+  section "13. Step Sequence Validation ($plugin_name)"
+
+  local step_seq_errors=0
+  local step_seq_checked=0
+  local dirname_check display_name numeric_ok file_ok current_seq prev dupes found_ref
+  local -a all_steps seq_list
+
+  for file in "$PLUGIN_ROOT"/commands/*.md "$PLUGIN_ROOT"/skills/*/SKILL.md; do
+    [ -f "$file" ] || continue
+
+    # Skip _shared
+    dirname_check="$(basename "$(dirname "$file")")"
+    [ "$dirname_check" = "_shared" ] && continue
+
+    # Display name — validate character class to prevent escape sequence injection
+    if [[ "$file" == */skills/*/SKILL.md ]]; then
+      if [[ ! "$dirname_check" =~ ^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$ ]]; then
+        warn "Skipping '$dirname_check' — unexpected characters in directory name"
+        continue
+      fi
+      display_name="$dirname_check/SKILL.md"
+    else
+      display_name="$(basename "$file")"
+    fi
+
+    # Extract integer step numbers from ##/###/#### Step N headers
+    # Sub-steps like "Step 2b" are excluded: the number must NOT be followed by a letter
+    all_steps=()
+    while IFS= read -r num; do
+      [ -n "$num" ] && all_steps+=("$num")
+    done < <(grep -E '^#{2,4} Step [0-9]+([^0-9a-zA-Z]|$)' "$file" 2>/dev/null | sed -n 's/^#\{2,4\} Step \([0-9][0-9]*\).*/\1/p')
+
+    # Skip files with fewer than 2 steps (nothing to sequence-validate)
+    [ ${#all_steps[@]} -lt 2 ] && continue
+
+    # Guard: verify all extracted values are numeric (defense-in-depth for arithmetic)
+    numeric_ok=true
+    for num in "${all_steps[@]}"; do
+      case "$num" in
+        *[!0-9]*) numeric_ok=false; break ;;
+      esac
+    done
+    if [ "$numeric_ok" = false ]; then
+      warn "$display_name: non-numeric step value extracted — skipping"
+      continue
+    fi
+
+    file_ok=true
+
+    # Split into contiguous sequences (new sequence when step number drops)
+    # Semicolon delimiter is safe because all_steps values are digit-only (guarded above)
+    seq_list=()
+    current_seq="${all_steps[0]}"
+    prev="${all_steps[0]}"
+
+    for ((i = 1; i < ${#all_steps[@]}; i++)); do
+      if [ "${all_steps[$i]}" -lt "$prev" ]; then
+        # Sequence reset detected — save current, start new
+        seq_list+=("$current_seq")
+        current_seq="${all_steps[$i]}"
+      else
+        current_seq="$current_seq;${all_steps[$i]}"
+      fi
+      prev="${all_steps[$i]}"
+    done
+    seq_list+=("$current_seq")
+
+    # Validate each sequence: start value, gaps, and duplicates
+    for seq in "${seq_list[@]}"; do
+      IFS=';' read -ra steps <<< "$seq"
+
+      # Sequences should start at 0 or 1 — anything else suggests misordering
+      if [ "${steps[0]}" -gt 1 ]; then
+        fail "$display_name: sequence starts at Step ${steps[0]} (expected 0 or 1)"
+        file_ok=false
+        step_seq_errors=$((step_seq_errors + 1))
+      fi
+
+      # Check gaps (each step should be previous + 1)
+      for ((j = 1; j < ${#steps[@]}; j++)); do
+        expected=$(( steps[j-1] + 1 ))
+        if [ "${steps[$j]}" -ne "$expected" ]; then
+          fail "$display_name: gap — Step ${steps[$((j-1))]} to Step ${steps[$j]} (expected Step $expected)"
+          file_ok=false
+          step_seq_errors=$((step_seq_errors + 1))
+        fi
+      done
+
+      # Check duplicates
+      dupes=$(printf '%s\n' "${steps[@]}" | sort -n | uniq -d)
+      if [ -n "$dupes" ]; then
+        while IFS= read -r d; do
+          [ -z "$d" ] && continue
+          fail "$display_name: duplicate Step $d"
+          file_ok=false
+          step_seq_errors=$((step_seq_errors + 1))
+        done <<< "$dupes"
+      fi
+    done
+
+    # Validate skip/jump references point to existing step headers
+    while IFS= read -r ref_line; do
+      # Extract only target step numbers from "to Step N" — not incidental mentions
+      while IFS= read -r ref_num; do
+        [ -n "$ref_num" ] || continue
+        found_ref=false
+        for s in "${all_steps[@]}"; do
+          if [ "$s" = "$ref_num" ]; then
+            found_ref=true
+            break
+          fi
+        done
+        if [ "$found_ref" = false ]; then
+          fail "$display_name: references 'Step $ref_num' but no such step header exists"
+          file_ok=false
+          step_seq_errors=$((step_seq_errors + 1))
+        fi
+      done < <(grep -oiE 'to Step [0-9]+' <<< "$ref_line" | grep -oE '[0-9]+')
+    done < <(grep -iE '(skip|proceed|go|continue|jump|return|fall.?back|advance).*to Step [0-9]+' "$file" 2>/dev/null || true)
+
+    step_seq_checked=$((step_seq_checked + 1))
+    if [ "$file_ok" = true ]; then
+      pass "$display_name"
+    fi
+  done
+
+  if [ "$step_seq_checked" -eq 0 ]; then
+    warn "No files with step sequences found"
   fi
 
   # ── Plugin Summary ───────────────────────────────────────────────
@@ -665,7 +797,7 @@ for plugin_dir in "${plugin_dirs[@]}"; do
 done
 
 # ══════════════════════════════════════════════════════════════════════
-# Section 12 — Summary
+# Section 14 — Summary
 # ══════════════════════════════════════════════════════════════════════
 section "Summary"
 
