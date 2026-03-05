@@ -136,20 +136,31 @@ Related fixes: [similar patterns fixed elsewhere, or "none"]
 Present the full debugging report:
 
 ```
-## Debugging Complete: [Brief title]
+**Debugging summary.**
+Root cause: [one-line root cause]
+Fix: [one-line fix description]
 
-**Bug**: [one-line description]
-**Root cause**: [one-line root cause]
-**Fix**: [one-line fix description]
-
-**Reproduction** → **Isolation** → **Analysis** → **Fix**
+Bug: [one-line description]
+Reproduction → Isolation → Analysis → Fix
 [Link to each section above]
 
-**Regression test**: [test name and how to run it]
-**Tests**: All passing
-**Build**: Clean
+Regression test: [test name and how to run it]
+Tests: All passing
+Build: Clean
+```
 
-**Compound learning**: [If this revealed a pattern, it should be captured via compound-learnings]
+## Handoff
+
+After the completion report, print this completion marker exactly:
+
+```
+**Debugging complete.**
+Artifacts:
+- Regression test: [test file path]
+- Files changed: [list]
+- Defense-in-depth: [additions, or "none"]
+Compound learning: [If this revealed a pattern, it should be captured via compound-learnings]
+Returning to the calling workflow.
 ```
 
 ## Rules

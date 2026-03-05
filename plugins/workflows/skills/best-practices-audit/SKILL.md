@@ -14,6 +14,12 @@ You are auditing a project's CLAUDE.md to ensure it follows Anthropic's official
 - The `/workflows:setup-claude-md` command includes similar audit logic
 - After significant CLAUDE.md changes
 
+## Preconditions
+
+Before auditing, validate inputs exist:
+
+1. **CLAUDE.md exists**: Use the Read tool to read the project root CLAUDE.md. If missing, stop with: "No CLAUDE.md found. Use `/workflows:setup-claude-md` to create one."
+
 ## Reference
 
 Read the best-practices reference from `.claude/skills/setup-claude-md/claude-code-best-practices.md`. If the file is not accessible, use the audit checklist below as the authoritative guide.
@@ -205,6 +211,19 @@ Follow visual-explainer SKILL.md rules strictly (no generic AI styling, no slop)
 5. Verify the file was written successfully.
 6. Open in the default browser: `open -- <path>` on macOS, `xdg-open -- <path>` on Linux. The `--` end-of-options marker prevents a sanitized name starting with `-` from being misread as a flag (stricter than the visual-explainer base pattern, which omits `--`).
 7. Tell the user the file path.
+
+## Handoff
+
+After the Report section, print this completion marker exactly:
+
+```
+**Best-practices audit complete.**
+Artifacts:
+- CLAUDE.md: [N] auto-fixes applied
+- Visual report: [path to HTML file, or "skipped"]
+- Flagged items: [N] items need developer input
+Proceeding to → /workflows:ship (Step 6: worktree cleanup)
+```
 
 ## Rules
 

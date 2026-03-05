@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.17.0] - 2026-03-04
+
+### Changed
+- Inner loop skill chain hardened with standardized preconditions, handoff markers, and context anchors (BRI-1776)
+  - `brainstorming` skill — objective complexity criteria (2+ modules, 4+ tasks, 2+ approaches, new patterns), file-write verification, handoff marker with artifact list
+  - `writing-plans` skill — precondition check for design doc and issue ID, context anchor reads from design doc, handoff marker with task count
+  - `git-worktrees` skill — precondition check for plan file and issue ID, context anchor reads from plan, handoff marker replaces "Worktree Ready" block
+  - `executing-plans` skill — preconditions (plan file, clean git state), context anchor reads design doc + plan, explicit `verification-before-completion` invocation at checkpoints with 3-retry limit, handoff marker with verification summary
+  - `compound-learnings` skill — preconditions (diff exists, CLAUDE.md exists), context anchor reads git log + design doc + plan
+  - `best-practices-audit` skill — precondition (CLAUDE.md exists), handoff marker
+  - `systematic-debugging` skill — completion marker with "Returning to the calling workflow"
+- `session-start` command — Step 4 uses objective complexity checklist instead of subjective judgment, Step 7 says verification is "explicitly invoked", new chain integrity rule in Rules section
+- `ship` command — Step 1 context anchor (restates issue, decisions, review result from files), Steps 4-5 note skills verify own preconditions
+
 ## [3.16.0] - 2026-03-04
 
 ### Added

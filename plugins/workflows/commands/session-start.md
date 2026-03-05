@@ -61,14 +61,26 @@ Once an issue is selected:
 2. **Read linked docs** referenced in the issue (PRDs, design specs, etc.).
 3. **Identify related code** — Find relevant files from the issue description and labels. Read them.
 
-## Step 4: Brainstorm (Non-Trivial Issues)
+## Step 4: Brainstorm (Objective Complexity Check)
 
-**Assess complexity**: Is this issue non-trivial? (Multi-step feature, architectural change, ambiguous requirements, multiple valid approaches)
+**Assess complexity using objective criteria** — do not rely on subjective "is this non-trivial?" judgment.
 
-- **If non-trivial**: The `brainstorming` skill activates. Engage in Socratic discovery — ask clarifying questions, explore alternatives, produce a design document for approval. When the design involves system topology, service interactions, data flow, or new integrations, the skill auto-generates a visual architecture diagram for review alongside the design document.
-- **If trivial** (simple bug fix, config change, single-file edit): Skip brainstorming and proceed to planning.
+**Brainstorm if ANY of these are true:**
+- Changes span 2+ modules or directories
+- Plan would require 4+ tasks
+- There are 2+ viable implementation approaches
+- Introduces a new pattern, integration, or architectural component
 
-Ask the developer if unsure: "This looks straightforward — should we brainstorm approaches or jump to planning?"
+**Skip brainstorming if ALL of these are true:**
+- Single-module change (1-2 files)
+- Clear single approach — no meaningful alternatives
+- Under 3 implementation steps
+- No new patterns or integrations
+
+**Ambiguous** (criteria on both sides): Ask the developer via AskUserQuestion: "This issue has some complexity signals — should we brainstorm approaches or jump to planning?"
+
+- **If brainstorming**: The `brainstorming` skill activates. Engage in Socratic discovery — ask clarifying questions, explore alternatives, produce a design document for approval. When the design involves system topology, service interactions, data flow, or new integrations, the skill auto-generates a visual architecture diagram for review alongside the design document.
+- **If skipping**: Proceed directly to planning.
 
 ## Step 5: Write Plan
 
@@ -97,7 +109,7 @@ The `executing-plans` skill activates:
 
 1. Execute each task via subagent-per-task (fresh context per task)
 2. TDD enforcement: red → green → refactor per task
-3. Checkpoint after each task — `verification-before-completion` activates at each checkpoint (build, tests, acceptance criteria, integration)
+3. Checkpoint after each task — the `verification-before-completion` skill is explicitly invoked at each checkpoint (all 4 levels: build, tests, acceptance criteria, integration)
 4. Parallelize independent tasks
 
 State clearly: "Plan approved. Starting execution. I'll checkpoint after each task and let you know when ready for review."
@@ -111,3 +123,5 @@ State clearly: "Plan approved. Starting execution. I'll checkpoint after each ta
 - If Linear isn't accessible, ask the user to provide issue details manually.
 - The inner loop is: brainstorm → plan → worktree → execute → review → ship. Each step hands off to the next.
 - Skills activate automatically in sequence — the developer only needs to run `session-start`, then `review`, then `ship`.
+- **Chain integrity**: Each inner loop skill prints a completion marker listing artifacts produced. If a skill's completion marker is missing from the conversation and the skill was not intentionally skipped, that skill did not finish — do not proceed to the next step.
+- **Handoff naming**: Skills reference the next skill by directory name (e.g., `writing-plans`). When the next step is a command, use the `/workflows:` prefix (e.g., `/workflows:review`).
