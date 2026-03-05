@@ -518,6 +518,7 @@ To add a new plugin to the bundle, create the plugin directory and add it to the
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System diagrams, runtime flow, skill routing, design decisions |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to add commands, skills, agents, hooks; branch and PR conventions |
 | [docs/getting-started.md](docs/getting-started.md) | Developer setup for working on this repo |
+| [docs/workflow-guide.md](docs/workflow-guide.md) | Full workflow walkthrough, skill reference, visual features |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Common issues and solutions |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |
 | [ROADMAP.md](ROADMAP.md) | Development plan and lifecycle vision |
