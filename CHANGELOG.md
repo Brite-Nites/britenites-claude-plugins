@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.16.0] - 2026-03-04
+
+### Added
+- `retrospective` command — optional visual retro slide deck (Step 4) with delivery dashboard, what went well/needs improvement, and action items. Opt-in via `--slides` flag or AskUserQuestion prompt (BRI-1735)
+- `scope` command — automatic Mermaid mind map diagram of themes and features (Step 3 item 6), plus optional session summary slides (Step 6 sub-section) via `--slides` flag (BRI-1735)
+- `architecture-decision` command — automatic before/after architecture diagrams with Mermaid (Step 5b) showing component changes and options comparison cards. Context section fact-check (Step 7d) verifies file paths, function names, and architecture claims against the codebase before writing (BRI-1735)
+- `sprint-planning` command — optional sprint overview slides (Step 6 sub-section) with velocity dashboard, committed issues, dependency graph, and capacity analysis via `--slides` flag (BRI-1735)
+
+### Fixed
+- `scripts/validate.sh` — orphan agent detection now scans commands in addition to skill frontmatter. Resolves false-positive warnings for agents dispatched by commands (e.g., review agents) (BRI-1735)
+
 ## [3.15.0] - 2026-03-04
 
 ### Changed
@@ -283,7 +294,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.14.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.16.0...HEAD
+[3.16.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.15.0...v3.16.0
+[3.15.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.14.0...v3.15.0
 [3.14.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.12.0...v3.13.0
 [3.12.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.11.0...v3.12.0

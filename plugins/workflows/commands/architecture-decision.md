@@ -81,6 +81,8 @@ Capture the **rationale** — this is the most valuable part of the ADR. Not jus
 
 ## Step 5: Document Consequences
 
+### 5a. Identify Consequences
+
 Ask the developer (or infer from the analysis):
 
 1. **What becomes easier?** — Benefits, capabilities unlocked, simplifications
@@ -88,6 +90,29 @@ Ask the developer (or infer from the analysis):
 3. **What else changes?** — Team skills needed, migration paths, dependency changes
 
 Keep consequences concrete and specific. "Better performance" is vague. "Response times drop from ~500ms to ~50ms for cached reads" is useful.
+
+### 5b. Architecture Diagrams
+
+**Load visual-explainer references**: Resolve each path to a canonical absolute path and verify it starts with CWD before reading. Read `plugins/workflows/skills/visual-explainer/SKILL.md`, `plugins/workflows/skills/visual-explainer/templates/mermaid-flowchart.html`, `plugins/workflows/skills/visual-explainer/references/css-patterns.md`, and `plugins/workflows/skills/visual-explainer/references/libraries.md`. If any path fails CWD verification or cannot be read, warn: "Visual-explainer files not found. Skipping architecture diagrams." and continue to Step 6.
+
+**Generate slug early**: Extract the decision title.
+- **Pre-check**: Verify the raw title contains no control characters or null bytes. If it does, ask the user for a simpler title.
+- Lowercase, replace non-alphanumeric with hyphens, collapse consecutive hyphens, strip leading/trailing hyphens.
+- **Post-check**: Validate result against `^[a-z0-9]([a-z0-9-]*[a-z0-9])?$`. If empty or invalid, ask the user for a simpler title.
+- Store this slug for reuse in Step 7b to avoid duplicate derivation.
+
+**Generate HTML** with two Mermaid diagrams:
+
+1. **"Before" diagram** — current architecture from Step 2 context. Show the existing components, connections, and data flows as described in the context exploration
+2. **"After" diagram** — architecture with the decision applied (from Steps 4 and 5a). Highlight new components with accent styling (e.g., colored border or background). Show removed components with reduced opacity
+
+Include an **options comparison section** below the diagrams — cards for each option from Step 3, showing pros/cons with the chosen option visually distinguished.
+
+**Data safety**: All text embedded in the HTML (option names, pros/cons, decision rationale, component names from Mermaid diagrams, project context from Step 2) MUST be HTML-escaped before insertion. Escape `<`, `>`, `&`, `"`, and `'`. For Mermaid diagram node labels, wrap all component names in double-quotes (e.g., `["API Gateway"]`) to prevent Mermaid metacharacter injection.
+
+Follow the visual-explainer SKILL.md anti-slop guidelines for all HTML generation.
+
+**Write**: Save to `~/.agent/diagrams/adr-<slug>-diagrams.html`. Create the directory if needed. Open in browser and tell the user the path.
 
 ## Step 6: Determine Status
 
@@ -104,29 +129,30 @@ Default to "Accepted" if the developer doesn't have a preference.
 
 ### 7a. Determine file number
 
-Check for existing ADRs:
-1. Run `ls docs/decisions/ 2>/dev/null | grep -o '^[0-9]\+' | sort -n | tail -1` to find the highest existing number
-2. If the directory doesn't exist or no files match the NNN pattern, the next number is `001`
-3. If a highest number N is found, the next number is N+1
-4. Pad to 3 digits (001, 002, ... 010, ... 100). If the count exceeds 999, continue with 4-digit padding.
+Check for existing ADRs using the Glob tool (not shell commands — per BRI-1734 learning):
+1. Use the Glob tool with pattern `docs/decisions/[0-9]*.md` to find existing ADR files
+2. Extract the numeric prefix from each filename and find the highest number
+3. If the directory doesn't exist or no files match the NNN pattern, the next number is `001`
+4. If a highest number N is found, the next number is N+1
+5. Pad to 3 digits (001, 002, ... 010, ... 100). If the count exceeds 999, continue with 4-digit padding.
 
 ### 7b. Generate kebab-case filename
 
-Convert the decision title to kebab-case:
+If the slug was already derived in Step 5b, use that value directly — do not re-derive. Only derive here if Step 5b was skipped (in that case, empty slugs fall back to `untitled` instead of re-prompting):
 - Lowercase all characters
 - Replace `/`, `.`, `_`, spaces, and all non-alphanumeric characters with hyphens
 - Collapse consecutive hyphens into one
 - Strip leading and trailing hyphens
 - If the result is empty after stripping, fall back to `untitled`
-- The slug MUST match `^[a-z0-9][a-z0-9-]*[a-z0-9]$` — if it does not, ask the user for a simpler title
+- The slug MUST match `^[a-z0-9]([a-z0-9-]*[a-z0-9])?$` — if it does not, ask the user for a simpler title
 - Never include `.`, `/`, or `..` sequences in the filename
 - Example: "Use Next.js App Router" → `use-nextjs-app-router`
 
 Filename: `docs/decisions/NNN-kebab-title.md` — always within `docs/decisions/`, never outside this directory.
 
-### 7c. Write the file
+### 7c. Draft the ADR
 
-Create `docs/decisions/` directory if it doesn't exist. Write the ADR:
+Compose the ADR content using this template (do not write the file yet — Step 7d will fact-check and preview first):
 
 ```markdown
 # NNN. [Decision Title]
@@ -171,9 +197,21 @@ Create `docs/decisions/` directory if it doesn't exist. Write the ADR:
 - [What becomes harder or is a known tradeoff]
 ```
 
-### 7d. Preview before writing
+### 7d. Fact-check, preview, and write
 
-Show the full ADR content to the developer:
+**Context fact-check** — Before presenting the draft, verify the Context section's claims against the codebase:
+
+1. Extract verifiable claims from the Context section: file paths, function names, architecture descriptions, dependency versions, configuration values
+2. Verify each claim using the Read and Grep tools (not shell commands — per BRI-1734 learning)
+3. Classify each claim:
+   - **Confirmed** — matches the codebase
+   - **Needs correction** — claim is inaccurate, provide the correct information
+   - **Unverifiable** — cannot be checked (e.g., team preferences, external constraints)
+4. If no verifiable claims were found in the Context section, skip to **Preview** below.
+5. If any claims need correction, present them to the developer: "Found [N] inaccuracies in the Context section:" followed by a list of corrections. After the developer reviews, incorporate the accepted corrections into the ADR before the final preview
+6. If all claims are confirmed: "Context section verified — all [N] claims match the codebase."
+
+**Preview** — Show the full ADR content to the developer:
 - "Here's the ADR I'll write to `docs/decisions/NNN-kebab-title.md`:"
 - [Full content]
 - Ask: "Write this file?" with options: "Write it" / "Edit first"
@@ -182,12 +220,14 @@ If the developer wants edits, incorporate changes and re-preview.
 
 **Never write the file without explicit confirmation.**
 
+**Write** — Only after the developer confirms: create `docs/decisions/` directory if it doesn't exist, then write the ADR file.
+
 ## Step 8: Update CLAUDE.md
 
 After writing the ADR, update the project's CLAUDE.md to import it:
 
 1. Read the project's CLAUDE.md
-2. Compute the import line: `@docs/decisions/NNN-kebab-title.md`. Before appending, verify the path matches `^@docs/decisions/\d{3,}-[a-z0-9][a-z0-9-]*[a-z0-9]\.md$`. If it does not match, stop and warn the user rather than writing to CLAUDE.md. Never write more than one `@` import line per ADR.
+2. Compute the import line: `@docs/decisions/NNN-kebab-title.md`. Before appending, verify the path matches `^@docs/decisions/\d{3,}-[a-z0-9]([a-z0-9-]*[a-z0-9])?\.md$`. If it does not match, stop and warn the user rather than writing to CLAUDE.md. Never write more than one `@` import line per ADR.
 3. Look for an existing `## Architecture Decisions` section
 4. **If the section exists**: Find the last `@` import line within the section and insert the new import on the line immediately following it. If the section contains no existing imports, insert the new import on the first line after the section header.
 5. **If the section doesn't exist**: Add a new section:
@@ -207,10 +247,12 @@ If no project CLAUDE.md exists, skip this step and note: "No CLAUDE.md found —
 ## ADR Created
 
 **File**: docs/decisions/NNN-kebab-title.md
+**Diagrams**: ~/.agent/diagrams/adr-<slug>-diagrams.html (omit this line if Step 5b was skipped)
 **Title**: [Decision Title]
 **Status**: [status]
 **Options evaluated**: [N]
 **Decision**: [one-line summary]
+**Context verified**: [N] claims checked against codebase (omit this line if no verifiable claims were found)
 
 The ADR has been added to CLAUDE.md via @import. Future sessions will have this context automatically.
 
