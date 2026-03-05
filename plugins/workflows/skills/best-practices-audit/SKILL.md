@@ -192,7 +192,7 @@ Log each auto-fix decision:
 **Hook candidates**:
 - [rules that should become hooks]
 
-**Visual report**: [path to HTML file, or "skipped — visual-explainer not available"]
+**Visual report**: [path to HTML file, or "Visual-explainer files not found. Skipping audit report."]
 ```
 
 ## Visual Audit Report (Optional)
@@ -201,14 +201,14 @@ Generate a visual HTML report if the visual-explainer skill is available.
 
 ### Availability check
 
-Read these files — if **any** is missing, skip visual output entirely and note "skipped — visual-explainer not available" in the report:
+Read these files — if **any** is missing, skip visual output entirely and note "Visual-explainer files not found. Skipping audit report." in the report:
 1. `plugins/workflows/skills/visual-explainer/SKILL.md`
 2. `plugins/workflows/skills/visual-explainer/templates/data-table.html`
 3. `plugins/workflows/skills/visual-explainer/references/css-patterns.md`
 
 If all files are present, read `plugins/workflows/skills/visual-explainer/SKILL.md` for anti-slop design guidelines before generating. Apply strictly.
 
-If visual-explainer files are missing, narrate the skip reason: "Visual report skipped — visual-explainer skill files not available."
+If visual-explainer files are missing, narrate the skip reason: "Visual-explainer files not found. Skipping audit report."
 
 ### HTML structure (4 sections)
 
@@ -242,7 +242,7 @@ Artifacts:
 - CLAUDE.md: [N] auto-fixes applied
 - Visual report: [path to HTML file, or "skipped"]
 - Flagged items: [N] items need developer input
-Proceeding to → /workflows:ship
+Returning to → /workflows:ship
 ```
 
 ## Rules

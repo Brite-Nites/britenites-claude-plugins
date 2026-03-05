@@ -143,7 +143,7 @@ After writing the plan, run this multi-step approval flow.
 
 **Issue ID sanitization** (applies to all steps below, including iterations): Verify the issue ID matches `^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$` before using it in any file path. If it doesn't match, ask the user to confirm the issue ID manually. Re-use this sanitized ID throughout — do not re-read from raw issue context on iteration.
 
-**Prerequisite read**: Read the `visual-explainer` skill (`plugins/workflows/skills/visual-explainer/SKILL.md`) for styling guidelines before starting. Apply to any visual steps that run.
+**Prerequisite read**: Read the `visual-explainer` skill (`plugins/workflows/skills/visual-explainer/SKILL.md`) for styling guidelines before starting. Apply to any visual steps that run. If the file cannot be read, warn: "Visual-explainer files not found. Skipping visual plan.", log the decision (see `_shared/observability.md` Decision Log format): `Decision: Skip visuals. Reason: visual-explainer files unavailable. Alternatives: would have generated visual plan and plan review for 4+ tasks.` — then skip Steps 2 and 3 of this Visual Plan Approval section (visual plan rendering and plan validation) and proceed directly to Step 4 — Approval.
 
 ### Step 1 — Assess complexity
 
@@ -180,6 +180,8 @@ Generate a visual plan review comparing the plan against the current codebase:
 3. Generate the plan review per the command's structure; write to `~/.agent/diagrams/<sanitized-issue-id>-plan-review.html`, open in browser
 4. Tell the user the file path so they can re-open or share it
 
+Narrate: `Step 3/4: Visual plan approval... done`
+
 ### Step 4 — Approval
 
 Narrate: `Step 4/4: Requesting plan approval...`
@@ -191,7 +193,7 @@ Narrate: `Step 4/4: Requesting plan approval...`
 5. **If changes requested**: Iterate the markdown plan, re-save to `docs/plans/<sanitized-issue-id>-plan.md` using the same sanitized issue ID, regenerate whichever visual artifacts were produced in Steps 2 and 3 (write to the same file paths so the user can refresh their browser), and re-present
 6. **If plan-review reveals blocking issues after 3 iterations**: Use error recovery (see `_shared/observability.md`). AskUserQuestion with options: "Approve plan as-is / Continue iterating / Stop and revisit design."
 
-Narrate: `Step 3/4: Visual plan approval... done`
+Narrate: `Step 4/4: Requesting plan approval... done`
 
 ## Handoff
 

@@ -71,8 +71,8 @@ These activate automatically in sequence. None need to be invoked manually.
 
 | Skill | Activates When | Purpose | Produces |
 |-------|---------------|---------|----------|
-| `brainstorming` | 2+ modules, 4+ tasks, 2+ approaches, or new patterns | Socratic discovery | `docs/designs/<id>-<slug>.md` |
-| `writing-plans` | Multi-step task, after brainstorm or complexity skip | Break into 2-5min tasks with TDD | `docs/plans/<id>-plan.md` |
+| `brainstorming` | 2+ modules, 4+ tasks, 2+ approaches, or new patterns | Socratic discovery | `docs/designs/<issue-id>-<slug>.md` |
+| `writing-plans` | Multi-step task, after brainstorm or complexity skip | Break into 2-5min tasks with TDD | `docs/plans/<issue-id>-plan.md` |
 | `git-worktrees` | Plan approved, before coding | Isolated workspace + clean baseline | `.claude/worktrees/` branch |
 | `executing-plans` | Plan file exists | Subagent-per-task + TDD + checkpoints | Implemented code + tests |
 | `verification-before-completion` | Task checkpoints during execution | 4-level verification (build, tests, acceptance, integration) | Verification report |
@@ -126,9 +126,9 @@ These visuals are generated automatically during the inner loop workflow.
 
 | Phase | Visual | Trigger | Output Path |
 |-------|--------|---------|-------------|
-| Brainstorming | Architecture diagram | Design involves topology or new patterns | `~/.agent/diagrams/<id>-architecture.html` |
-| Writing Plans | Visual plan | 4+ tasks | `~/.agent/diagrams/<id>-visual-plan.html` |
-| Writing Plans | Plan review | All plans | `~/.agent/diagrams/<id>-plan-review.html` |
+| Brainstorming | Architecture diagram | Design involves topology or new patterns | `~/.agent/diagrams/<issue-id>-architecture.html` |
+| Writing Plans | Visual plan | 4+ tasks | `~/.agent/diagrams/<issue-id>-visual-plan.html` |
+| Writing Plans | Plan review | All plans | `~/.agent/diagrams/<issue-id>-plan-review.html` |
 | Review | Review report | Always (Step 5) | `~/.agent/diagrams/review-<sanitized-branch>.html` |
 | Ship | Audit report | Optional | `~/.agent/diagrams/audit-<project>.html` |
 
@@ -206,7 +206,7 @@ Create PR, update Linear, capture learnings, audit CLAUDE.md, suggest next issue
 | 1 | Pre-Ship Checks | Clean state, tests pass, build succeeds, branch up to date |
 | 2 | Create Pull Request | Push branch, create PR with structured description |
 | 3 | Update Linear | Move issue to "In Review", add comment with PR link |
-| 4 | Compound Learnings | Accuracy pass on CLAUDE.md, capture durable knowledge (untrusted sources sanitized before writing), write session summary |
+| 4 | Compound Learnings | Accuracy pass on CLAUDE.md, capture durable knowledge (sanitization enforced in `compound-learnings` skill), write session summary |
 | 5 | Best Practices Audit | 8-dimension audit of CLAUDE.md, auto-fix structural issues |
 | 6 | Worktree Cleanup | Remove worktree and local branch if applicable |
 | 7 | Session Close | Summary of what shipped, learnings captured, suggested next issue |

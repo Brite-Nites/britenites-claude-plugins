@@ -109,7 +109,7 @@ Generate a visual HTML review page using the visual-explainer skill. The agent f
 
 ### 5a. Load visual-explainer references
 
-Read these files for styling rules, anti-slop guidelines, and structural patterns. If any path does not exist (plugin running outside its source repo), tell the user: "Visual-explainer skill files not found. Generating plain HTML without design constraints." Then skip to Step 5b, generate plain semantic HTML using the same 6-section structure as Step 5d (no external CSS patterns, no templates, no anime.js animations), and continue with Step 5e.
+Read these files for styling rules, anti-slop guidelines, and structural patterns. If any path does not exist (plugin running outside its source repo), tell the user: "Visual-explainer files not found. Generating plain HTML review report." Then skip to Step 5b, generate plain semantic HTML using the same 6-section structure as Step 5d (no external CSS patterns, no templates, no anime.js animations), and continue with Step 5e.
 
 1. `plugins/workflows/skills/visual-explainer/SKILL.md` — workflow, styling rules, anti-slop design guidelines
 2. `plugins/workflows/skills/visual-explainer/templates/architecture.html` — reference template for card-heavy layouts
