@@ -1,0 +1,428 @@
+{
+  "version": "1.0.0",
+  "skills": [
+    {
+      "name": "agent-browser",
+      "tier": "utility",
+      "user_invocable": true,
+      "keywords": ["browser automation", "navigate website", "fill form", "take screenshot", "web testing", "interact with web page", "extract from web"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "best-practices-audit",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["audit CLAUDE.md", "best practices audit", "CLAUDE.md drift"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "brainstorming",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["design exploration", "clarifying questions", "explore alternatives", "explore tradeoffs", "design document"],
+      "negative_keywords": ["debug", "bug", "failing test", "production issue", "error report", "root cause analysis", "unexpected behavior"],
+      "beats": []
+    },
+    {
+      "name": "code-quality",
+      "tier": "backend-quality",
+      "user_invocable": true,
+      "keywords": ["setup eslint", "configure prettier", "setup ruff", "configure mypy", "linting config", "formatting config", "code quality tooling", "lint setup"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "compound-learnings",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["capture learnings", "compound knowledge", "session summary", "update CLAUDE.md with learnings"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "create-issues",
+      "tier": "post-plan",
+      "user_invocable": false,
+      "keywords": ["create linear issues", "create issues from plan"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "executing-plans",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["execute plan", "run plan", "implement plan", "subagent per task"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "find-skills",
+      "tier": "utility",
+      "user_invocable": true,
+      "keywords": ["find a skill", "is there a skill", "discover skill", "install skill", "search for skill"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "frontend-design",
+      "tier": "design",
+      "user_invocable": true,
+      "keywords": ["build component", "create page", "implement dashboard", "build layout", "code the UI", "implement interface", "build web application"],
+      "negative_keywords": ["review UI", "audit design", "check accessibility", "choose palette", "design system", "plan visual direction", "select fonts"],
+      "beats": ["ui-ux-pro-max"]
+    },
+    {
+      "name": "git-worktrees",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["setup worktree", "isolated workspace", "create worktree"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "post-plan-setup",
+      "tier": "post-plan",
+      "user_invocable": true,
+      "keywords": ["post-plan workflow", "refine and create issues", "run post-plan setup"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "python-best-practices",
+      "tier": "backend-quality",
+      "user_invocable": true,
+      "keywords": ["fastapi endpoint", "pydantic model", "sqlalchemy query", "async python", "python api architecture", "fastapi router"],
+      "negative_keywords": ["react", "next.js", "typescript", "eslint", "prettier"],
+      "beats": []
+    },
+    {
+      "name": "react-best-practices",
+      "tier": "design",
+      "user_invocable": true,
+      "keywords": ["react component", "next.js page", "data fetching react", "bundle optimization", "react performance", "server component"],
+      "negative_keywords": ["fastapi", "pydantic", "sqlalchemy", "python api"],
+      "beats": []
+    },
+    {
+      "name": "refine-plan",
+      "tier": "post-plan",
+      "user_invocable": false,
+      "keywords": ["refine plan", "agent-ready tasks", "refine v1 plan"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "setup-claude-md",
+      "tier": "post-plan",
+      "user_invocable": false,
+      "keywords": ["generate CLAUDE.md", "setup CLAUDE.md", "create CLAUDE.md"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "systematic-debugging",
+      "tier": "inner-loop",
+      "user_invocable": true,
+      "keywords": ["debug", "bug investigation", "failing test", "production issue", "root cause analysis", "unexpected behavior", "error report"],
+      "negative_keywords": [],
+      "beats": ["brainstorming"]
+    },
+    {
+      "name": "testing-strategy",
+      "tier": "backend-quality",
+      "user_invocable": true,
+      "keywords": ["vitest test", "react testing library", "msw handler", "playwright test", "pytest fixture", "test structure", "coverage config", "write test"],
+      "negative_keywords": ["eslint", "prettier", "ruff config", "mypy config"],
+      "beats": []
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "tier": "design",
+      "user_invocable": true,
+      "keywords": ["choose palette", "select fonts", "design system", "plan visual direction", "explore UI styles", "color palette", "font pairing", "design planning"],
+      "negative_keywords": ["build component", "code the UI", "review UI", "audit design"],
+      "beats": []
+    },
+    {
+      "name": "verification-before-completion",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["verify task complete", "task checkpoint", "acceptance criteria met", "genuinely resolved"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "visual-explainer",
+      "tier": "design",
+      "user_invocable": true,
+      "keywords": ["diagram", "architecture overview", "visual explanation", "diff review", "plan review", "project recap", "comparison table", "visual report"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
+      "name": "web-design-guidelines",
+      "tier": "design",
+      "user_invocable": true,
+      "keywords": ["review UI", "check accessibility", "audit design", "review UX", "check site against best practices", "UI compliance"],
+      "negative_keywords": ["build component", "create page"],
+      "beats": ["frontend-design"]
+    },
+    {
+      "name": "writing-plans",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["break into tasks", "plan implementation", "create execution plan", "write plan"],
+      "negative_keywords": [],
+      "beats": []
+    }
+  ],
+  "precedence": [
+    {
+      "winner": "systematic-debugging",
+      "loser": "brainstorming",
+      "context": "Bug investigation triggers debugging, not brainstorming"
+    },
+    {
+      "winner": "frontend-design",
+      "loser": "ui-ux-pro-max",
+      "context": "Build/implement keywords trigger implementation, not design planning"
+    },
+    {
+      "winner": "web-design-guidelines",
+      "loser": "frontend-design",
+      "context": "Review/audit keywords trigger review, not implementation"
+    }
+  ],
+  "test_cases": [
+    {
+      "phrase": "I need to debug this failing test in the auth module",
+      "expected": ["systematic-debugging"],
+      "not_expected": ["brainstorming"],
+      "description": "Bug investigation should trigger debugging, not brainstorming"
+    },
+    {
+      "phrase": "Let's do some design exploration before we plan this feature",
+      "expected": ["brainstorming"],
+      "not_expected": [],
+      "description": "Design exploration triggers brainstorming"
+    },
+    {
+      "phrase": "I have an approved plan, let's execute plan tasks",
+      "expected": ["executing-plans"],
+      "not_expected": [],
+      "description": "Execute plan triggers executing-plans"
+    },
+    {
+      "phrase": "Let's break into tasks and plan implementation for the dashboard",
+      "expected": ["writing-plans"],
+      "not_expected": [],
+      "description": "Planning triggers writing-plans"
+    },
+    {
+      "phrase": "We need to setup worktree for this issue",
+      "expected": ["git-worktrees"],
+      "not_expected": [],
+      "description": "Worktree setup triggers git-worktrees"
+    },
+    {
+      "phrase": "Time to capture learnings and write session summary",
+      "expected": ["compound-learnings"],
+      "not_expected": [],
+      "description": "Capturing learnings triggers compound-learnings"
+    },
+    {
+      "phrase": "Run best practices audit on the CLAUDE.md",
+      "expected": ["best-practices-audit"],
+      "not_expected": [],
+      "description": "Audit CLAUDE.md triggers best-practices-audit"
+    },
+    {
+      "phrase": "Let's verify task complete and check acceptance criteria met",
+      "expected": ["verification-before-completion"],
+      "not_expected": [],
+      "description": "Task checkpoint triggers verification"
+    },
+    {
+      "phrase": "Build component for the user profile card",
+      "expected": ["frontend-design"],
+      "not_expected": ["ui-ux-pro-max"],
+      "description": "Build component triggers frontend-design, not ui-ux-pro-max"
+    },
+    {
+      "phrase": "I need to choose palette and select fonts for the new app",
+      "expected": ["ui-ux-pro-max"],
+      "not_expected": ["frontend-design"],
+      "description": "Palette/font selection triggers ui-ux-pro-max, not frontend-design"
+    },
+    {
+      "phrase": "Review UI for accessibility and audit design compliance",
+      "expected": ["web-design-guidelines"],
+      "not_expected": ["frontend-design"],
+      "description": "Review/audit triggers web-design-guidelines, not frontend-design"
+    },
+    {
+      "phrase": "Create page layout and implement dashboard for analytics",
+      "expected": ["frontend-design"],
+      "not_expected": ["ui-ux-pro-max", "web-design-guidelines"],
+      "description": "Create/implement triggers frontend-design exclusively"
+    },
+    {
+      "phrase": "Generate a diagram of the system architecture overview",
+      "expected": ["visual-explainer"],
+      "not_expected": [],
+      "description": "Diagram request triggers visual-explainer"
+    },
+    {
+      "phrase": "I need a visual explanation of the data flow",
+      "expected": ["visual-explainer"],
+      "not_expected": [],
+      "description": "Visual explanation triggers visual-explainer"
+    },
+    {
+      "phrase": "Write a new fastapi endpoint for user registration",
+      "expected": ["python-best-practices"],
+      "not_expected": ["react-best-practices"],
+      "description": "FastAPI endpoint triggers python-best-practices"
+    },
+    {
+      "phrase": "Review this pydantic model for the order schema",
+      "expected": ["python-best-practices"],
+      "not_expected": [],
+      "description": "Pydantic model triggers python-best-practices"
+    },
+    {
+      "phrase": "Optimize this react component for performance",
+      "expected": ["react-best-practices"],
+      "not_expected": ["python-best-practices"],
+      "description": "React component triggers react-best-practices"
+    },
+    {
+      "phrase": "Implement server component for the product listing next.js page",
+      "expected": ["react-best-practices"],
+      "not_expected": ["python-best-practices"],
+      "description": "Next.js/server component triggers react-best-practices"
+    },
+    {
+      "phrase": "Setup eslint and configure prettier for the project",
+      "expected": ["code-quality"],
+      "not_expected": ["testing-strategy"],
+      "description": "Linting setup triggers code-quality"
+    },
+    {
+      "phrase": "Write vitest test for the checkout component",
+      "expected": ["testing-strategy"],
+      "not_expected": ["code-quality"],
+      "description": "Vitest test triggers testing-strategy"
+    },
+    {
+      "phrase": "Add playwright test for the login flow",
+      "expected": ["testing-strategy"],
+      "not_expected": [],
+      "description": "Playwright test triggers testing-strategy"
+    },
+    {
+      "phrase": "Configure pytest fixture for database setup",
+      "expected": ["testing-strategy"],
+      "not_expected": [],
+      "description": "Pytest fixture triggers testing-strategy"
+    },
+    {
+      "phrase": "Find a skill for kubernetes deployment",
+      "expected": ["find-skills"],
+      "not_expected": [],
+      "description": "Skill discovery triggers find-skills"
+    },
+    {
+      "phrase": "I need browser automation to fill form on the staging site",
+      "expected": ["agent-browser"],
+      "not_expected": [],
+      "description": "Browser automation triggers agent-browser"
+    },
+    {
+      "phrase": "Run the post-plan workflow to refine and create issues",
+      "expected": ["post-plan-setup"],
+      "not_expected": [],
+      "description": "Post-plan workflow triggers post-plan-setup"
+    },
+    {
+      "phrase": "Create linear issues from the refined plan",
+      "expected": ["create-issues"],
+      "not_expected": [],
+      "description": "Creating issues from plan triggers create-issues"
+    },
+    {
+      "phrase": "Can you help me with this unexpected behavior in the API?",
+      "expected": ["systematic-debugging"],
+      "not_expected": ["brainstorming"],
+      "description": "Unexpected behavior triggers debugging over brainstorming"
+    },
+    {
+      "phrase": "There's a production issue with the payment service error report",
+      "expected": ["systematic-debugging"],
+      "not_expected": ["brainstorming"],
+      "description": "Production issue + error report triggers debugging"
+    },
+    {
+      "phrase": "What's the weather like today?",
+      "expected": [],
+      "not_expected": [],
+      "description": "Irrelevant phrase should match no skills"
+    },
+    {
+      "phrase": "Tell me a joke about programming",
+      "expected": [],
+      "not_expected": [],
+      "description": "Irrelevant phrase should match no skills"
+    },
+    {
+      "phrase": "How do I make coffee?",
+      "expected": [],
+      "not_expected": [],
+      "description": "Irrelevant phrase should match no skills"
+    },
+    {
+      "phrase": "Let's plan visual direction and explore UI styles before building",
+      "expected": ["ui-ux-pro-max"],
+      "not_expected": ["frontend-design"],
+      "description": "Design planning triggers ui-ux-pro-max, not frontend-design"
+    },
+    {
+      "phrase": "I want to implement interface and build web application for the dashboard",
+      "expected": ["frontend-design"],
+      "not_expected": ["ui-ux-pro-max"],
+      "description": "Implementation keywords trigger frontend-design"
+    },
+    {
+      "phrase": "We need to debug this bug investigation and do root cause analysis",
+      "expected": ["systematic-debugging"],
+      "not_expected": ["brainstorming"],
+      "description": "Multiple debugging keywords all point to systematic-debugging"
+    },
+    {
+      "phrase": "Refine plan into agent-ready tasks",
+      "expected": ["refine-plan"],
+      "not_expected": [],
+      "description": "Refine plan triggers refine-plan"
+    },
+    {
+      "phrase": "Generate CLAUDE.md for this project",
+      "expected": ["setup-claude-md"],
+      "not_expected": [],
+      "description": "Generate CLAUDE.md triggers setup-claude-md"
+    },
+    {
+      "phrase": "We need to implement dashboard with UI compliance requirements",
+      "expected": ["web-design-guidelines"],
+      "not_expected": ["frontend-design"],
+      "description": "Beats: web-design-guidelines beats frontend-design (both match via UI compliance + implement dashboard, beats resolves)"
+    },
+    {
+      "phrase": "I want to implement dashboard and explore UI styles for the project",
+      "expected": ["frontend-design"],
+      "not_expected": ["ui-ux-pro-max"],
+      "description": "Beats: frontend-design beats ui-ux-pro-max (both match via implement dashboard + explore UI styles, beats resolves)"
+    }
+  ]
+}

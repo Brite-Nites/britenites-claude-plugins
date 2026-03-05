@@ -23,3 +23,6 @@ jobs:
 
       - name: Test security hook regexes
         run: bash scripts/test-hooks.sh
+
+      - name: Test skill trigger matching
+        run: bash scripts/test-skill-triggers.sh
