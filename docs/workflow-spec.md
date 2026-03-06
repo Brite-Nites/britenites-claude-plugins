@@ -805,7 +805,7 @@ steps:
     activates-skill: null
     visual-gating: false
   - id: 3
-    name: "Launch Review Agents"
+    name: "Select & Launch Review Agents"
     required: true
     skip-condition: null
     skip-target: null
@@ -1286,6 +1286,7 @@ sequence:
   - from: "/workflows:review"
     to: "/workflows:ship"
     provides:
+      - "Agent selection results (tier, agent list, activation reasons)"
       - "Simplify pass results (applied/suggestions/reverted)"
       - "Review findings (P1/P2/P3)"
       - "P1 fixes applied"
@@ -1766,6 +1767,12 @@ error-handling:
   - failure-point: "P1 persists after 3 fix attempts (Step 5)"
     action: escalate
     detail: "Flag for human review with full context on what was tried"
+  - failure-point: "Stack detection fails (Step 3)"
+    action: degrade
+    detail: "Proceed with Tier 1 agents only (code-reviewer, security-reviewer, performance-reviewer)"
+  - failure-point: "CLAUDE.md override parse fails (Step 3)"
+    action: degrade
+    detail: "Ignore overrides, proceed with agents selected from Tiers 1-2"
   - failure-point: "Visual-explainer files not found (Step 6)"
     action: degrade
     detail: "Generate plain HTML review report"

@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
-7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then 3 review agents (code, security, TypeScript) run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
+7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then review agents are dynamically selected based on your stack (3-8 agents) and run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
 8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
 
 ### Artifacts produced
@@ -191,11 +191,41 @@ Self-verify work, simplify code, run review agents in parallel, fix P1s, produce
 | 0 | Verify Agent Dispatch | Test Task tool with trivial agent before committing to parallel agents |
 | 1 | Self-Verification | Check plan steps, run tests, verify build, review own diff |
 | 2 | Simplify Pass | 3 agents in parallel (code reuse, quality, efficiency) auto-fix behavior-preserving improvements |
-| 3 | Launch Review Agents | 3 agents in parallel: code-reviewer, security-reviewer, typescript-reviewer |
+| 3 | Select & Launch Review Agents | Dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch in parallel |
 | 4 | Collect & Classify | Merge and deduplicate findings by severity (P1/P2/P3) |
 | 5 | Fix Loop | Auto-fix P1s (max 3 attempts), re-verify with agents |
 | 6 | Visual Review Report | Generate 6-section HTML report (summary, KPIs, architecture, findings, file map, tests) |
 | 7 | Final Report | Present verdict: ready to ship, needs input on P2s, or blocked |
+
+**Review Agent Roster**
+
+| Tier | Agent | Activation | Focus |
+|------|-------|-----------|-------|
+| 1 (always) | `code-reviewer` | Always | Bugs, logic errors, edge cases |
+| 1 (always) | `security-reviewer` | Always | OWASP Top 10, secrets, auth |
+| 1 (always) | `performance-reviewer` | Always | Complexity, N+1, memory leaks, bundle size |
+| 2 (stack) | `typescript-reviewer` | `tsconfig.json` exists | Type safety, React/Next.js patterns |
+| 2 (stack) | `python-reviewer` | `pyproject.toml` or `requirements.txt` exists | FastAPI, Pydantic v2, async patterns |
+| 2 (stack) | `data-reviewer` | `prisma/schema.prisma`, `alembic/`, or `**/migrations/` exists | Migration safety, query patterns, constraints |
+| 3 (opt-in) | `architecture-reviewer` | CLAUDE.md enables OR diff touches 5+ directories | Coupling, SOLID, dependency direction |
+| 3 (opt-in) | `accessibility-reviewer` | CLAUDE.md enables (opt-in only) | WCAG 2.1, keyboard nav, ARIA, screen reader |
+
+**CLAUDE.md Review Agent Overrides**
+
+Add a `## Review Agents` section to your project's CLAUDE.md to customize which agents run:
+
+```markdown
+## Review Agents
+
+include:
+  - accessibility-reviewer
+  - architecture-reviewer
+
+exclude:
+  - typescript-reviewer
+```
+
+`include:` adds agents that wouldn't otherwise activate. `exclude:` removes agents from the selection. Tier 1 agents (code-reviewer, security-reviewer, performance-reviewer) cannot be excluded.
 
 #### `/workflows:ship`
 
