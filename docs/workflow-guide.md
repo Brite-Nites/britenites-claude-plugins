@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
-7. After you run `/workflows:review`, 3 review agents (code, security, TypeScript) run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
+7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then 3 review agents (code, security, TypeScript) run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
 8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
 
 ### Artifacts produced
@@ -129,7 +129,7 @@ These visuals are generated automatically during the inner loop workflow.
 | Brainstorming | Architecture diagram | Design involves topology or new patterns | `~/.agent/diagrams/<issue-id>-architecture.html` |
 | Writing Plans | Visual plan | 4+ tasks | `~/.agent/diagrams/<issue-id>-visual-plan.html` |
 | Writing Plans | Plan review | All plans | `~/.agent/diagrams/<issue-id>-plan-review.html` |
-| Review | Review report | Always (Step 5) | `~/.agent/diagrams/review-<sanitized-branch>.html` |
+| Review | Review report | Always (Step 6) | `~/.agent/diagrams/review-<sanitized-branch>.html` |
 | Ship | Audit report | Optional | `~/.agent/diagrams/audit-<project>.html` |
 
 ### 3b. Outer Loop Visuals (`--slides` flag)
@@ -184,17 +184,18 @@ Start a work session. Guides you from issue selection through execution.
 
 #### `/workflows:review`
 
-Self-verify work, run review agents in parallel, fix P1s, produce a visual report.
+Self-verify work, simplify code, run review agents in parallel, fix P1s, produce a visual report.
 
 | Step | Name | What happens |
 |------|------|-------------|
-| 0 | Verify Agent Dispatch | Test Task tool with trivial agent before committing to 3 parallel agents |
+| 0 | Verify Agent Dispatch | Test Task tool with trivial agent before committing to parallel agents |
 | 1 | Self-Verification | Check plan steps, run tests, verify build, review own diff |
-| 2 | Launch Review Agents | 3 agents in parallel: code-reviewer, security-reviewer, typescript-reviewer |
-| 3 | Collect & Classify | Merge and deduplicate findings by severity (P1/P2/P3) |
-| 4 | Fix Loop | Auto-fix P1s (max 3 attempts), re-verify with agents |
-| 5 | Visual Review Report | Generate 6-section HTML report (summary, KPIs, architecture, findings, file map, tests) |
-| 6 | Final Report | Present verdict: ready to ship, needs input on P2s, or blocked |
+| 2 | Simplify Pass | 3 agents in parallel (code reuse, quality, efficiency) auto-fix behavior-preserving improvements |
+| 3 | Launch Review Agents | 3 agents in parallel: code-reviewer, security-reviewer, typescript-reviewer |
+| 4 | Collect & Classify | Merge and deduplicate findings by severity (P1/P2/P3) |
+| 5 | Fix Loop | Auto-fix P1s (max 3 attempts), re-verify with agents |
+| 6 | Visual Review Report | Generate 6-section HTML report (summary, KPIs, architecture, findings, file map, tests) |
+| 7 | Final Report | Present verdict: ready to ship, needs input on P2s, or blocked |
 
 #### `/workflows:ship`
 
