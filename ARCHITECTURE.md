@@ -7,9 +7,9 @@ How the Brite Claude Plugins bundle is structured, how it executes, and why it's
 ```mermaid
 graph TD
     MP["marketplace.json<br/>(plugin registry)"] --> PJ["plugin.json<br/>(metadata + paths)"]
-    PJ --> CMD["commands/<br/>7 slash commands"]
-    PJ --> SKL["skills/<br/>10 auto-invoked skills"]
-    PJ --> AGT["agents/<br/>7 specialized agents"]
+    PJ --> CMD["commands/<br/>24 slash commands"]
+    PJ --> SKL["skills/<br/>22 auto-invoked skills"]
+    PJ --> AGT["agents/<br/>12 specialized agents"]
     PJ --> HK["hooks/hooks.json<br/>3 event hooks"]
     PJ --> MCP[".mcp.json<br/>2 MCP servers"]
     SKL --> SH["_shared/<br/>validation + output formats"]
@@ -131,7 +131,7 @@ The v2.0.0 session commands create a complete development loop:
 ```mermaid
 flowchart LR
     SS["/session-start<br/>Pick issue, plan work"] --> IM["Implement<br/>Write code"]
-    IM --> RV["/review<br/>3 agents in parallel"]
+    IM --> RV["/review<br/>N agents (dynamic)"]
     RV -->|"P1s found"| FX["Fix P1s"]
     FX --> RV
     RV -->|"Clean"| SH["/ship<br/>PR, Linear, learnings"]
@@ -140,19 +140,24 @@ flowchart LR
 
 **`/session-start`**: Pulls latest, queries Linear for open issues, helps pick one, creates an execution plan.
 
-**`/review`**: Runs `code-reviewer`, `security-reviewer`, and `typescript-reviewer` agents in parallel (all sonnet). Auto-fixes P1s, reports P2/P3s.
+**`/review`**: Dynamically selects review agents based on stack (3-8 agents, all sonnet). Tier 1 always runs (code, security, performance); Tier 2 activates for detected stacks (TypeScript, Python, data); Tier 3 is opt-in (architecture, accessibility). Auto-fixes P1s, reports P2/P3s.
 
 **`/ship`**: Creates PR, updates Linear issue status, compounds learnings to CLAUDE.md and memory, suggests next issue.
 
 ### Review Agents
 
-| Agent | Model | Focus |
-|-------|-------|-------|
-| `code-reviewer` | sonnet | Bugs, logic errors, edge cases, P1/P2/P3 severity |
-| `security-reviewer` | sonnet | OWASP Top 10, secrets exposure, auth issues |
-| `typescript-reviewer` | sonnet | Type safety, React/Next.js patterns, hook rules |
+| Tier | Agent | Model | Focus |
+|------|-------|-------|-------|
+| 1 (always) | `code-reviewer` | sonnet | Bugs, logic errors, edge cases |
+| 1 (always) | `security-reviewer` | sonnet | OWASP Top 10, secrets exposure, auth issues |
+| 1 (always) | `performance-reviewer` | sonnet | Algorithmic complexity, N+1, memory leaks, bundle size |
+| 2 (stack) | `typescript-reviewer` | sonnet | Type safety, React/Next.js patterns, hook rules |
+| 2 (stack) | `python-reviewer` | sonnet | FastAPI, Pydantic v2, async patterns, type hints |
+| 2 (stack) | `data-reviewer` | sonnet | Migration safety, schema constraints, query patterns |
+| 3 (opt-in) | `architecture-reviewer` | sonnet | Coupling, SOLID, dependency direction, boundaries |
+| 3 (opt-in) | `accessibility-reviewer` | sonnet | WCAG 2.1, keyboard nav, ARIA, screen reader |
 
-All three produce findings in the same `**[P1/P2/P3]** file:line — title` format for consistent output.
+All agents produce findings in the same `**[P1/P2/P3]** file:line — title` format for consistent output. Agent selection is dynamic — see `/workflows:review` Step 3.
 
 ## Hook Execution
 
@@ -247,9 +252,14 @@ plugins/workflows/
       validation-pattern.md           # Self-validation & retry loop
       output-formats.md               # Standard output formatting
   agents/
-    code-reviewer.md                  # Code quality reviewer (sonnet)
-    security-reviewer.md              # Security vulnerability reviewer (sonnet)
-    typescript-reviewer.md            # TypeScript/React reviewer (sonnet)
+    code-reviewer.md                  # Code quality reviewer (sonnet, Tier 1)
+    security-reviewer.md              # Security vulnerability reviewer (sonnet, Tier 1)
+    performance-reviewer.md           # Performance reviewer (sonnet, Tier 1)
+    typescript-reviewer.md            # TypeScript/React reviewer (sonnet, Tier 2)
+    python-reviewer.md                # Python/FastAPI reviewer (sonnet, Tier 2)
+    data-reviewer.md                  # Database/migration reviewer (sonnet, Tier 2)
+    architecture-reviewer.md          # Architecture reviewer (sonnet, Tier 3)
+    accessibility-reviewer.md         # Accessibility reviewer (sonnet, Tier 3)
     post-plan-orchestrator.md         # Orchestrator agent (opus)
     plan-refiner.md                   # Plan refinement agent (opus)
     issue-creator.md                  # Issue creation agent (opus)

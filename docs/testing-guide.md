@@ -31,7 +31,7 @@ Run these outside Claude, from a regular terminal or CI.
 
 | Test | Command | Expected |
 |------|---------|----------|
-| T0.1 Structural validation | `bash scripts/validate.sh` | 0 errors (3 warnings for orphan agents are expected) |
+| T0.1 Structural validation | `bash scripts/validate.sh` | 0 errors, 0 warnings |
 | T0.2 Hook regex tests | `bash scripts/test-hooks.sh` | 37/37 pass |
 | T0.3 Prerequisites check | `bash scripts/check-prereqs.sh` | All PASS (or explained SKIPs) |
 | T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 24 commands found |
@@ -109,8 +109,8 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Test | Command | Setup | Steps | Expected |
 |------|---------|-------|-------|----------|
 | T3.6 | `/workflows:code-review` | Make a small code change | Run without args | Quick review with P1/P2/P3 findings on current diff |
-| T3.7 | `/workflows:code-review --deep` | Same branch | Run with `--deep` | 3 review agents dispatched in parallel, merged report |
-| T3.8 | `/workflows:review` | Same branch | Run → Step 0 agent dispatch check → self-verify → 3 agents → report | Full review report with verdict |
+| T3.7 | `/workflows:code-review --deep` | Same branch | Run with `--deep` | Review agents dynamically selected and dispatched in parallel, merged report |
+| T3.8 | `/workflows:review` | Same branch | Run → Step 0 agent dispatch check → self-verify → dynamic agent selection → report | Full review report with verdict |
 | T3.9 | `/workflows:security-audit` | Any project | Run | Automated checks (deps, secrets, env) + agent review + health grade (A–F) |
 | T3.10 | `/workflows:security-audit --quick` | Any project | Run with `--quick` | Automated checks only (no agent dispatch), faster |
 
@@ -155,7 +155,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 4. Observe `git-worktrees` activates → worktree created with issue ID branch
 5. Observe `executing-plans` activates → subagents dispatched per task → TDD enforced
 6. Observe `verification-before-completion` runs at checkpoints
-7. `/workflows:review` → 3 agents run → P1s fixed → verdict
+7. `/workflows:review` → dynamic agent selection → agents run in parallel → P1s fixed → verdict
 8. `/workflows:ship` → PR created → Linear updated → `compound-learnings` runs → `best-practices-audit` runs (if CLAUDE.md changed) → session summary
 
 **Cleanup:** Delete test PR, remove worktree, clean up generated files.
@@ -215,6 +215,11 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T6.5 | `plan-refiner` | `/workflows:post-plan-setup` Phase 1 | Refined plan with agent-ready tasks |
 | T6.6 | `issue-creator` | `/workflows:post-plan-setup` Phase 2 | Linear issues created with structured descriptions |
 | T6.7 | `post-plan-orchestrator` | `/workflows:post-plan-setup` | Orchestrates phases 1–3 with review gates |
+| T6.8 | `performance-reviewer` | `/workflows:review` (always selected) | Performance findings with complexity/impact analysis |
+| T6.9 | `python-reviewer` | `/workflows:review` (when `pyproject.toml` exists) | Python/FastAPI findings with type/async analysis |
+| T6.10 | `data-reviewer` | `/workflows:review` (when `prisma/` or `migrations/` exists) | Migration safety and query pattern findings |
+| T6.11 | `architecture-reviewer` | `/workflows:review` (when diff touches 5+ dirs or CLAUDE.md enables) | Coupling, SOLID, boundary violation findings |
+| T6.12 | `accessibility-reviewer` | `/workflows:review` (when CLAUDE.md enables) | WCAG compliance findings with success criterion references |
 
 ---
 
@@ -228,7 +233,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
 | Skills (Post-plan) | 4 | T4.2 (refine-plan, create-issues, setup-claude-md, post-plan-setup) |
 | Skills (Browser) | 1 | Not directly tested (requires browser MCP) |
-| Agents | 7 | T6.1–T6.7 |
+| Agents | 12 | T6.1–T6.12 |
 | Hooks | 4 types | T5.1–T5.4, T0.2 |
 | Scripts | 4 | T0.1–T0.4 |
 
@@ -248,8 +253,8 @@ Layer 2 (Skills):     __/12
 Layer 3 (Commands):   __/17
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
-Layer 6 (Agents):     __/7
+Layer 6 (Agents):     __/12
 
-Total:  __/60
+Total:  __/65
 Notes:  ____
 ```

@@ -30,7 +30,7 @@ Only report findings you are confident about. A review with 3 high-confidence fi
 
 ### Context-Dependent
 - API contract violations (if API code is involved)
-- Database query correctness (N+1, missing indexes, transaction boundaries)
+- Database query correctness (N+1, missing indexes, transaction boundaries) — defer to data-reviewer or performance-reviewer when running alongside them
 - State management bugs (stale closures, missing dependency arrays)
 - Concurrency issues (if async or parallel code is involved)
 

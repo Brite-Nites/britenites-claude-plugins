@@ -24,9 +24,9 @@ This command supports two modes:
 Perform a direct review yourself, working through the checklists below. Best for quick spot-checks and PR reviews.
 
 ### Deep Mode (use when `$ARGUMENTS` contains "deep" or "--deep")
-Dispatch the three specialized review agents in parallel for comprehensive coverage. This is what `/workflows:review` does during the session loop. Use it for thorough pre-merge reviews.
+Launch the selected review agents in parallel for comprehensive coverage. This is what `/workflows:review` does during the session loop. Use it for thorough pre-merge reviews.
 
-**To run deep mode:** Launch the `code-reviewer`, `security-reviewer`, and `typescript-reviewer` agents in parallel via the Task tool, passing the diff context. Collect and merge their findings into a single P1/P2/P3 report.
+**To run deep mode:** Use the same dynamic agent selection algorithm as `/workflows:review` Step 3 — Tier 1 (always: code-reviewer, security-reviewer, performance-reviewer), Tier 2 (stack-detected: typescript-reviewer, python-reviewer, data-reviewer), Tier 3 (opt-in/conditional: architecture-reviewer, accessibility-reviewer). Launch all selected agents in parallel via the Task tool, passing the diff context. Collect and merge their findings into a single P1/P2/P3 report.
 
 ---
 
