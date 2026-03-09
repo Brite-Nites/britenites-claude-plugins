@@ -220,6 +220,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T6.10 | `data-reviewer` | `/workflows:review` (when `prisma/` or `migrations/` exists) | Migration safety and query pattern findings |
 | T6.11 | `architecture-reviewer` | `/workflows:review` (when diff touches 5+ dirs or CLAUDE.md enables) | Coupling, SOLID, boundary violation findings |
 | T6.12 | `accessibility-reviewer` | `/workflows:review` (when CLAUDE.md enables) | WCAG compliance findings with success criterion references |
+| T6.13 | Confidence filtering | `/workflows:review` on a branch with changes | Each finding has `Confidence: N/10`, Step 4 narration shows filtered count, low-confidence P2/P3s absent from report but counted, borderline P1s show "Needs Human Review", HTML report shows confidence pills, "show all" shows all findings |
 
 ---
 
@@ -233,7 +234,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
 | Skills (Post-plan) | 4 | T4.2 (refine-plan, create-issues, setup-claude-md, post-plan-setup) |
 | Skills (Browser) | 1 | Not directly tested (requires browser MCP) |
-| Agents | 12 | T6.1–T6.12 |
+| Agents | 13 | T6.1–T6.13 |
 | Hooks | 4 types | T5.1–T5.4, T0.2 |
 | Scripts | 4 | T0.1–T0.4 |
 
@@ -249,12 +250,12 @@ Environment: macOS / Linux / WSL
 
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
-Layer 2 (Skills):     __/12
-Layer 3 (Commands):   __/17
+Layer 2 (Skills):     __/13
+Layer 3 (Commands):   __/24
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
-Layer 6 (Agents):     __/12
+Layer 6 (Agents):     __/13
 
-Total:  __/65
+Total:  __/66
 Notes:  ____
 ```

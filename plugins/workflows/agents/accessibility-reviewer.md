@@ -99,6 +99,7 @@ For each finding:
 WCAG: Success criterion reference (e.g., 1.1.1 Non-text Content)
 Why: What's inaccessible and who it affects
 Fix: Suggested resolution (code snippet when helpful)
+Confidence: N/10
 ```
 
 End with:
@@ -108,6 +109,22 @@ End with:
 **Summary**: X P1, Y P2, Z P3
 **WCAG Compliance**: Compliant / Partial / Non-compliant
 ```
+
+## Confidence Scoring
+
+| Score | Meaning | When to use |
+|-------|---------|-------------|
+| 9-10 | Certain | Exact code path identified, evidence unambiguous |
+| 7-8 | High | Strong evidence, minor gaps in trace |
+| 5-6 | Medium | Pattern-based, depends on runtime context |
+| 3-4 | Low | Educated guess from common anti-patterns |
+| 1-2 | Speculative | Feels off, no concrete failure scenario |
+
+Calibration rules:
+- P1s should generally be >= 7. Confidence < 7 on a P1 routes it to human review instead of auto-fix.
+- Reading surrounding context (30+ lines) and tracing callers increases confidence. Skipping context-reading caps confidence at 6.
+- Code execution traces rate higher than pattern-matching alone.
+- When in doubt, score conservatively.
 
 ## Rules
 

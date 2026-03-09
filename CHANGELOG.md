@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.21.0] - 2026-03-06
+
+### Added
+- Confidence scoring for review agent findings (BRI-1816)
+  - Every finding includes `Confidence: N/10` (1-10 scale) for self-assessed certainty
+  - Shared scoring criteria in `_shared/output-formats.md` and all 8 review agent prompts
+  - Step 4 confidence threshold filtering: >= 7 included, low-confidence P2/P3 filtered, borderline P1s marked "Needs Human Review"
+  - Step 5 splits P1s: auto-fixable (confidence >= 7) vs human-review (confidence < 7)
+  - Step 6 visual report: confidence pill badges (green/neutral/amber/red), avg confidence in KPI dashboard
+  - Step 7 final report: new "P1 (needs review)" and "Filtered" lines, "Has borderline P1s for review" verdict
+  - `$ARGUMENTS` "show all" bypasses confidence filtering while still showing scores
+  - Missing confidence defaults to 5 (conservative: P2/P3 filtered, P1 to human review)
+  - Cross-agent dedup prefers higher confidence before specialization order
+  - Deep mode in `/workflows:code-review` applies same confidence filtering
+
 ## [3.18.1] - 2026-03-05
 
 ### Changed
@@ -357,7 +372,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.1...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.21.0...HEAD
+[3.21.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.20.0...v3.21.0
 [3.18.1]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.17.0...v3.18.0
 [3.17.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.16.0...v3.17.0

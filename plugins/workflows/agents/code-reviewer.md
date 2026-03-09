@@ -67,6 +67,7 @@ For each finding:
 
 Why: What's wrong and what impact it has
 Fix: Suggested resolution (code snippet when helpful)
+Confidence: N/10
 ```
 
 End with:
@@ -77,9 +78,25 @@ End with:
 **Verdict**: Ship / Fix Required / Needs Discussion
 ```
 
+## Confidence Scoring
+
+| Score | Meaning | When to use |
+|-------|---------|-------------|
+| 9-10 | Certain | Exact code path identified, evidence unambiguous |
+| 7-8 | High | Strong evidence, minor gaps in trace |
+| 5-6 | Medium | Pattern-based, depends on runtime context |
+| 3-4 | Low | Educated guess from common anti-patterns |
+| 1-2 | Speculative | Feels off, no concrete failure scenario |
+
+Calibration rules:
+- P1s should generally be >= 7. Confidence < 7 on a P1 routes it to human review instead of auto-fix.
+- Reading surrounding context (30+ lines) and tracing callers increases confidence. Skipping context-reading caps confidence at 6.
+- Code execution traces rate higher than pattern-matching alone.
+- When in doubt, score conservatively.
+
 ## Rules
 
-- Confidence threshold: Only report P1s you are >90% sure about
+- Confidence threshold: P1s with confidence < 7 are flagged for human review, not auto-fixed
 - Read the actual code, not just the diff — context matters
 - If you cannot determine severity, default to P3
 - Do not suggest refactors unless they fix a real problem

@@ -192,10 +192,10 @@ Self-verify work, simplify code, run review agents in parallel, fix P1s, produce
 | 1 | Self-Verification | Check plan steps, run tests, verify build, review own diff |
 | 2 | Simplify Pass | 3 agents in parallel (code reuse, quality, efficiency) auto-fix behavior-preserving improvements |
 | 3 | Select & Launch Review Agents | Dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch in parallel |
-| 4 | Collect & Classify | Merge and deduplicate findings by severity (P1/P2/P3) |
-| 5 | Fix Loop | Auto-fix P1s (max 3 attempts), re-verify with agents |
-| 6 | Visual Review Report | Generate 6-section HTML report (summary, KPIs, architecture, findings, file map, tests) |
-| 7 | Final Report | Present verdict: ready to ship, needs input on P2s, or blocked |
+| 4 | Collect & Classify | Merge, deduplicate, and confidence-filter findings (>= 7 included, low-confidence P2/P3 filtered, borderline P1s to human review) |
+| 5 | Fix Loop | Auto-fix high-confidence P1s (>= 7, max 3 attempts), present borderline P1s for human review |
+| 6 | Visual Review Report | Generate 6-section HTML report (summary, KPIs with avg confidence, architecture, findings with confidence pills, file map, tests) |
+| 7 | Final Report | Present verdict: ready to ship, needs input on P2s, blocked, or has borderline P1s for review |
 
 **Review Agent Roster**
 
@@ -226,6 +226,20 @@ exclude:
 ```
 
 `include:` adds agents that wouldn't otherwise activate. `exclude:` removes agents from the selection. Tier 1 agents (code-reviewer, security-reviewer, performance-reviewer) cannot be excluded.
+
+**Confidence Scoring**
+
+Every review agent self-assesses confidence (1-10) on each finding. This reduces false-positive noise from the expanded agent roster.
+
+| Score | Meaning |
+|-------|---------|
+| 9-10 | Certain — exact code path identified |
+| 7-8 | High — strong evidence, minor gaps |
+| 5-6 | Medium — pattern-based |
+| 3-4 | Low — educated guess |
+| 1-2 | Speculative |
+
+Step 4 applies threshold filtering: findings with confidence >= 7 are included in the report. Low-confidence P2/P3s are filtered (count shown in appendix). Borderline P1s (confidence < 7) are kept but marked "Needs Human Review" and excluded from auto-fix. Use "show all" in `$ARGUMENTS` to bypass filtering.
 
 #### `/workflows:ship`
 
@@ -295,4 +309,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 60-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 66-test validation suite.
