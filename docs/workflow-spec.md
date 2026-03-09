@@ -1288,8 +1288,7 @@ sequence:
   - from: "/workflows:review"
     to: "/workflows:ship"
     provides:
-      - "Depth mode (fast/thorough/comprehensive)"
-      - "Agent selection results (tier, agent list, activation reasons)"
+      - "Agent selection results (tier, agent list, activation reasons, depth mode)"
       - "Simplify pass results (applied/suggestions/reverted)"
       - "Review findings (P1/P2/P3) with confidence scores"
       - "P1 fixes applied (auto-fixable, confidence >= 7)"
