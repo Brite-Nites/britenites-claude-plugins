@@ -145,7 +145,7 @@ exclude:
 ```
 
 - `include:` adds agents that wouldn't otherwise activate (e.g., `accessibility-reviewer` is opt-in only)
-- `exclude:` removes agents from the selection (Tier 1 agents cannot be excluded)
+- `exclude:` removes agents from the selection (Tier 1 agents cannot be excluded). Overrides are bypassed in `comprehensive` depth mode
 - Valid agent names: `code-reviewer`, `security-reviewer`, `performance-reviewer`, `typescript-reviewer`, `python-reviewer`, `data-reviewer`, `architecture-reviewer`, `accessibility-reviewer`. Unrecognized names are ignored.
 - See `docs/workflow-guide.md` for the full 8-agent roster with activation conditions
 

@@ -193,6 +193,7 @@ Control how many review agents run via `$ARGUMENTS`:
 ```
 /workflows:review fast            # Tier 1 only (3 agents) — quick checks
 /workflows:review                 # Tier 1 + Tier 2 (default, 3-6 agents)
+/workflows:review thorough        # Explicit default — same as bare invocation
 /workflows:review comprehensive   # All tiers (3-8 agents) — pre-release
 ```
 
@@ -225,8 +226,8 @@ Depth can be combined with other flags: `/workflows:review fast skip simplify sh
 | 2 (stack) | `typescript-reviewer` | `tsconfig.json` exists | Type safety, React/Next.js patterns |
 | 2 (stack) | `python-reviewer` | `pyproject.toml` or `requirements.txt` exists | FastAPI, Pydantic v2, async patterns |
 | 2 (stack) | `data-reviewer` | `prisma/schema.prisma`, `alembic/`, or `**/migrations/` exists | Migration safety, query patterns, constraints |
-| 3 (opt-in) | `architecture-reviewer` | CLAUDE.md enables OR diff touches 5+ directories | Coupling, SOLID, dependency direction |
-| 3 (opt-in) | `accessibility-reviewer` | CLAUDE.md enables (opt-in only) | WCAG 2.1, keyboard nav, ARIA, screen reader |
+| 3 (opt-in) | `architecture-reviewer` | CLAUDE.md enables, OR diff touches 5+ directories, OR `comprehensive` depth | Coupling, SOLID, dependency direction |
+| 3 (opt-in) | `accessibility-reviewer` | CLAUDE.md enables, OR `comprehensive` depth | WCAG 2.1, keyboard nav, ARIA, screen reader |
 
 **CLAUDE.md Review Agent Overrides**
 
@@ -243,7 +244,7 @@ exclude:
   - typescript-reviewer
 ```
 
-`include:` adds agents that wouldn't otherwise activate. `exclude:` removes agents from the selection. Tier 1 agents (code-reviewer, security-reviewer, performance-reviewer) cannot be excluded.
+`include:` adds agents that wouldn't otherwise activate. `exclude:` removes agents from the selection. Tier 1 agents (code-reviewer, security-reviewer, performance-reviewer) cannot be excluded. In `comprehensive` depth mode, all overrides are bypassed — all agents run unconditionally.
 
 **Confidence Scoring**
 
