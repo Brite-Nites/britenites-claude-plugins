@@ -21,7 +21,22 @@ For each finding in a review or audit:
 
 Why: Explanation of impact
 Fix: Suggested resolution (code snippet when helpful)
+Confidence: N/10
 ```
+
+### Confidence Scoring
+
+Self-assessed confidence on a 1-10 scale. Include with every finding.
+
+| Score | Meaning | When to use |
+|-------|---------|-------------|
+| 9-10 | Certain | Exact code path identified, evidence unambiguous |
+| 7-8 | High | Strong evidence, minor gaps in trace |
+| 5-6 | Medium | Pattern-based, depends on runtime context |
+| 3-4 | Low | Educated guess from common anti-patterns |
+| 1-2 | Speculative | Feels off, no concrete failure scenario |
+
+Threshold: findings with confidence >= 7 are included in reports. Lower-confidence P2/P3s are filtered. Lower-confidence P1s are kept but marked for human review.
 
 ### Summary Block
 

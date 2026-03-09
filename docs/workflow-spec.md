@@ -820,10 +820,11 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
+    note: "Confidence threshold filtering: >= 7 included, low-confidence P2/P3 filtered, borderline P1s marked for human review. Missing confidence defaults to 5."
   - id: 5
     name: "Fix Loop (P1s Only)"
     required: false
-    skip-condition: "No P1 findings"
+    skip-condition: "No auto-fixable P1 findings (confidence >= 7)"
     skip-target: 6
     jump-on-fail: null
     activates-skill: null
@@ -1288,10 +1289,12 @@ sequence:
     provides:
       - "Agent selection results (tier, agent list, activation reasons)"
       - "Simplify pass results (applied/suggestions/reverted)"
-      - "Review findings (P1/P2/P3)"
-      - "P1 fixes applied"
+      - "Review findings (P1/P2/P3) with confidence scores"
+      - "P1 fixes applied (auto-fixable, confidence >= 7)"
+      - "Borderline P1s for human review (confidence < 7)"
+      - "Filtered finding count (low-confidence P2/P3s)"
       - "Visual review report"
-      - "Verdict (ready/needs-input/blocked)"
+      - "Verdict (ready/needs-input/blocked/has-borderline-p1s)"
     requires:
       - "Task tool dispatch working"
 
@@ -1773,6 +1776,9 @@ error-handling:
   - failure-point: "CLAUDE.md override parse fails (Step 3)"
     action: degrade
     detail: "Ignore overrides, proceed with agents selected from Tiers 1-2"
+  - failure-point: "Missing confidence score on finding (Step 4)"
+    action: degrade
+    detail: "Default to confidence 5. P2/P3 filtered, P1 routed to human review."
   - failure-point: "Visual-explainer files not found (Step 6)"
     action: degrade
     detail: "Generate plain HTML review report"
