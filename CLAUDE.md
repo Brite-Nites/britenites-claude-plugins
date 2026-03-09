@@ -131,7 +131,7 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 
 ## Review Agents
 
-`/workflows:review` dynamically selects review agents based on project stack. Override the default selection by adding this section to your project's CLAUDE.md:
+`/workflows:review` supports depth modes via `$ARGUMENTS`: `fast` (Tier 1 only), `thorough` (default, Tier 1+2), `comprehensive` (all tiers). It dynamically selects review agents based on depth mode and project stack. Override the default selection by adding this section to your project's CLAUDE.md:
 
 ```markdown
 ## Review Agents

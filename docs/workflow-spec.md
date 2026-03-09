@@ -812,6 +812,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
+    note: "Depth mode from $ARGUMENTS: fast (Tier 1 only), thorough (Tier 1+2, default), comprehensive (all tiers). Unrecognized depth defaults to thorough."
   - id: 4
     name: "Collect & Classify Findings"
     required: true
@@ -1287,6 +1288,7 @@ sequence:
   - from: "/workflows:review"
     to: "/workflows:ship"
     provides:
+      - "Depth mode (fast/thorough/comprehensive)"
       - "Agent selection results (tier, agent list, activation reasons)"
       - "Simplify pass results (applied/suggestions/reverted)"
       - "Review findings (P1/P2/P3) with confidence scores"
@@ -1770,6 +1772,9 @@ error-handling:
   - failure-point: "P1 persists after 3 fix attempts (Step 5)"
     action: escalate
     detail: "Flag for human review with full context on what was tried"
+  - failure-point: "Unrecognized depth mode in $ARGUMENTS (Step 3)"
+    action: degrade
+    detail: "Default to thorough (Tier 1 + Tier 2)"
   - failure-point: "Stack detection fails (Step 3)"
     action: degrade
     detail: "Proceed with Tier 1 agents only (code-reviewer, security-reviewer, performance-reviewer)"

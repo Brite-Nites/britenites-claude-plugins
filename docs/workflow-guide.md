@@ -186,12 +186,30 @@ Start a work session. Guides you from issue selection through execution.
 
 Self-verify work, simplify code, run review agents in parallel, fix P1s, produce a visual report.
 
+**Depth Modes**
+
+Control how many review agents run via `$ARGUMENTS`:
+
+```
+/workflows:review fast            # Tier 1 only (3 agents) — quick checks
+/workflows:review                 # Tier 1 + Tier 2 (default, 3-6 agents)
+/workflows:review comprehensive   # All tiers (3-8 agents) — pre-release
+```
+
+| Mode | Agents | When to use |
+|------|--------|-------------|
+| `fast` | Tier 1 only (code, security, performance) | Quick checks, small changes |
+| `thorough` (default) | Tier 1 + Tier 2 (stack-conditional) | Normal reviews |
+| `comprehensive` | All tiers including Tier 3 opt-ins | Major features, pre-release |
+
+Depth can be combined with other flags: `/workflows:review fast skip simplify show all`.
+
 | Step | Name | What happens |
 |------|------|-------------|
 | 0 | Verify Agent Dispatch | Test Task tool with trivial agent before committing to parallel agents |
 | 1 | Self-Verification | Check plan steps, run tests, verify build, review own diff |
 | 2 | Simplify Pass | 3 agents in parallel (code reuse, quality, efficiency) auto-fix behavior-preserving improvements |
-| 3 | Select & Launch Review Agents | Dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch in parallel |
+| 3 | Select & Launch Review Agents | Parse depth mode, then dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch in parallel |
 | 4 | Collect & Classify | Merge, deduplicate, and confidence-filter findings (>= 7 included, low-confidence P2/P3 filtered, borderline P1s to human review) |
 | 5 | Fix Loop | Auto-fix high-confidence P1s (>= 7, max 3 attempts), present borderline P1s for human review |
 | 6 | Visual Review Report | Generate 6-section HTML report (summary, KPIs with avg confidence, architecture, findings with confidence pills, file map, tests) |
