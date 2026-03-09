@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
-7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then review agents are dynamically selected based on your stack (3-8 agents) and run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
+7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then review agents are dynamically selected based on depth mode and your stack (3-8 agents) and run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
 8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
 
 ### Artifacts produced
@@ -328,4 +328,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 66-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 67-test validation suite.
