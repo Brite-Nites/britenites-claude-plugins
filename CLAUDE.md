@@ -131,7 +131,7 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 
 ## Review Agents
 
-`/workflows:review` dynamically selects review agents based on project stack. Override the default selection by adding this section to your project's CLAUDE.md:
+`/workflows:review` supports depth modes via `$ARGUMENTS`: `fast` (Tier 1 only), `thorough` (default, Tier 1+2), `comprehensive` (all tiers). It dynamically selects review agents based on depth mode and project stack. Override the default selection by adding this section to your project's CLAUDE.md:
 
 ```markdown
 ## Review Agents
@@ -145,7 +145,7 @@ exclude:
 ```
 
 - `include:` adds agents that wouldn't otherwise activate (e.g., `accessibility-reviewer` is opt-in only)
-- `exclude:` removes agents from the selection (Tier 1 agents cannot be excluded)
+- `exclude:` removes agents from the selection (Tier 1 agents cannot be excluded). Overrides are bypassed in `comprehensive` depth mode
 - Valid agent names: `code-reviewer`, `security-reviewer`, `performance-reviewer`, `typescript-reviewer`, `python-reviewer`, `data-reviewer`, `architecture-reviewer`, `accessibility-reviewer`. Unrecognized names are ignored.
 - See `docs/workflow-guide.md` for the full 8-agent roster with activation conditions
 
@@ -189,7 +189,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
-- `docs/testing-guide.md` — comprehensive testing guide (66 tests across 7 layers).
+- `docs/testing-guide.md` — comprehensive testing guide (67 tests across 7 layers).
 
 ## ADR Convention
 

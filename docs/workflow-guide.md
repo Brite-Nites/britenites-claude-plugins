@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
-7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then review agents are dynamically selected based on your stack (3-8 agents) and run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
+7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then review agents are dynamically selected based on depth mode and your stack (3-8 agents) and run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
 8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
 
 ### Artifacts produced
@@ -186,12 +186,31 @@ Start a work session. Guides you from issue selection through execution.
 
 Self-verify work, simplify code, run review agents in parallel, fix P1s, produce a visual report.
 
+**Depth Modes**
+
+Control how many review agents run via `$ARGUMENTS`:
+
+```
+/workflows:review fast            # Tier 1 only (3 agents) — quick checks
+/workflows:review                 # Tier 1 + Tier 2 (default, 3-6 agents)
+/workflows:review thorough        # Explicit default — same as bare invocation
+/workflows:review comprehensive   # All tiers (3-8 agents) — pre-release
+```
+
+| Mode | Agents | When to use |
+|------|--------|-------------|
+| `fast` | Tier 1 only (code, security, performance) | Quick checks, small changes |
+| `thorough` (default) | Tier 1 + Tier 2 (stack-conditional) | Normal reviews |
+| `comprehensive` | All tiers including Tier 3 opt-ins | Major features, pre-release |
+
+Depth can be combined with other flags: `/workflows:review fast skip simplify show all`.
+
 | Step | Name | What happens |
 |------|------|-------------|
 | 0 | Verify Agent Dispatch | Test Task tool with trivial agent before committing to parallel agents |
 | 1 | Self-Verification | Check plan steps, run tests, verify build, review own diff |
 | 2 | Simplify Pass | 3 agents in parallel (code reuse, quality, efficiency) auto-fix behavior-preserving improvements |
-| 3 | Select & Launch Review Agents | Dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch in parallel |
+| 3 | Select & Launch Review Agents | Parse depth mode, then dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch in parallel |
 | 4 | Collect & Classify | Merge, deduplicate, and confidence-filter findings (>= 7 included, low-confidence P2/P3 filtered, borderline P1s to human review) |
 | 5 | Fix Loop | Auto-fix high-confidence P1s (>= 7, max 3 attempts), present borderline P1s for human review |
 | 6 | Visual Review Report | Generate 6-section HTML report (summary, KPIs with avg confidence, architecture, findings with confidence pills, file map, tests) |
@@ -207,8 +226,8 @@ Self-verify work, simplify code, run review agents in parallel, fix P1s, produce
 | 2 (stack) | `typescript-reviewer` | `tsconfig.json` exists | Type safety, React/Next.js patterns |
 | 2 (stack) | `python-reviewer` | `pyproject.toml` or `requirements.txt` exists | FastAPI, Pydantic v2, async patterns |
 | 2 (stack) | `data-reviewer` | `prisma/schema.prisma`, `alembic/`, or `**/migrations/` exists | Migration safety, query patterns, constraints |
-| 3 (opt-in) | `architecture-reviewer` | CLAUDE.md enables OR diff touches 5+ directories | Coupling, SOLID, dependency direction |
-| 3 (opt-in) | `accessibility-reviewer` | CLAUDE.md enables (opt-in only) | WCAG 2.1, keyboard nav, ARIA, screen reader |
+| 3 (opt-in) | `architecture-reviewer` | CLAUDE.md enables, OR diff touches 5+ directories, OR `comprehensive` depth | Coupling, SOLID, dependency direction |
+| 3 (opt-in) | `accessibility-reviewer` | CLAUDE.md enables, OR `comprehensive` depth | WCAG 2.1, keyboard nav, ARIA, screen reader |
 
 **CLAUDE.md Review Agent Overrides**
 
@@ -225,7 +244,7 @@ exclude:
   - typescript-reviewer
 ```
 
-`include:` adds agents that wouldn't otherwise activate. `exclude:` removes agents from the selection. Tier 1 agents (code-reviewer, security-reviewer, performance-reviewer) cannot be excluded.
+`include:` adds agents that wouldn't otherwise activate. `exclude:` removes agents from the selection. Tier 1 agents (code-reviewer, security-reviewer, performance-reviewer) cannot be excluded. In `comprehensive` depth mode, all overrides are bypassed — all agents run unconditionally.
 
 **Confidence Scoring**
 
@@ -309,4 +328,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 66-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 67-test validation suite.

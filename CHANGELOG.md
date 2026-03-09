@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.22.0] - 2026-03-09
+
+### Added
+- Review depth modes: `fast`, `thorough` (default), `comprehensive` (BRI-1817)
+  - `fast` — Tier 1 agents only (code, security, performance) for quick checks
+  - `thorough` — Tier 1 + Tier 2 stack-conditional agents (default, unchanged behavior)
+  - `comprehensive` — All tiers including Tier 3 opt-ins unconditionally
+  - Depth parsed from `$ARGUMENTS`, coexists with "skip simplify" and "show all" flags
+  - Usage: `/workflows:review fast`, `/workflows:review comprehensive`
+
 ## [3.21.0] - 2026-03-06
 
 ### Added
@@ -372,7 +382,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.21.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.22.0...HEAD
+[3.22.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.21.0...v3.22.0
 [3.21.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.20.0...v3.21.0
 [3.18.1]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.17.0...v3.18.0
