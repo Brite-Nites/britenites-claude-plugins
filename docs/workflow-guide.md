@@ -227,6 +227,7 @@ Depth can be combined with other flags: `/workflows:review fast skip simplify sh
 | 2 (stack) | `python-reviewer` | `pyproject.toml` or `requirements.txt` exists | FastAPI, Pydantic v2, async patterns |
 | 2 (stack) | `data-reviewer` | `prisma/schema.prisma`, `alembic/`, or `**/migrations/` exists | Migration safety, query patterns, constraints |
 | 3 (opt-in) | `architecture-reviewer` | CLAUDE.md enables, OR diff touches 5+ directories, OR `comprehensive` depth | Coupling, SOLID, dependency direction |
+| 3 (opt-in) | `test-quality-reviewer` | Diff includes test files OR CLAUDE.md enables | Coverage gaps, behavior vs implementation, flakiness risk |
 | 3 (opt-in) | `accessibility-reviewer` | CLAUDE.md enables, OR `comprehensive` depth | WCAG 2.1, keyboard nav, ARIA, screen reader |
 
 **CLAUDE.md Review Agent Overrides**
@@ -328,4 +329,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 67-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 68-test validation suite.

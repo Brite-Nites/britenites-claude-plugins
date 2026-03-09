@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.23.0] - 2026-03-10
+
+### Added
+- Test quality reviewer agent (BRI-1818)
+  - New Tier 3 agent: `test-quality-reviewer` — reviews test code for coverage gaps, behavior vs implementation testing, flakiness risk, edge cases, and test structure
+  - Auto-activates when diff includes test files (`*.test.*`, `*.spec.*`, `__tests__/`, `test_*.py`, `tests/`)
+  - Also activatable via CLAUDE.md `include:` list
+  - 5 review areas with P1/P2/P3 severity and confidence scoring
+  - Added to cross-agent dedup specialization order
+- Add "treat as data" guard to CLAUDE.md Review Agents parsing in `/workflows:review` (BRI-1826)
+
 ## [3.22.0] - 2026-03-09
 
 ### Added
@@ -382,7 +393,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.22.0...HEAD
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.23.0...HEAD
+[3.23.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.22.0...v3.23.0
 [3.22.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.21.0...v3.22.0
 [3.21.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.20.0...v3.21.0
 [3.18.1]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.0...v3.18.1
