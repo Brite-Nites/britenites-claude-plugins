@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Added
 - Test quality reviewer agent (BRI-1818)
   - New Tier 3 agent: `test-quality-reviewer` — reviews test code for coverage gaps, behavior vs implementation testing, flakiness risk, edge cases, and test structure
-  - Auto-activates when diff includes test files (`*.test.*`, `*.spec.*`, `__tests__/`, `test_*.py`, `tests/`)
+  - Auto-activates when diff includes test files (`*.test.*`, `*.spec.*`, `__tests__/**`, `test_*.py`, `**/tests/**`)
   - Also activatable via CLAUDE.md `include:` list
   - 5 review areas with P1/P2/P3 severity and confidence scoring
   - Added to cross-agent dedup specialization order
