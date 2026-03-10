@@ -8,9 +8,9 @@ Use this 3-tier system for review-type outputs:
 
 | Severity | Meaning | Action |
 |----------|---------|--------|
-| **Critical** | Bugs, security issues, data loss risks | Must fix |
-| **Recommended** | Code smells, missing tests, unclear naming | Should fix |
-| **Nit** | Formatting, style preferences, minor polish | Optional |
+| **P1** | Bugs, security issues, data loss risks | Must fix (blocks ship) |
+| **P2** | Code smells, missing tests, unclear naming | Should fix (user decides) |
+| **P3** | Formatting, style preferences, minor polish | Nit (report only) |
 
 ### Finding Format
 
@@ -44,7 +44,7 @@ End review-type outputs with:
 
 ```
 ---
-**Summary**: X critical, Y recommended, Z nits
+**Summary**: X P1, Y P2, Z P3
 **Verdict**: Approve / Request Changes / Needs Discussion
 **Callouts**: Note any particularly well-written code
 ```
