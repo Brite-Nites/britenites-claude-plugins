@@ -102,7 +102,7 @@ End with:
 ```
 ---
 **Summary**: X P1, Y P2, Z P3
-**Test Health**: Strong / Adequate / Needs Attention
+**Verdict**: Ship / Fix Required / Needs Discussion
 ```
 
 ## Confidence Scoring
