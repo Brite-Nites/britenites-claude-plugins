@@ -1,7 +1,7 @@
 ---
 name: architecture-reviewer
 description: Reviews code for coupling, SOLID violations, dependency direction, boundary violations, pattern consistency, and API surface issues
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

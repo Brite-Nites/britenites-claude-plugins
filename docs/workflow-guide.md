@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
-7. After you run `/workflows:review`, a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then review agents are dynamically selected based on depth mode and your stack (3-8 agents) and run in parallel, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
+7. After you run `/workflows:review`, a Haiku-powered diff triage gates trivial diffs, then a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then Opus-powered review agents are dynamically selected based on depth mode and your stack (3-9 agents) and run in parallel, findings are validated by per-finding subagents, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
 8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
 
 ### Artifacts produced
@@ -129,7 +129,7 @@ These visuals are generated automatically during the inner loop workflow.
 | Brainstorming | Architecture diagram | Design involves topology or new patterns | `~/.agent/diagrams/<issue-id>-architecture.html` |
 | Writing Plans | Visual plan | 4+ tasks | `~/.agent/diagrams/<issue-id>-visual-plan.html` |
 | Writing Plans | Plan review | All plans | `~/.agent/diagrams/<issue-id>-plan-review.html` |
-| Review | Review report | Always (Step 6) | `~/.agent/diagrams/review-<sanitized-branch>.html` |
+| Review | Review report | Always (Step 8) | `~/.agent/diagrams/review-<sanitized-branch>.html` |
 | Ship | Audit report | Optional | `~/.agent/diagrams/audit-<project>.html` |
 
 ### 3b. Outer Loop Visuals (`--slides` flag)
@@ -194,7 +194,7 @@ Control how many review agents run via `$ARGUMENTS`:
 /workflows:review fast            # Tier 1 only (3 agents) — quick checks
 /workflows:review                 # Tier 1 + Tier 2 (default, 3-6 agents)
 /workflows:review thorough        # Explicit default — same as bare invocation
-/workflows:review comprehensive   # All tiers (3-8 agents) — pre-release
+/workflows:review comprehensive   # All tiers (3-9 agents) — pre-release
 ```
 
 | Mode | Agents | When to use |
@@ -203,32 +203,35 @@ Control how many review agents run via `$ARGUMENTS`:
 | `thorough` (default) | Tier 1 + Tier 2 (stack-conditional) | Normal reviews |
 | `comprehensive` | All tiers including Tier 3 opt-ins | Major features, pre-release |
 
-Depth can be combined with other flags: `/workflows:review fast skip simplify show all`.
+Depth can be combined with other flags: `/workflows:review fast skip triage skip simplify skip validation show all`.
 
 | Step | Name | What happens |
 |------|------|-------------|
 | 0 | Verify Agent Dispatch | Test Task tool with trivial agent before committing to parallel agents |
 | 1 | Self-Verification | Check plan steps, run tests, verify build, review own diff |
-| 2 | Simplify Pass | 3 agents in parallel (code reuse, quality, efficiency) auto-fix behavior-preserving improvements |
-| 3 | Select & Launch Review Agents | Parse depth mode, then dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch in parallel |
-| 4 | Collect & Classify | Merge, deduplicate, and confidence-filter findings (>= 7 included, low-confidence P2/P3 filtered, borderline P1s to human review) |
-| 5 | Fix Loop | Auto-fix high-confidence P1s (>= 7, max 3 attempts), present borderline P1s for human review |
-| 6 | Visual Review Report | Generate 6-section HTML report (summary, KPIs with avg confidence, architecture, findings with confidence pills, file map, tests) |
-| 7 | Final Report | Present verdict: ready to ship, needs input on P2s, blocked, or has borderline P1s for review |
+| 2 | Diff Triage | Haiku agent classifies diff as trivial/non-trivial — trivial diffs skip to Step 8 |
+| 3 | Simplify Pass | 3 agents in parallel (code reuse, quality, efficiency) auto-fix behavior-preserving improvements |
+| 4 | Select & Launch Review Agents | Parse depth mode, then dynamic agent selection (Tier 1 always, Tier 2 stack-detected, Tier 3 opt-in), launch Opus agents in parallel |
+| 5 | Collect & Classify | Merge, deduplicate, and confidence-filter findings (>= 7 included, low-confidence P2/P3 filtered, borderline P1s to human review) |
+| 6 | Validate Findings | Per-finding verification: Opus subagent per P1, Sonnet subagent per P2/P3 (max 20 subagents). In `fast` mode, only P1s are validated; P2/P3 validation is skipped. Skippable via "skip validation" flag. |
+| 7 | Fix Loop | Auto-fix high-confidence P1s (>= 7, max 3 attempts), present borderline P1s for human review |
+| 8 | Visual Review Report | Generate 6-section HTML report (summary, KPIs with avg confidence, architecture, findings with confidence pills, file map, tests) |
+| 9 | Final Report | Present verdict: ready to ship, needs input on P2s, blocked, or has borderline P1s for review |
 
 **Review Agent Roster**
 
-| Tier | Agent | Activation | Focus |
-|------|-------|-----------|-------|
-| 1 (always) | `code-reviewer` | Always | Bugs, logic errors, edge cases |
-| 1 (always) | `security-reviewer` | Always | OWASP Top 10, secrets, auth |
-| 1 (always) | `performance-reviewer` | Always | Complexity, N+1, memory leaks, bundle size |
-| 2 (stack) | `typescript-reviewer` | `tsconfig.json` exists | Type safety, React/Next.js patterns |
-| 2 (stack) | `python-reviewer` | `pyproject.toml` or `requirements.txt` exists | FastAPI, Pydantic v2, async patterns |
-| 2 (stack) | `data-reviewer` | `prisma/schema.prisma`, `alembic/`, or `**/migrations/` exists | Migration safety, query patterns, constraints |
-| 3 (opt-in) | `architecture-reviewer` | CLAUDE.md enables, OR diff touches 5+ directories, OR `comprehensive` depth | Coupling, SOLID, dependency direction |
-| 3 (opt-in) | `test-quality-reviewer` | Diff includes test files OR CLAUDE.md enables | Coverage gaps, behavior vs implementation, flakiness risk |
-| 3 (opt-in) | `accessibility-reviewer` | CLAUDE.md enables, OR `comprehensive` depth | WCAG 2.1, keyboard nav, ARIA, screen reader |
+| Tier | Agent | Model | Activation | Focus |
+|------|-------|-------|-----------|-------|
+| — | `diff-triage` | Haiku | Always (Step 2 gating) | Classify diff as trivial/non-trivial |
+| 1 (always) | `code-reviewer` | Opus | Always | Bugs, logic errors, edge cases |
+| 1 (always) | `security-reviewer` | Opus | Always | OWASP Top 10, secrets, auth |
+| 1 (always) | `performance-reviewer` | Opus | Always | Complexity, N+1, memory leaks, bundle size |
+| 2 (stack) | `typescript-reviewer` | Opus | `tsconfig.json` exists | Type safety, React/Next.js patterns |
+| 2 (stack) | `python-reviewer` | Opus | `pyproject.toml` or `requirements.txt` exists | FastAPI, Pydantic v2, async patterns |
+| 2 (stack) | `data-reviewer` | Opus | `prisma/schema.prisma`, `alembic/`, or `**/migrations/` exists | Migration safety, query patterns, constraints |
+| 3 (opt-in) | `architecture-reviewer` | Opus | CLAUDE.md enables, OR diff touches 5+ directories, OR `comprehensive` depth | Coupling, SOLID, dependency direction |
+| 3 (opt-in) | `test-quality-reviewer` | Opus | Diff includes test files OR CLAUDE.md enables | Coverage gaps, behavior vs implementation, flakiness risk |
+| 3 (opt-in) | `accessibility-reviewer` | Opus | CLAUDE.md enables, OR `comprehensive` depth | WCAG 2.1, keyboard nav, ARIA, screen reader |
 
 **CLAUDE.md Review Agent Overrides**
 
@@ -259,7 +262,19 @@ Every review agent self-assesses confidence (1-10) on each finding. This reduces
 | 3-4 | Low — educated guess |
 | 1-2 | Speculative |
 
-Step 4 applies threshold filtering: findings with confidence >= 7 are included in the report. Low-confidence P2/P3s are filtered (count shown in appendix). Borderline P1s (confidence < 7) are kept but marked "Needs Human Review" and excluded from auto-fix. Use "show all" in `$ARGUMENTS` to bypass filtering.
+Step 5 applies threshold filtering: findings with confidence >= 7 are included in the report. Low-confidence P2/P3s are filtered (count shown in appendix). Borderline P1s (confidence < 7) are kept but marked "Needs Human Review" and excluded from auto-fix. Use "show all" in `$ARGUMENTS` to bypass filtering.
+
+**Model Tiering**
+
+The review pipeline uses three model tiers for cost-effective depth:
+
+| Tier | Model | Used for |
+|------|-------|----------|
+| Gating | Haiku | Diff triage (Step 2) — fast classification of trivial vs non-trivial diffs |
+| Review | Opus | All 9 review agents (Step 4) — deep reasoning for bug detection, security analysis, and architectural review |
+| Validation | Opus/Sonnet | Per-finding verification (Step 6) — Opus for P1s, Sonnet for P2/P3s |
+
+This ensures expensive Opus inference only runs when the diff warrants it, and each finding is independently verified before entering the fix loop.
 
 #### `/workflows:ship`
 
@@ -329,4 +344,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 68-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 78-test validation suite.

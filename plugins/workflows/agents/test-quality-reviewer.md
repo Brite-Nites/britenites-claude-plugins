@@ -1,7 +1,7 @@
 ---
 name: test-quality-reviewer
 description: Reviews test code for coverage gaps, behavior-focused testing, flakiness risk, edge case coverage, and test structure quality
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

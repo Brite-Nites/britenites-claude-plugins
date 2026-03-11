@@ -1,7 +1,7 @@
 ---
 name: security-reviewer
 description: Reviews code for security vulnerabilities, secrets exposure, auth issues, and OWASP Top 10 compliance
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

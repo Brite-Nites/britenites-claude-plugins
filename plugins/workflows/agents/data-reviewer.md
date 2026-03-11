@@ -1,7 +1,7 @@
 ---
 name: data-reviewer
 description: Reviews database migrations, schema changes, query safety, and data integrity patterns for Prisma, Alembic, and raw SQL
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

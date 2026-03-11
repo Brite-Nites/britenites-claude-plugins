@@ -140,7 +140,7 @@ flowchart LR
 
 **`/session-start`**: Pulls latest, queries Linear for open issues, helps pick one, creates an execution plan.
 
-**`/review`**: Dynamically selects review agents based on stack (3-8 agents, all sonnet). Tier 1 always runs (code, security, performance); Tier 2 activates for detected stacks (TypeScript, Python, data); Tier 3 is opt-in (architecture, accessibility). Auto-fixes P1s, reports P2/P3s.
+**`/review`**: Haiku-powered diff triage gates trivial diffs, then dynamically selects Opus-powered review agents based on depth mode and stack (3-9 agents). Tier 1 always runs (code, security, performance); Tier 2 activates for detected stacks (TypeScript, Python, data); Tier 3 is conditional/opt-in (architecture, accessibility, test-quality). Per-finding validation (Opus for P1s, Sonnet for P2/P3s) confirms findings before auto-fixing P1s. Reports P2/P3s.
 
 **`/ship`**: Creates PR, updates Linear issue status, compounds learnings to CLAUDE.md and memory, suggests next issue.
 
@@ -148,16 +148,18 @@ flowchart LR
 
 | Tier | Agent | Model | Focus |
 |------|-------|-------|-------|
-| 1 (always) | `code-reviewer` | sonnet | Bugs, logic errors, edge cases |
-| 1 (always) | `security-reviewer` | sonnet | OWASP Top 10, secrets exposure, auth issues |
-| 1 (always) | `performance-reviewer` | sonnet | Algorithmic complexity, N+1, memory leaks, bundle size |
-| 2 (stack) | `typescript-reviewer` | sonnet | Type safety, React/Next.js patterns, hook rules |
-| 2 (stack) | `python-reviewer` | sonnet | FastAPI, Pydantic v2, async patterns, type hints |
-| 2 (stack) | `data-reviewer` | sonnet | Migration safety, schema constraints, query patterns |
-| 3 (opt-in) | `architecture-reviewer` | sonnet | Coupling, SOLID, dependency direction, boundaries |
-| 3 (opt-in) | `accessibility-reviewer` | sonnet | WCAG 2.1, keyboard nav, ARIA, screen reader |
+| — (gating) | `diff-triage` | haiku | Pre-filters trivial diffs before expensive review pipeline |
+| 1 (always) | `code-reviewer` | opus | Bugs, logic errors, edge cases |
+| 1 (always) | `security-reviewer` | opus | OWASP Top 10, secrets exposure, auth issues |
+| 1 (always) | `performance-reviewer` | opus | Algorithmic complexity, N+1, memory leaks, bundle size |
+| 2 (stack) | `typescript-reviewer` | opus | Type safety, React/Next.js patterns, hook rules |
+| 2 (stack) | `python-reviewer` | opus | FastAPI, Pydantic v2, async patterns, type hints |
+| 2 (stack) | `data-reviewer` | opus | Migration safety, schema constraints, query patterns |
+| 3 (conditional) | `architecture-reviewer` | opus | Coupling, SOLID, dependency direction, boundaries |
+| 3 (conditional) | `accessibility-reviewer` | opus | WCAG 2.1, keyboard nav, ARIA, screen reader |
+| 3 (conditional) | `test-quality-reviewer` | opus | Coverage gaps, flakiness, test structure, edge cases |
 
-All agents produce findings in the same `**[P1/P2/P3]** file:line — title` format for consistent output. Agent selection is dynamic — see `/workflows:review` Step 3.
+All agents produce findings in the same `**[P1/P2/P3]** file:line — title` format with confidence scores (1-10). Agent selection is dynamic — see `/workflows:review` Step 4. Per-finding validation (Step 6) uses Opus for P1s and Sonnet for P2/P3s.
 
 ## Hook Execution
 
@@ -252,14 +254,16 @@ plugins/workflows/
       validation-pattern.md           # Self-validation & retry loop
       output-formats.md               # Standard output formatting
   agents/
-    code-reviewer.md                  # Code quality reviewer (sonnet, Tier 1)
-    security-reviewer.md              # Security vulnerability reviewer (sonnet, Tier 1)
-    performance-reviewer.md           # Performance reviewer (sonnet, Tier 1)
-    typescript-reviewer.md            # TypeScript/React reviewer (sonnet, Tier 2)
-    python-reviewer.md                # Python/FastAPI reviewer (sonnet, Tier 2)
-    data-reviewer.md                  # Database/migration reviewer (sonnet, Tier 2)
-    architecture-reviewer.md          # Architecture reviewer (sonnet, Tier 3)
-    accessibility-reviewer.md         # Accessibility reviewer (sonnet, Tier 3)
+    diff-triage.md                    # Diff triage gating agent (haiku)
+    code-reviewer.md                  # Code quality reviewer (opus, Tier 1)
+    security-reviewer.md              # Security vulnerability reviewer (opus, Tier 1)
+    performance-reviewer.md           # Performance reviewer (opus, Tier 1)
+    typescript-reviewer.md            # TypeScript/React reviewer (opus, Tier 2)
+    python-reviewer.md                # Python/FastAPI reviewer (opus, Tier 2)
+    data-reviewer.md                  # Database/migration reviewer (opus, Tier 2)
+    architecture-reviewer.md          # Architecture reviewer (opus, Tier 3)
+    accessibility-reviewer.md         # Accessibility reviewer (opus, Tier 3)
+    test-quality-reviewer.md          # Test quality reviewer (opus, Tier 3)
     post-plan-orchestrator.md         # Orchestrator agent (opus)
     plan-refiner.md                   # Plan refinement agent (opus)
     issue-creator.md                  # Issue creation agent (opus)

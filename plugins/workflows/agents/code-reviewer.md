@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Reviews code for bugs, logic errors, edge cases, and code quality issues using P1/P2/P3 severity
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

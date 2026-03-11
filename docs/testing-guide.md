@@ -220,9 +220,19 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T6.10 | `data-reviewer` | `/workflows:review` (when `prisma/` or `migrations/` exists) | Migration safety and query pattern findings |
 | T6.11 | `architecture-reviewer` | `/workflows:review` (when diff touches 5+ dirs, CLAUDE.md enables, or `comprehensive` depth) | Coupling, SOLID, boundary violation findings |
 | T6.12 | `accessibility-reviewer` | `/workflows:review` (when CLAUDE.md enables or `comprehensive` depth) | WCAG compliance findings with success criterion references |
-| T6.13 | Confidence filtering | `/workflows:review` on a branch with changes | Each finding has `Confidence: N/10`, Step 4 narration shows filtered count, low-confidence P2/P3s absent from report but counted, borderline P1s show "Needs Human Review", HTML report shows confidence pills, "show all" shows all findings |
-| T6.14 | Depth modes | `/workflows:review fast`, `/workflows:review comprehensive` | `fast`: only 3 Tier 1 agents selected, Tier 2/3 skipped. `comprehensive`: all agents selected regardless of stack or CLAUDE.md overrides, narration shows override bypass. Default (no keyword): `thorough` behavior unchanged. Combined flags work: `fast skip simplify show all`. Whole-word matching: "fast-path" does not trigger `fast` mode |
+| T6.13 | Confidence filtering | `/workflows:review` on a branch with changes | Each finding has `Confidence: N/10`, Step 5 narration shows filtered count, low-confidence P2/P3s absent from report but counted, borderline P1s show "Needs Human Review", HTML report shows confidence pills, "show all" shows all findings |
+| T6.14 | Depth modes | `/workflows:review fast`, `/workflows:review comprehensive` | `fast`: only 3 Tier 1 agents selected, Tier 2/3 skipped. `comprehensive`: all agents selected regardless of stack or CLAUDE.md overrides, narration shows override bypass. Default (no keyword): `thorough` behavior unchanged. Combined flags work: `fast skip simplify skip validation show all`. Whole-word matching: "fast-path" does not trigger `fast` mode |
 | T6.15 | `test-quality-reviewer` | `/workflows:review` (when diff includes test files or CLAUDE.md enables) | Test quality findings: coverage gaps, behavior vs implementation, flakiness risk, edge cases, test structure |
+| T6.16 | Diff triage — trivial | `/workflows:review` on a branch with only comment/doc changes (< 50 lines) | Step 2 narrates "Trivial diff detected", Steps 3-7 skipped, abbreviated visual report generated, verdict is "Trivial change — no review agents needed" |
+| T6.17 | Diff triage — non-trivial | `/workflows:review` on a branch with logic changes | Step 2 narrates "Non-trivial diff", proceeds to Step 3 (simplify pass) and full review pipeline |
+| T6.18 | Diff triage — skip flag | `/workflows:review skip triage` | Step 2 narrates "Diff triage skipped (user request)", proceeds directly to Step 3 |
+| T6.19 | Validation — P1 confirmed | `/workflows:review` on a branch with a real bug | Step 6 dispatches Opus subagent for P1, verdict is CONFIRMED, finding remains in report |
+| T6.20 | Validation — P1 downgraded | `/workflows:review` on a branch with a borderline P1 | Step 6 Opus subagent returns DOWNGRADED, finding reclassified to P2/P3 with "[Downgraded from P1]" note |
+| T6.21 | Validation — finding dismissed | `/workflows:review` on a branch with false-positive-prone patterns | Step 6 subagent returns DISMISSED, finding removed from main report and added to "Dismissed by validation" appendix |
+| T6.22 | Validation cap | `/workflows:review` on a branch with 25+ findings | Step 6 caps at 20 subagents, remaining P3s batched into single Sonnet subagent, all P1s validated individually |
+| T6.23 | Validation — skip flag | `/workflows:review skip validation` | Step 6 narrates "Validation skipped (user request)", proceeds directly to Step 7 |
+| T6.24 | Validation — fast mode P2/P3 skip | `/workflows:review fast` with P2/P3 findings but no P1s | Step 6 narrates "Validation skipped (fast mode, no P1s)", proceeds to Step 7 without dispatching subagents |
+| T6.25 | Validation — fast mode P1 only | `/workflows:review fast` with P1 findings | Step 6 narrates "Validating P1s only (fast mode)", dispatches Opus subagents for P1s only, skips P2/P3 verification |
 
 ---
 
@@ -236,7 +246,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
 | Skills (Post-plan) | 4 | T4.2 (refine-plan, create-issues, setup-claude-md, post-plan-setup) |
 | Skills (Browser) | 1 | Not directly tested (requires browser MCP) |
-| Agents | 15 | T6.1–T6.15 |
+| Agents | 25 | T6.1–T6.25 |
 | Hooks | 4 types | T5.1–T5.4, T0.2 |
 | Scripts | 4 | T0.1–T0.4 |
 
@@ -256,8 +266,8 @@ Layer 2 (Skills):     __/13
 Layer 3 (Commands):   __/24
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
-Layer 6 (Agents):     __/14
+Layer 6 (Agents):     __/25
 
-Total:  __/67
+Total:  __/78
 Notes:  ____
 ```

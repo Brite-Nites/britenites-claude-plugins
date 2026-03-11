@@ -131,7 +131,9 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 
 ## Review Agents
 
-`/workflows:review` supports depth modes via `$ARGUMENTS`: `fast` (Tier 1 only), `thorough` (default, Tier 1+2), `comprehensive` (all tiers). It dynamically selects review agents based on depth mode and project stack. Override the default selection by adding this section to your project's CLAUDE.md:
+`/workflows:review` supports depth modes via `$ARGUMENTS`: `fast` (Tier 1 only), `thorough` (default, Tier 1+2), `comprehensive` (all tiers). It dynamically selects review agents based on depth mode and project stack. All 9 review agents run on **Opus** for deeper reasoning. A **Haiku**-powered `diff-triage` agent gates trivial diffs before launching the expensive review pipeline. Per-finding validation (Step 6) uses **Opus** subagents for P1s and **Sonnet** subagents for P2/P3s.
+
+Override the default selection by adding this section to your project's CLAUDE.md:
 
 ```markdown
 ## Review Agents
@@ -146,8 +148,8 @@ exclude:
 
 - `include:` adds agents that wouldn't otherwise activate (e.g., `accessibility-reviewer` is opt-in only)
 - `exclude:` removes agents from the selection (Tier 1 agents cannot be excluded). Overrides are bypassed in `comprehensive` depth mode
-- Valid agent names: `code-reviewer`, `security-reviewer`, `performance-reviewer`, `typescript-reviewer`, `python-reviewer`, `data-reviewer`, `architecture-reviewer`, `accessibility-reviewer`, `test-quality-reviewer`. Unrecognized names are ignored.
-- See `docs/workflow-guide.md` for the full 9-agent roster with activation conditions
+- Valid agent names: `code-reviewer`, `security-reviewer`, `performance-reviewer`, `typescript-reviewer`, `python-reviewer`, `data-reviewer`, `architecture-reviewer`, `accessibility-reviewer`, `test-quality-reviewer`. Unrecognized names are ignored. Note: `diff-triage` is a gating agent (Step 2), not a selectable review agent — bypass it via `"skip triage"` in `$ARGUMENTS`, not via `exclude:`.
+- See `docs/workflow-guide.md` for the full 9-agent review roster with activation conditions
 
 ## plugin.json Schema (STRICT — read before editing)
 
@@ -189,7 +191,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
-- `docs/testing-guide.md` — comprehensive testing guide (68 tests across 7 layers).
+- `docs/testing-guide.md` — comprehensive testing guide (78 tests across 7 layers).
 
 ## ADR Convention
 
