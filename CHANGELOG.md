@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.24.0] - 2026-03-10
+
+### Added
+- Model tiering for review agents (BRI-1819)
+  - All 9 review agents upgraded from Sonnet to Opus for deeper reasoning
+  - New `diff-triage` agent (Haiku) gates trivial diffs before expensive review pipeline
+  - Per-finding validation: Opus verifies P1s, Sonnet verifies P2/P3s (Step 6)
+  - Review pipeline expanded from 8 steps (0-7) to 10 steps (0-9)
+  - "skip triage" / "no triage" flag to bypass diff gating
+  - "skip validation" / "no validation" flag to bypass per-finding validation
+  - Depth-aware validation: `fast` mode skips P2/P3 validation (P1s always validated)
+
 ## [3.23.0] - 2026-03-10
 
 ### Added

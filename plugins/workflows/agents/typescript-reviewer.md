@@ -1,7 +1,7 @@
 ---
 name: typescript-reviewer
 description: Reviews TypeScript, React, and Next.js code for type safety, component boundaries, hook rules, and framework patterns
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

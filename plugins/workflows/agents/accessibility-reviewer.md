@@ -1,7 +1,7 @@
 ---
 name: accessibility-reviewer
 description: Reviews frontend code for WCAG 2.1 compliance, keyboard navigation, ARIA usage, screen reader support, and responsive accessibility
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

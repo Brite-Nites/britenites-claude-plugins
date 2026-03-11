@@ -470,12 +470,9 @@ exit(1)
       agent_ok=false
     fi
 
-    # tools — must be comma-separated string
+    # tools — optional, but if present must be comma-separated string
     tools_val=$(yaml_val "$fm" "tools")
-    if [ -z "$tools_val" ]; then
-      fail "$base: missing 'tools' field"
-      agent_ok=false
-    else
+    if [ -n "$tools_val" ]; then
       next_line=$(sed -n '/^tools:/{ n; p; }' "$file")
       if [[ "$next_line" =~ ^[[:space:]]*-[[:space:]] ]]; then
         fail "$base: tools must be comma-separated string, not YAML array"

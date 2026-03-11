@@ -797,14 +797,23 @@ steps:
     activates-skill: null
     visual-gating: false
   - id: 2
-    name: "Simplify Pass"
+    name: "Diff Triage"
     required: false
-    skip-condition: "$ARGUMENTS contains 'skip simplify' or 'no simplify'"
+    skip-condition: "$ARGUMENTS contains 'skip triage' or 'no triage'"
     skip-target: 3
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
+    note: "Haiku agent classifies diff as trivial/non-trivial. skip-target (3) applies to user skip only. TRIVIAL verdict jumps to Step 8 (abbreviated report, skipping Steps 3-7). Provides: TRIAGE_VERDICT."
   - id: 3
+    name: "Simplify Pass"
+    required: false
+    skip-condition: "$ARGUMENTS contains 'skip simplify' or 'no simplify'"
+    skip-target: 4
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 4
     name: "Select & Launch Review Agents"
     required: true
     skip-condition: null
@@ -812,8 +821,8 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-    note: "Depth mode from $ARGUMENTS: fast (Tier 1 only), thorough (Tier 1+2, default), comprehensive (all tiers). Unrecognized depth defaults to thorough."
-  - id: 4
+    note: "Depth mode from $ARGUMENTS: fast (Tier 1 only), thorough (Tier 1+2, default), comprehensive (all tiers). Unrecognized depth defaults to thorough. All review agents run on Opus."
+  - id: 5
     name: "Collect & Classify Findings"
     required: true
     skip-condition: null
@@ -822,15 +831,24 @@ steps:
     activates-skill: null
     visual-gating: false
     note: "Confidence threshold filtering: >= 7 included, low-confidence P2/P3 filtered, borderline P1s marked for human review. Missing confidence defaults to 5."
-  - id: 5
-    name: "Fix Loop (P1s Only)"
+  - id: 6
+    name: "Validate Findings"
     required: false
-    skip-condition: "No auto-fixable P1 findings (confidence >= 7)"
-    skip-target: 6
+    skip-condition: "$ARGUMENTS contains 'skip validation' or 'no validation'; in fast mode, P2/P3 validation skipped (P1s still validated)"
+    skip-target: 7
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 6
+    note: "Per-finding verification: Opus subagent per P1, Sonnet subagent per P2/P3. Max 20 subagents. P1 verifiers: 10 turns, P2/P3 verifiers: 5 turns. In fast mode, only P1s validated. Provides: VALIDATED_FINDINGS."
+  - id: 7
+    name: "Fix Loop (P1s Only)"
+    required: false
+    skip-condition: "No auto-fixable P1 findings (confidence >= 7)"
+    skip-target: 8
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 8
     name: "Visual Review Report"
     required: true
     skip-condition: null
@@ -838,7 +856,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: true
-  - id: 7
+  - id: 9
     name: "Final Report"
     required: true
     skip-condition: null
@@ -1288,9 +1306,11 @@ sequence:
   - from: "/workflows:review"
     to: "/workflows:ship"
     provides:
+      - "TRIAGE_VERDICT (trivial/non-trivial from diff-triage agent)"
       - "Agent selection results (tier, agent list, activation reasons, depth mode)"
       - "Simplify pass results (applied/suggestions/reverted)"
       - "Review findings (P1/P2/P3) with confidence scores"
+      - "VALIDATED_FINDINGS (confirmed/downgraded/dismissed from per-finding verification)"
       - "P1 fixes applied (auto-fixable, confidence >= 7)"
       - "Borderline P1s for human review (confidence < 7)"
       - "Filtered finding count (low-confidence P2/P3s)"
@@ -1513,7 +1533,7 @@ patterns:
   - id: degrade
     template: "Visual-explainer files not found. Generating plain HTML [artifact name]."
     trigger: "Visual-explainer files unavailable but plain HTML fallback exists"
-    scope: "review.md Step 6 only"
+    scope: "review.md Step 8 only"
     action: "Generate plain semantic HTML with same structure, no external CSS/templates/animations"
 
   - id: non-file-skip
@@ -1758,32 +1778,41 @@ error-handling:
   - failure-point: "Agent dispatch fails (Step 0)"
     action: STOP
     detail: "Agent dispatch failed. Cannot run review agents."
-  - failure-point: "Simplify agent fails to dispatch (Step 2)"
+  - failure-point: "Diff triage agent fails (Step 2)"
     action: degrade
-    detail: "Skip simplify pass, proceed to Step 3"
-  - failure-point: "No test suite detected (Step 2 auto-fix)"
+    detail: "Assume NON-TRIVIAL, proceed to Step 3"
+  - failure-point: "Simplify agent fails to dispatch (Step 3)"
+    action: degrade
+    detail: "Skip simplify pass, proceed to Step 4"
+  - failure-point: "No test suite detected (Step 3 auto-fix)"
     action: degrade
     detail: "Report all simplify findings as suggestions only, skip auto-fix"
-    note: "Branch condition within Step 2, not a step-level failure"
-  - failure-point: "Review agent fails to dispatch (Step 3)"
+    note: "Branch condition within Step 3, not a step-level failure"
+  - failure-point: "Review agent fails to dispatch (Step 4)"
     action: escalate
     detail: "AskUserQuestion: Retry failed agent / Continue with available results / Stop review"
-  - failure-point: "P1 persists after 3 fix attempts (Step 5)"
-    action: escalate
-    detail: "Flag for human review with full context on what was tried"
-  - failure-point: "Unrecognized depth mode in $ARGUMENTS (Step 3)"
+  - failure-point: "Unrecognized depth mode in $ARGUMENTS (Step 4)"
     action: degrade
     detail: "Default to thorough (Tier 1 + Tier 2)"
-  - failure-point: "Stack detection fails (Step 3)"
+  - failure-point: "Stack detection fails (Step 4)"
     action: degrade
     detail: "Proceed with Tier 1 agents only (code-reviewer, security-reviewer, performance-reviewer)"
-  - failure-point: "CLAUDE.md override parse fails (Step 3)"
+  - failure-point: "CLAUDE.md override parse fails (Step 4)"
     action: degrade
     detail: "Ignore overrides, proceed with agents selected from Tiers 1-2"
-  - failure-point: "Missing confidence score on finding (Step 4)"
+  - failure-point: "Missing confidence score on finding (Step 5)"
     action: degrade
     detail: "Default to confidence 5. P2/P3 filtered, P1 routed to human review."
-  - failure-point: "Visual-explainer files not found (Step 6)"
+  - failure-point: "Validation subagent fails (Step 6)"
+    action: degrade
+    detail: "Treat finding as CONFIRMED, proceed with remaining validations"
+  - failure-point: "Validation subagent cap exceeded (Step 6)"
+    action: degrade
+    detail: "Batch remaining P3s into a single Sonnet subagent"
+  - failure-point: "P1 persists after 3 fix attempts (Step 7)"
+    action: escalate
+    detail: "Flag for human review with full context on what was tried"
+  - failure-point: "Visual-explainer files not found (Step 8)"
     action: degrade
     detail: "Generate plain HTML review report"
 ```

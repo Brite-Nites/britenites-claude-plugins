@@ -1,7 +1,7 @@
 ---
 name: performance-reviewer
 description: Reviews code for performance issues including algorithmic complexity, database queries, memory leaks, bundle size, caching, and network efficiency
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 

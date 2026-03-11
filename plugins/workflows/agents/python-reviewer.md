@@ -1,7 +1,7 @@
 ---
 name: python-reviewer
 description: Reviews Python and FastAPI code for type safety, async patterns, Pydantic v2 usage, error handling, and architectural correctness
-model: sonnet
+model: opus
 tools: Glob, Grep, Read, Bash
 ---
 
