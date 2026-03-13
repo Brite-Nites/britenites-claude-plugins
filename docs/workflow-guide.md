@@ -39,7 +39,7 @@ The inner loop is the core development workflow. You run **3 commands** — ever
 
 Between those 3 commands, skills activate in sequence based on the work:
 
-1. **session-start** pulls latest, reads CLAUDE.md and auto-memory, queries Linear for your next issue
+1. **session-start** pulls latest, reads CLAUDE.md and auto-memory, checks Context7 availability, gathers company context (or skips if already set up), queries Linear for your next issue
 2. **brainstorming** activates if complexity criteria are met (2+ modules, 4+ tasks, 2+ approaches, or new patterns) — produces a design document via Socratic discovery
 3. **writing-plans** breaks the work into 2-5 minute tasks with exact file paths, verification steps, and TDD structure
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
@@ -173,14 +173,15 @@ Start a work session. Guides you from issue selection through execution.
 
 | Step | Name | What happens |
 |------|------|-------------|
-| 0 | Verify Prerequisites | Confirm Linear MCP and sequential-thinking MCP are available |
+| 0 | Verify Prerequisites | Confirm Linear MCP, sequential-thinking MCP, Context7 MCP (non-blocking) |
 | 1 | Environment Setup | Git pull, read CLAUDE.md + auto-memory, optional visual project recap |
-| 2 | Query Linear | Find in-progress issues first, then backlog; scoped to project in CLAUDE.md |
-| 3 | Read Issue Details | Fetch full issue, linked docs, identify relevant code |
-| 4 | Brainstorm | Objective complexity check — brainstorm if criteria met, skip if not |
-| 5 | Write Plan | Break work into tasks, visual plan approval for 4+ tasks |
-| 6 | Set Up Worktree | Isolated branch + dependency install + clean baseline |
-| 7 | Execute | Subagent-per-task with TDD and checkpoints |
+| 2 | Company Context | Check for `## Company Context` in CLAUDE.md — run interview if missing, skip if present or opted out |
+| 3 | Query Linear | Find in-progress issues first, then backlog; scoped to project in CLAUDE.md |
+| 4 | Read Issue Details | Fetch full issue, linked docs, identify relevant code |
+| 5 | Brainstorm | Objective complexity check — brainstorm if criteria met, skip if not |
+| 6 | Write Plan | Break work into tasks, visual plan approval for 4+ tasks |
+| 7 | Set Up Worktree | Isolated branch + dependency install + clean baseline |
+| 8 | Execute | Subagent-per-task with TDD and checkpoints |
 
 #### `/workflows:review`
 
@@ -331,6 +332,14 @@ Project: Your Project Name
 ```
 
 Without this, `/workflows:session-start` will ask for the project name manually each time.
+
+### Recommended: Context7 for Library Docs and Company Knowledge
+
+Context7 provides two capabilities:
+1. **Library documentation** — up-to-date docs for any framework/library (React, Prisma, etc.)
+2. **Company knowledge** — the Brite Handbook indexed at `/brite-nites/handbook` (org structure, engineering processes, brand, conventions)
+
+Setup: `npx ctx7 setup --claude --api-key <key>`. Without Context7, sessions degrade gracefully — library docs fall back to training data, and company context is gathered manually during the interview.
 
 ### Output directory
 

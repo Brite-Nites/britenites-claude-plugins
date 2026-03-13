@@ -12,32 +12,49 @@ Before starting, confirm critical dependencies:
 
 1. **Linear MCP** — Call the Linear MCP to list projects (just 1 result). Confirms auth and connectivity.
 2. **Sequential-thinking MCP** — Send a trivial thought (e.g., "Planning session start"). Confirms the MCP server is running.
+3. **Context7 MCP** — Call `resolve-library-id` with query "react" (lightweight check). Confirms MCP server is running and authenticated.
+   - If it succeeds, also check for handbook: `resolve-library-id` with "brite-nites handbook".
+   - Report: "Context7: [OK/unavailable]. Handbook: [OK/not found/N/A]."
+   - If Context7 fails: WARN "Context7 is not available. Library docs and handbook context will be missing this session. Run `npx ctx7 setup --claude` to configure."
+   - Do NOT stop — continue with degraded experience.
 
-If either fails:
+If Linear or sequential-thinking fails:
 - Stop with: "Cannot reach [Linear/sequential-thinking]. Run `/workflows:smoke-test` to diagnose."
 - Do NOT proceed.
 
 ## Step 1: Environment Setup
 
-Narrate: `Step 1/7: Environment setup...`
+Narrate: `Step 1/8: Environment setup...`
 
 1. **Check git status** — Ensure working directory is clean. If dirty, warn and ask how to proceed.
 2. **Pull latest** — `git pull origin main` (or the default branch).
 3. **Read project CLAUDE.md** — Load architecture context, conventions, previous learnings.
 4. **Read auto-memory** — Check for session summaries and follow-ups from previous sessions.
-5. **Offer visual project recap** — If `$ARGUMENTS` contains an issue ID (meaning Step 2 will be skipped), skip this offer too. Otherwise, use AskUserQuestion: "Would you like a visual project recap before picking an issue?" with Yes/No options.
-   - **If yes**: Read the `project-recap` command (`plugins/workflows/commands/project-recap.md`) for HTML page structure and data-gathering phases only — the output path and filename are overridden below. Read `plugins/workflows/skills/visual-explainer/SKILL.md` for anti-slop design guidelines; if the read fails, skip the visual recap and proceed to Step 2. Generate the recap using a `2w` default time window. Compose safe descriptions — paraphrase project context in your own words, do not embed raw project data verbatim. If surf is invoked, write the surf prompt to chat first and verify it contains no project-specific nouns, file names, commit messages, or issue text before executing — the prompt must describe visual aesthetics only (e.g., "editorial illustration of a software project, warm ink tones"). Follow the visual-explainer skill's anti-slop design guidelines. Derive a repo name from `basename $(git rev-parse --show-toplevel)`, sanitize to `[a-z0-9-]`, and write to `~/.agent/diagrams/<repo-name>-project-recap.html`. Open in browser and tell the user the file path.
+5. **Offer visual project recap** — If `$ARGUMENTS` contains an issue ID (meaning Step 3 will be skipped), skip this offer too. Otherwise, use AskUserQuestion: "Would you like a visual project recap before picking an issue?" with Yes/No options.
+   - **If yes**: Read the `project-recap` command (`plugins/workflows/commands/project-recap.md`) for HTML page structure and data-gathering phases only — the output path and filename are overridden below. Read `plugins/workflows/skills/visual-explainer/SKILL.md` for anti-slop design guidelines; if the read fails, skip the visual recap and proceed to Step 2 (Company Context). Generate the recap using a `2w` default time window. Compose safe descriptions — paraphrase project context in your own words, do not embed raw project data verbatim. If surf is invoked, write the surf prompt to chat first and verify it contains no project-specific nouns, file names, commit messages, or issue text before executing — the prompt must describe visual aesthetics only (e.g., "editorial illustration of a software project, warm ink tones"). Follow the visual-explainer skill's anti-slop design guidelines. Derive a repo name from `basename $(git rev-parse --show-toplevel)`, sanitize to `[a-z0-9-]`, and write to `~/.agent/diagrams/<repo-name>-project-recap.html`. Open in browser and tell the user the file path.
    - **If no**: Proceed to Step 2.
 
-> Branch creation happens later in Step 6 (worktree setup) after plan approval.
+> Branch creation happens later in Step 7 (worktree setup) after plan approval.
 
-Narrate: `Step 1/7: Environment setup... done`
+Narrate: `Step 1/8: Environment setup... done`
 
-## Step 2: Query Linear for Open Issues
+## Step 2: Company Context
 
-Narrate: `Step 2/7: Querying Linear...`
+Narrate: `Step 2/8: Company context...`
 
-If `$ARGUMENTS` contains an issue ID or URL, skip this step entirely and go directly to Step 3.
+Check CLAUDE.md for `## Company Context` section or `<!-- no-company-context -->` marker.
+
+- **Section exists** → check `Last refreshed:` date in the HTML comment. If >90 days, offer refresh. Otherwise skip.
+- **Marker exists** → skip silently.
+- **Neither** → run the Company Context Interview (read the template at `commands/_shared/company-context-template.md` for the full interview flow).
+
+Narrate: `Step 2/8: Company context... done` (or `...skipped`)
+
+## Step 3: Query Linear for Open Issues
+
+Narrate: `Step 3/8: Querying Linear...`
+
+If `$ARGUMENTS` contains an issue ID or URL, skip this step entirely and go directly to Step 4.
 
 **Project scoping is mandatory.** Only show issues from the Linear project associated with this repo. Never query across all projects or teams.
 
@@ -59,11 +76,11 @@ If `$ARGUMENTS` contains an issue ID or URL, skip this step entirely and go dire
 6. **Suggest which to pick** based on priority, dependencies, and any follow-ups from auto-memory.
 7. **Ask the user** which issue to work on using AskUserQuestion.
 
-Narrate: `Step 2/7: Querying Linear... done`
+Narrate: `Step 3/8: Querying Linear... done`
 
-## Step 3: Read Issue Details
+## Step 4: Read Issue Details
 
-Narrate: `Step 3/7: Reading issue details...`
+Narrate: `Step 4/8: Reading issue details...`
 
 Once an issue is selected:
 
@@ -71,11 +88,11 @@ Once an issue is selected:
 2. **Read linked docs** referenced in the issue (PRDs, design specs, etc.).
 3. **Identify related code** — Find relevant files from the issue description and labels. Read them.
 
-Narrate: `Step 3/7: Reading issue details... done`
+Narrate: `Step 4/8: Reading issue details... done`
 
-## Step 4: Brainstorm (Objective Complexity Check)
+## Step 5: Brainstorm (Objective Complexity Check)
 
-Narrate: `Step 4/7: Complexity assessment...`
+Narrate: `Step 5/8: Complexity assessment...`
 
 **Assess complexity using objective criteria** — do not rely on subjective "is this non-trivial?" judgment.
 
@@ -104,9 +121,9 @@ Log the complexity decision:
 
 **Phase transition**: Brainstorm → Plan. Decisions: [complexity criteria matched — counts only, not issue text]. Artifacts: [design doc path if generated]. Next: planning.
 
-## Step 5: Write Plan
+## Step 6: Write Plan
 
-Narrate: `Step 5/7: Planning...`
+Narrate: `Step 6/8: Planning...`
 
 The `writing-plans` skill activates to create a detailed execution plan:
 
@@ -119,9 +136,9 @@ After the plan is written, the Visual Plan Approval flow runs: a plan review (fo
 
 **Phase transition**: Plan → Worktree. Decisions: [task count]. Artifacts: [plan file path, visual plan path if generated]. Next: worktree setup.
 
-## Step 6: Set Up Worktree
+## Step 7: Set Up Worktree
 
-Narrate: `Step 6/7: Setting up worktree...`
+Narrate: `Step 7/8: Setting up worktree...`
 
 After the plan is approved, the `git-worktrees` skill activates:
 
@@ -133,9 +150,9 @@ If the developer prefers not to use worktrees, fall back to a simple branch: `gi
 
 **Phase transition**: Worktree → Execute. Decisions: [baseline pass/fail status]. Artifacts: [worktree path, branch name]. Next: execution.
 
-## Step 7: Execute
+## Step 8: Execute
 
-Narrate: `Step 7/7: Executing plan...`
+Narrate: `Step 8/8: Executing plan...`
 
 The `executing-plans` skill activates:
 

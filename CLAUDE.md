@@ -10,6 +10,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Project: Brite Plugin Marketplace
 
+## Architecture Decisions
+@docs/decisions/001-cross-repo-import-solution.md
+
+## Company Context
+
+`/workflows:session-start` gathers company context on first run via an interactive interview (Linear project, initiative, goal, handbook topics). The result is a `## Company Context` metadata block in the project's CLAUDE.md (~5-10 lines of pointers, not payload). Skills query Linear and Context7 on-demand using these pointers. Add `<!-- no-company-context -->` to CLAUDE.md to opt out. Context auto-refreshes after 90 days.
+
 ## Plugin Philosophy
 
 - **Process**: Superpowers' full workflow with TDD, subagent-per-task execution, and compound knowledge accumulation
@@ -26,6 +33,8 @@ plugins/
     .claude-plugin/plugin.json     # Plugin metadata (name, version, author)
     commands/
       *.md                         # Command definitions (markdown format)
+      _shared/                     # Shared templates referenced by commands
+        company-context-template.md  # Company Context Interview template
     skills/
       */SKILL.md                   # Skill definitions (auto-invoked by Claude)
       _shared/                     # Shared utilities referenced by skills
