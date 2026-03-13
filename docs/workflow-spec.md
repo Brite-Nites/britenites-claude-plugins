@@ -705,6 +705,7 @@ command: session-start
 prereqs:
   - "Linear MCP — list projects (1 result) confirms auth"
   - "Sequential-thinking MCP — trivial thought confirms running"
+  - "Context7 MCP — resolve-library-id('react') confirms running (non-blocking)"
 steps:
   - id: 0
     name: "Verify Prerequisites"
@@ -723,14 +724,23 @@ steps:
     activates-skill: null
     visual-gating: true
   - id: 2
-    name: "Query Linear for Open Issues"
-    required: true
-    skip-condition: "$ARGUMENTS contains an issue ID or URL"
+    name: "Company Context"
+    required: false
+    skip-condition: "CLAUDE.md has ## Company Context section or <!-- no-company-context --> marker"
     skip-target: 3
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
+    note: "Runs Company Context Interview from commands/_shared/company-context-template.md. Produces: company-context block in CLAUDE.md."
   - id: 3
+    name: "Query Linear for Open Issues"
+    required: true
+    skip-condition: "$ARGUMENTS contains an issue ID or URL"
+    skip-target: 4
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 4
     name: "Read Issue Details"
     required: true
     skip-condition: null
@@ -738,15 +748,15 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 4
+  - id: 5
     name: "Brainstorm (Objective Complexity Check)"
     required: true
     skip-condition: "ALL negative criteria true (single-module, single-approach, <3 steps, no new patterns)"
-    skip-target: 5
+    skip-target: 6
     jump-on-fail: null
     activates-skill: brainstorming
     visual-gating: false
-  - id: 5
+  - id: 6
     name: "Write Plan"
     required: true
     skip-condition: null
@@ -754,7 +764,7 @@ steps:
     jump-on-fail: null
     activates-skill: writing-plans
     visual-gating: true
-  - id: 6
+  - id: 7
     name: "Set Up Worktree"
     required: true
     skip-condition: null
@@ -762,7 +772,7 @@ steps:
     jump-on-fail: null
     activates-skill: git-worktrees
     visual-gating: false
-  - id: 7
+  - id: 8
     name: "Execute"
     required: true
     skip-condition: null
@@ -1452,6 +1462,40 @@ artifacts:
     consumers: ["session-start (via CLAUDE.md @import)"]
     persistence: permanent
 
+  - id: company-context
+    path: "CLAUDE.md (## Company Context section)"
+    producer: "session-start (command, Step 2)"
+    consumers: [brainstorming, writing-plans, executing-plans, compound-learnings]
+    persistence: permanent
+    schema:
+      fields:
+        - name: initiative
+          type: string
+          source: "Linear MCP (get_project)"
+          sanitization: "[a-zA-Z0-9 _.,/-], max 120 chars"
+        - name: goal
+          type: string
+          source: "developer input (AskUserQuestion)"
+        - name: team
+          type: string
+          source: "Linear MCP (get_project)"
+          sanitization: "[a-zA-Z0-9 _.,/-], max 120 chars"
+        - name: lead
+          type: string
+          source: "Linear MCP (get_project)"
+          sanitization: "[a-zA-Z0-9 _.,/-], max 120 chars"
+        - name: related-projects
+          type: "string[]"
+          source: "Linear MCP + developer input"
+          sanitization: "[a-zA-Z0-9 _.,/-], max 120 chars each"
+        - name: handbook-library
+          type: string
+          source: "hardcoded (/brite-nites/handbook)"
+        - name: handbook-topics
+          type: "string[]"
+          source: "developer input (AskUserQuestion)"
+          sanitization: "[a-zA-Z0-9 _-], max 40 chars each"
+
   - id: project-recap
     path: "~/.agent/diagrams/<repo-name>-project-recap.html"
     producer: "session-start (command)"
@@ -1757,9 +1801,18 @@ error-handling:
   - failure-point: "Sequential-thinking MCP unavailable"
     action: STOP
     detail: "Cannot reach sequential-thinking. Run /workflows:smoke-test to diagnose."
+  - failure-point: "Context7 MCP unavailable (Step 0)"
+    action: degrade
+    detail: "WARN — library docs and handbook context unavailable. Continue session."
+  - failure-point: "Handbook not found on Context7 (Step 0)"
+    action: degrade
+    detail: "WARN — handbook not indexed. Company context interview skips handbook validation."
   - failure-point: "Working directory dirty (Step 1)"
     action: escalate
     detail: "Warn and ask how to proceed"
+  - failure-point: "Company context interview skipped by user (Step 2)"
+    action: skip
+    detail: "Write <!-- no-company-context --> marker, proceed to Step 3"
   - failure-point: "No Linear project configured"
     action: escalate
     detail: "Warn and ask user for project name manually"

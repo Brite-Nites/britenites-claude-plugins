@@ -6,6 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [3.26.0] - 2026-03-13
+
+### Added
+- Company Context Interview in session-start (BRI-1941)
+  - New Step 2: interactive interview gathers initiative, goal, team, related projects, handbook topics
+  - Produces `## Company Context` metadata block in CLAUDE.md (~5-10 lines of pointers)
+  - Skills query Linear and Context7 on-demand using these pointers
+  - `<!-- no-company-context -->` marker to opt out, auto-refresh after 90 days
+  - Shared template at `skills/_shared/company-context-template.md`
+  - Degrades gracefully: Linear-only, manual-only, or full (Linear + Context7 + Handbook)
+- Context7 MCP check in session-start Step 0 (non-blocking)
+  - Reports Context7 + Handbook availability status
+  - WARN if unavailable, continues with degraded experience
+- Context7 company knowledge rule (`~/.claude/rules/context7.md`)
+  - Documents Brite Handbook at `/brite-nites/handbook` for company-specific queries
+- Context7 Setup step in onboarding checklist (new Step 8)
+- Workflow guide: Context7 configuration section, updated session-start step table (0-8)
+
+### Changed
+- session-start steps renumbered: 0-7 → 0-8 (new Step 2 inserted)
+- workflow-spec.md: session-start step sequence updated with Company Context step and error handling
+- Version bump: 3.25.0 → 3.26.0
+
+## [3.25.0] - 2026-03-13
+
+### Added
+- Cross-repo @import evaluation and ADR (BRI-1940)
+  - Evaluated 3 prototypes: Context7 (hosted), QMD (local hybrid search), Copy-on-Setup (@imports)
+  - Decision: Context7 Pro — handbook indexed as private library, queried on-demand via MCP
+  - 659 files indexed, 2,789 snippets, 3.0/5 avg relevance (best of all prototypes)
+  - First ADR: `docs/decisions/001-cross-repo-import-solution.md`
+  - Full evaluation: `docs/research/cross-repo-import-evaluation.md`
+
 ## [3.24.0] - 2026-03-10
 
 ### Added
@@ -405,8 +438,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Linear MCP server renamed from `linear` to `linear-server`
 - Linear MCP URL updated from `.dev` to `.app`
 
-[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.23.0...HEAD
-[3.23.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.22.0...v3.23.0
+[Unreleased]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.26.0...HEAD
+[3.26.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.25.0...v3.26.0
+[3.25.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.24.0...v3.25.0
+[3.24.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.23.0...v3.24.0
+[3.23.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.22.0...v3.22.0
 [3.22.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.21.0...v3.22.0
 [3.21.0]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.20.0...v3.21.0
 [3.18.1]: https://github.com/Brite-Nites/brite-claude-plugins/compare/v3.18.0...v3.18.1
