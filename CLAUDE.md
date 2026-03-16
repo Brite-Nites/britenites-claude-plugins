@@ -15,7 +15,7 @@ Project: Brite Plugin Marketplace
 
 ## Company Context
 
-`/workflows:session-start` gathers company context on first run via an interactive interview (Linear project, initiative, goal, handbook topics). The result is a `## Company Context` metadata block in the project's CLAUDE.md (~5-10 lines of pointers, not payload). Skills query Linear and Context7 on-demand using these pointers. Add `<!-- no-company-context -->` to CLAUDE.md to opt out. Context auto-refreshes after 90 days.
+`/workflows:session-start` gathers company context on first run via an interactive interview (Linear project, initiative, goal, handbook topics). The result is a `## Company Context` metadata block in the project's CLAUDE.md (~5-10 lines of pointers, not payload). Skills query Linear and Context7 on-demand using these pointers — notably, `writing-plans` checks Active CDRs from the handbook INDEX before writing plans, surfacing conflicts with company decisions and referencing aligned CDRs in plan rationale. Add `<!-- no-company-context -->` to CLAUDE.md to opt out. Context auto-refreshes after 90 days.
 
 ## Plugin Philosophy
 
