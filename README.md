@@ -2,7 +2,7 @@
 
 A **Process + Org** plugin for Claude Code. Superpowers methodology + compound engineering + Linear integration — structured workflow (brainstorm → plan → worktree → execute → review → compound → audit) with Linear woven into every step.
 
-**Current version:** 3.12.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
+**Current version:** 3.24.0 | [Changelog](CHANGELOG.md) | [Roadmap](ROADMAP.md)
 
 ## Philosophy
 
@@ -19,6 +19,22 @@ session-start → brainstorm → plan → [worktree] → execute (subagent + TDD
 - **Domain skills are separate plugins** — tech-stack knowledge comes from context7 MCP or dedicated domain plugins
 
 Influenced by [superpowers](https://github.com/obra/superpowers) and [compound-engineering](https://github.com/EveryInc/compound-engineering-plugin). See the [Roadmap](ROADMAP.md) for what's coming next.
+
+## Vision: Brite Agent Platform
+
+This plugin is evolving into a four-layer platform for universal project routing, domain-specific knowledge, structured workflows, and autonomous execution.
+
+| Layer | Milestone | What it delivers |
+|-------|-----------|-----------------|
+| Knowledge | Company Knowledge Layer | Handbook repo as company brain — CDRs, context, precedents |
+| Routing | Project-Start Redesign | Trait-based classification routes any project type |
+| Traces | Decision Trace Architecture | Structured reasoning traces compound into searchable precedents |
+| Plugins | Plugin Ecosystem | Domain plugins (marketing, engineering, design, sales, product) |
+| Refresh | Context Refresh Pipeline | Automated BigQuery + Salesforce → handbook context |
+| Autonomous | Symphony Execution | Agents execute Linear issues autonomously |
+| Governance | Context Governance | Quality dashboards, CDR governance, flywheel monitoring |
+
+See the [Platform Design Document](docs/designs/brite-agent-platform.md) for the full PRD.
 
 ## Prerequisites
 
@@ -126,6 +142,19 @@ Skills activate automatically when Claude detects relevant context.
 | `agent-browser` | Automation | Navigating websites, filling forms, taking screenshots |
 | `find-skills` | Discovery | Looking for new skills or capabilities to install |
 
+## Review Agents
+
+`/workflows:review` runs up to 9 specialized review agents in parallel:
+
+| Tier | Agents | Activation |
+|------|--------|------------|
+| 1 (always) | code-reviewer, security-reviewer, performance-reviewer | Every review |
+| 2 (stack) | typescript-reviewer, python-reviewer, data-reviewer | Auto-detected from project files |
+| 3 (opt-in) | architecture-reviewer, accessibility-reviewer, test-quality-reviewer | Large projects or CLAUDE.md include |
+
+Depth modes: `fast` (Tier 1 only), `thorough` (default, Tier 1+2), `comprehensive` (all tiers).
+All agents run on Opus. A Haiku-powered diff-triage agent gates trivial diffs.
+
 **Workflow skills** (shipped):
 
 | Skill | Category | Trigger |
@@ -174,7 +203,7 @@ Each plugin requires `.claude-plugin/plugin.json`:
 {
   "name": "workflows",
   "description": "Process + Org plugin — structured workflow methodology with Linear integration",
-  "version": "3.12.0",
+  "version": "3.24.0",
   "author": { "name": "Brite" },
   "homepage": "https://github.com/brite-nites/brite-claude-plugins",
   "repository": "https://github.com/brite-nites/brite-claude-plugins",
@@ -501,7 +530,7 @@ The root `marketplace.json` registers plugins for distribution:
       "name": "workflows",
       "source": "./plugins/workflows",
       "description": "Process + Org plugin — structured workflow methodology with Linear integration",
-      "version": "3.12.0"
+      "version": "3.24.0"
     }
   ]
 }
@@ -538,4 +567,4 @@ MIT
 
 ## Issue Tracking
 
-Issues for this project are tracked in [Brite Plugin Marketplace](https://linear.app/brite-nites/project/brite-claude-code-plugin-402b57908532).
+Issues for this project are tracked in [Brite Plugin Marketplace](https://linear.app/brite-nites/project/brite-plugin-marketplace-402b57908532).
