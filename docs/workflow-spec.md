@@ -1990,3 +1990,153 @@ error-handling:
     action: skip
     detail: "Skip CLAUDE.md update, note: add @import when CLAUDE.md is created"
 ```
+
+## 6. Context Loading Cascade
+
+Authoritative specification for when context loads during the inner loop. Governs what each stage should load and at what tier. See `docs/designs/BRI-2006-context-loading-cascade.md` for rationale and design decisions.
+
+### 6a. Loading Table
+
+<!-- spec:cascade:loading-table -->
+```yaml
+principle: "Load context at the narrowest scope that still informs the decision"
+stages:
+  - stage: project-start
+    skill: project-start.md
+    what-loads: "Trait classification, CLAUDE.md generation with @imports"
+    how: "Interview + write"
+    tier: [1, 2]
+    status: implemented
+
+  - stage: session-start
+    skill: session-start.md
+    what-loads: "CLAUDE.md (Tier 1+2), auto-memory, Company Context check, Linear issues"
+    how: "Read + MCP queries"
+    tier: [1, 2]
+    status: implemented
+
+  - stage: brainstorm
+    skill: brainstorming/SKILL.md
+    what-loads: "Linear issue, CLAUDE.md, auto-memory, relevant source code"
+    how: "Read + Linear MCP"
+    tier: [1, 2]
+    status: implemented
+    planned:
+      - what: "Precedent search results from QMD/precedent DB"
+        issue: BRI-1960
+        tier: 3
+
+  - stage: plan
+    skill: writing-plans/SKILL.md
+    what-loads: "Design doc, Linear issue, CDR INDEX via Context7 (Tier 3 on-demand), source code, test patterns"
+    how: "Read + Context7 MCP"
+    tier: [1, 2, 3]
+    status: implemented
+    note: "CDR INDEX is the only Tier 3 load; queried on-demand, not pre-loaded"
+
+  - stage: execute
+    skill: executing-plans/SKILL.md
+    what-loads: "Design doc + plan file (parent); task desc + relevant files + conventions (subagent)"
+    how: "Read; subagent gets narrowest scope"
+    tier: [1, 5]
+    status: implemented
+    planned:
+      - what: "Per-task context filtering (task-level, not project-level)"
+        issue: null
+
+  - stage: review
+    skill: review.md
+    what-loads: "Diff stat, changed files; review agents read files themselves"
+    how: "git diff + agent dispatch"
+    tier: [5]
+    status: implemented
+    planned:
+      - what: "CDR compliance check"
+        issue: null
+
+  - stage: ship
+    skill: "ship.md + compound-learnings/SKILL.md"
+    what-loads: "CLAUDE.md, diff, commit history; captures learnings back"
+    how: "Read + write"
+    tier: [1, 4]
+    status: implemented
+```
+
+### 6b. Context Layers
+
+<!-- spec:cascade:context-layers -->
+```yaml
+layers:
+  - layer: company
+    tier: 1
+    scope: organization-wide
+    examples: "CDR INDEX, org structure, brand guidelines"
+    loaded-at: session-start
+    refresh: quarterly
+    status: partial
+    note: "Company Context pointers implemented; @imports planned in BRI-1945"
+
+  - layer: precedent
+    tier: 3
+    scope: all-projects
+    examples: "Past ADRs, decision traces, search results"
+    loaded-at: "brainstorm, plan"
+    refresh: continuous
+    status: planned
+    issue: BRI-1960
+
+  - layer: domain
+    tier: 2
+    scope: plugin-specific
+    examples: "engineering-context.md, design-context.md"
+    loaded-at: project-start
+    refresh: per-context-skill-standard
+    status: planned
+    issue: BRI-1966
+
+  - layer: project
+    tier: 1
+    scope: one-project
+    examples: "CLAUDE.md, docs/, architecture decisions"
+    loaded-at: session-start
+    refresh: every-session
+    status: implemented
+
+  - layer: task
+    tier: 5
+    scope: one-task
+    examples: "Relevant files, test results, Linear issue"
+    loaded-at: execute
+    refresh: every-task
+    status: implemented
+```
+
+### 6c. Tier Definitions
+
+<!-- spec:cascade:tiers -->
+```yaml
+tiers:
+  - tier: 1
+    name: always
+    description: "Loaded at session start for every session"
+    examples: "Project CLAUDE.md, auto-memory"
+    budget: "~50-100 lines"
+
+  - tier: 2
+    name: per-project
+    description: "Loaded at session start via @imports based on project traits"
+    examples: "Company Context pointers, domain context docs"
+    budget: "~80-200 lines per doc"
+
+  - tier: 3
+    name: on-demand
+    description: "Agent reads when task requires it; not pre-loaded"
+    examples: "Full CDR documents, precedent traces, analytical metrics"
+    budget: variable
+
+  - tier: 5
+    name: task-scoped
+    description: "Loaded per-subagent during execution; narrowest scope"
+    examples: "Task-relevant files, test results, specific code"
+    budget: variable
+```

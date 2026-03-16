@@ -41,6 +41,8 @@ Produces: design document, optional architecture diagram
 
 ## Phase 1: Context Gathering
 
+> **Context cascade**: This phase loads Tier 1+2 context (issue, CLAUDE.md, memory, code). See `docs/designs/BRI-2006-context-loading-cascade.md` for the full cascade spec.
+
 Narrate: `Phase 1/5: Gathering context...`
 
 Before asking questions, silently gather context:

@@ -33,6 +33,8 @@ Produces: plan file, optional visual plan, plan review
 
 ## Context Loading
 
+> **Context cascade**: This step loads Tier 1+2 context plus Tier 3 CDR INDEX on-demand. See `docs/designs/BRI-2006-context-loading-cascade.md` for the full cascade spec.
+
 ### Context Anchor
 
 Before gathering new context, restate key decisions from prior phases by reading persisted files (not conversation memory):
