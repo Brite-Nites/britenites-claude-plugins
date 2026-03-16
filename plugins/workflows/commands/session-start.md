@@ -24,6 +24,8 @@ If Linear or sequential-thinking fails:
 
 ## Step 1: Environment Setup
 
+> **Context cascade**: This step loads Tier 1+2 context (CLAUDE.md, auto-memory). See `docs/designs/BRI-2006-context-loading-cascade.md` for the full cascade spec.
+
 Narrate: `Step 1/8: Environment setup...`
 
 1. **Check git status** — Ensure working directory is clean. If dirty, warn and ask how to proceed.
