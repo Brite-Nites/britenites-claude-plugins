@@ -97,6 +97,10 @@ objective-criteria: null
 preconditions:
   - "Design doc exists if brainstorming criteria were met (glob docs/designs/<issue-id>-*.md)"
   - "Issue ID available from session-start or $ARGUMENTS"
+optional-inputs:
+  - source: "CDR INDEX via Context7 (handbook-library from ## Company Context)"
+    condition: "## Company Context exists in CLAUDE.md and Context7 is available"
+    on-unavailable: "Skip CDR check, log reason, proceed"
 output-artifacts:
   - path: "docs/plans/<issue-id>-plan.md"
     type: file
@@ -1685,6 +1689,9 @@ error-handling:
   - failure-point: "Issue ID missing"
     action: escalate
     detail: "Ask developer for issue ID"
+  - failure-point: "CDR INDEX unavailable (no Company Context, Context7 down, or no results)"
+    action: skip
+    detail: "Log reason in Decision Log format, proceed with planning without CDR awareness"
   - failure-point: "Visual-explainer files not found"
     action: skip
     detail: "Skip Steps 2 and 3 of Visual Plan Approval, proceed to Step 4 (Approval)"

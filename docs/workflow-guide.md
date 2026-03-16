@@ -41,7 +41,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 
 1. **session-start** pulls latest, reads CLAUDE.md and auto-memory, checks Context7 availability, gathers company context (or skips if already set up), queries Linear for your next issue
 2. **brainstorming** activates if complexity criteria are met (2+ modules, 4+ tasks, 2+ approaches, or new patterns) — produces a design document via Socratic discovery
-3. **writing-plans** breaks the work into 2-5 minute tasks with exact file paths, verification steps, and TDD structure
+3. **writing-plans** checks Active CDRs from the handbook (when company context is configured), then breaks the work into 2-5 minute tasks with exact file paths, verification steps, and TDD structure
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
@@ -72,7 +72,7 @@ These activate automatically in sequence. None need to be invoked manually.
 | Skill | Activates When | Purpose | Produces |
 |-------|---------------|---------|----------|
 | `brainstorming` | 2+ modules, 4+ tasks, 2+ approaches, or new patterns | Socratic discovery | `docs/designs/<issue-id>-<slug>.md` |
-| `writing-plans` | Multi-step task, after brainstorm or complexity skip | Break into 2-5min tasks with TDD | `docs/plans/<issue-id>-plan.md` |
+| `writing-plans` | Multi-step task, after brainstorm or complexity skip | CDR conflict check, then break into 2-5min tasks with TDD | `docs/plans/<issue-id>-plan.md` |
 | `git-worktrees` | Plan approved, before coding | Isolated workspace + clean baseline | `.claude/worktrees/` branch |
 | `executing-plans` | Plan file exists | Subagent-per-task + TDD + checkpoints | Implemented code + tests |
 | `verification-before-completion` | Task checkpoints during execution | 4-level verification (build, tests, acceptance, integration) | Verification report |
