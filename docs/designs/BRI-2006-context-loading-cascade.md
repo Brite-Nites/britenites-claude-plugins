@@ -54,7 +54,7 @@ Tier 3 content (full CDR documents, precedent traces, analytical metrics) is NOT
 | Stage | Skill/Command | What loads today | How | Status |
 |-------|--------------|-----------------|-----|--------|
 | **project-start** | `project-start.md` | Trait classification, CLAUDE.md generation with @imports | Interview + write | Implemented |
-| **session-start** | `session-start.md` | CLAUDE.md (Tier 1+2), auto-memory, Company Context check, Linear issues | Read + MCP queries | Implemented |
+| **session-start** | `session-start.md` | CLAUDE.md (Tier 1+2), auto-memory, Company Context check, @import freshness check, Linear issues | Read + MCP queries | Implemented |
 | **brainstorm** | `brainstorming/SKILL.md` | Linear issue, CLAUDE.md, auto-memory, relevant source code | Read + Linear MCP | Implemented |
 | **plan** | `writing-plans/SKILL.md` | Design doc, Linear issue, CDR INDEX via Context7 (Tier 3 on-demand), source code, test patterns | Read + Context7 MCP | Implemented |
 | **execute** | `executing-plans/SKILL.md` | Design doc + plan file (parent); task description + relevant files + conventions (subagent) | Read; subagent gets narrowest scope | Implemented |
@@ -69,7 +69,7 @@ Tier 3 content (full CDR documents, precedent traces, analytical metrics) is NOT
 | plan | CDR conflict check with full CDR lazy-load | BRI-1939 (partial — CDR INDEX query implemented, full conflict flow planned) |
 | execute | Per-task context filtering (task-level, not project-level) | BC-2003 (delivered) |
 | review | CDR compliance check ("does this PR violate active CDRs?") | No issue yet |
-| session-start | Freshness tracking on @imported context docs | BRI-1938 |
+| session-start | Freshness tracking on @imported context docs | BC-1938 (delivered) |
 
 ### 5-Layer Context Model
 

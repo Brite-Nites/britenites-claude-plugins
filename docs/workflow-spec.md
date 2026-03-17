@@ -1829,6 +1829,12 @@ error-handling:
   - failure-point: "Visual-explainer files not found (Step 1 recap)"
     action: skip
     detail: "Skip visual recap, proceed to Step 2"
+  - failure-point: "No @imported files have freshness frontmatter (Step 1)"
+    action: skip
+    detail: "Silent pass — no warnings, proceed normally"
+  - failure-point: "@imported file has stale freshness (Step 1)"
+    action: degrade
+    detail: "Advisory warning per tier (Aging/Stale/Very stale). Do not stop."
 ```
 
 <!-- spec:errors:review -->
@@ -2010,7 +2016,7 @@ stages:
 
   - stage: session-start
     skill: session-start.md
-    what-loads: "CLAUDE.md (Tier 1+2), auto-memory, Company Context check, Linear issues"
+    what-loads: "CLAUDE.md (Tier 1+2), auto-memory, Company Context check, @import freshness check, Linear issues"
     how: "Read + MCP queries"
     tier: [1, 2]
     status: implemented
@@ -2159,6 +2165,12 @@ guards:
     enforcement: advisory
     status: delivered
     issue: BC-2003
+
+  - stage: session-start
+    guard: "Compute staleness_ratio for @imported files with last_refreshed/refresh_cadence frontmatter; warn on ratio >1.0"
+    enforcement: advisory
+    status: delivered
+    issue: BC-1938
 
   - stage: plan
     guard: "CDR INDEX query is on-demand (Tier 3); full CDRs lazy-loaded only on conflict"

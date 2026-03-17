@@ -141,6 +141,18 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T3.23 | `/workflows:plan-review` | Run with path to a plan markdown file | Plan review HTML with current vs planned architecture diagrams, risk assessment, understanding gaps |
 | T3.24 | `/workflows:project-recap` | Run with `2w` | Project recap HTML with architecture snapshot, activity narrative, cognitive debt hotspots |
 
+### Freshness Tracking (session-start Step 1)
+
+| Test | Setup | Expected |
+|------|-------|----------|
+| T3.25a | @imported file with `last_refreshed` = today, `refresh_cadence: quarterly` | No freshness output (ratio ~0, Fresh) |
+| T3.25b | @imported file with `last_refreshed` = 100 days ago, `refresh_cadence: quarterly` | "Note: ... approaching refresh date" (ratio ~1.1, Aging) |
+| T3.25c | @imported file with `last_refreshed` = 150 days ago, `refresh_cadence: quarterly` | "Warning: ... overdue for refresh" (ratio ~1.67, Stale) |
+| T3.25d | @imported file with `last_refreshed` = 200 days ago, `refresh_cadence: quarterly` | "WARNING: ... significantly overdue" (ratio ~2.2, Very stale) |
+| T3.25e | @imported file with no YAML frontmatter | No freshness output (skip silently) |
+| T3.25f | @imported file with `refresh_cadence: on-change` | No freshness output (skip) |
+| T3.25g | No @imported files in CLAUDE.md | No freshness output (silent pass) |
+
 ---
 
 ## Layer 4: End-to-End Flow Tests (~30+ min each)
@@ -240,7 +252,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 24 | T1.1, T3.1–T3.24 |
+| Commands | 24 | T1.1, T3.1–T3.25g |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
@@ -263,11 +275,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/13
-Layer 3 (Commands):   __/24
+Layer 3 (Commands):   __/31
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/25
 
-Total:  __/78
+Total:  __/85
 Notes:  ____
 ```
