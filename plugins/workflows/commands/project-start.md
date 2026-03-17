@@ -87,6 +87,8 @@ If the user selects "Technical collaborator", you'll work together on technical 
 
 Once you understand them and their project, create a CLAUDE.md file in the project root. The structure depends on which path was taken.
 
+> **Budget constraint**: Keep the generated CLAUDE.md under ~100 lines. Extract detailed documentation (ADR content, extended conventions, domain context) to `docs/` files and reference them via `@import`. This ensures Tier 1 context stays within budget.
+
 ---
 
 ### CLAUDE.md for Non-Technical Users (Path A)

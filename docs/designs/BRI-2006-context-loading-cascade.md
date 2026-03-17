@@ -67,7 +67,7 @@ Tier 3 content (full CDR documents, precedent traces, analytical metrics) is NOT
 |-------|---------------|-------|
 | brainstorm | Precedent search results from QMD/precedent DB | BRI-1960 |
 | plan | CDR conflict check with full CDR lazy-load | BRI-1939 (partial — CDR INDEX query implemented, full conflict flow planned) |
-| execute | Per-task context filtering (task-level, not project-level) | No issue yet |
+| execute | Per-task context filtering (task-level, not project-level) | BC-2003 (delivered) |
 | review | CDR compliance check ("does this PR violate active CDRs?") | No issue yet |
 | session-start | Freshness tracking on @imported context docs | BRI-1938 |
 
@@ -93,4 +93,10 @@ Related issues:
 - BRI-1938 — Freshness tracking in session-start
 - BRI-1945 — CLAUDE.md with dynamic @imports
 - BRI-1939 — CDR-check pattern in writing-plans
-- BRI-2003 — Context budget management strategy
+- BC-2003 — Context budget management strategy
+
+### Budget Enforcement
+
+Budget guards and per-task context selection are defined in:
+- **Design doc**: `docs/designs/BC-2003-context-budget-management.md` — strategies, measurement baseline, offloading table
+- **Machine-parseable spec**: `docs/workflow-spec.md` Section 6d (`<!-- spec:cascade:budget-guards -->`) — guards, offloading strategy, progressive disclosure patterns
