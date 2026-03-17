@@ -2140,3 +2140,86 @@ tiers:
     examples: "Task-relevant files, test results, specific code"
     budget: variable
 ```
+
+### 6d. Budget Guards
+
+<!-- spec:cascade:budget-guards -->
+```yaml
+budget-principle: "Tier 1+2 context should consume <5% of context window (~100-300 lines total)"
+
+guards:
+  - stage: project-start
+    guard: "Generated CLAUDE.md should stay under ~100 lines; extract detail to docs/ via @import"
+    enforcement: advisory
+    status: delivered
+    issue: BC-2003
+
+  - stage: session-start
+    guard: "After loading CLAUDE.md + auto-memory, warn if CLAUDE.md exceeds ~120 lines"
+    enforcement: advisory
+    status: delivered
+    issue: BC-2003
+
+  - stage: plan
+    guard: "CDR INDEX query is on-demand (Tier 3); full CDRs lazy-loaded only on conflict"
+    enforcement: behavioral
+    status: delivered
+    issue: BRI-1939
+
+  - stage: execute
+    guard: "Per-task context selection — classify by file paths, inject only task-relevant CLAUDE.md sections"
+    enforcement: behavioral
+    status: delivered
+    issue: BC-2003
+
+  - stage: review
+    guard: "Review agents read files themselves; parent provides only diff stat and changed file list"
+    enforcement: behavioral
+    status: delivered
+    issue: null
+
+  - stage: ship
+    guard: "best-practices-audit enforces CLAUDE.md conciseness and @import extraction"
+    enforcement: behavioral
+    status: delivered
+    issue: null
+
+offloading-strategy:
+  in-context:
+    - "Project CLAUDE.md (Tier 1, <100 lines)"
+    - "Auto-memory session summaries (Tier 1, ~20-40 lines)"
+    - "Company Context pointers (Tier 2, ~3-5 lines)"
+    - "Build & test commands (Tier 1, always injected per-task)"
+
+  in-filesystem:
+    - "Full CDR documents — loaded on-demand via Context7 during plan stage"
+    - "Precedent search results — planned (BRI-1960), will live in filesystem until queried"
+    - "Design docs — loaded per-task by executing-plans parent agent"
+    - "Domain context docs — @imported at session-start (Tier 2), not inlined"
+    - "Architecture Decision Records — @imported via CLAUDE.md, not inlined"
+    - "Analytical metrics — loaded on-demand for data tasks only"
+
+progressive-disclosure:
+  - pattern: "CDR INDEX → full CDR"
+    status: implemented
+    issue: BRI-1939
+    description: "writing-plans queries CDR INDEX via Context7; lazy-loads full CDR only on conflict"
+
+  - pattern: "Precedent INDEX → full trace"
+    status: planned
+    issue: BRI-1960
+    description: "Brainstorm/plan will query precedent database; full traces loaded on match"
+
+  - pattern: "Metric definitions → metric values"
+    status: planned
+    issue: null
+    description: "Data tasks will load metric definitions; actual values queried on-demand from analytics"
+
+measurement:
+  method: "Manual line-count audit per release"
+  target: "Tier 1+2 < 5% of context window (~100-300 lines)"
+  baseline:
+    tier-1: "~80-140 lines (CLAUDE.md + auto-memory)"
+    tier-2: "~3-5 lines (Company Context pointers)"
+    total: "~103-145 lines — within 5% target"
+```
