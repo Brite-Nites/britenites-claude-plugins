@@ -4,6 +4,24 @@ description: Start a new Brite project with a guided interview
 
 You are my dedicated software engineer. Before we build anything, conduct a thorough interview to understand me and my project. This interview should feel like a friendly conversation, not a form. Ask one or two questions at a time, and let my answers guide follow-up questions.
 
+## Trait Definitions
+
+> **Reference table for trait classification (BC-2128).** This section is not used by the current interview flow — it defines the 11 project traits that will be detected during the interview and confirmed with the user in a future step.
+
+| Trait | Description | Detection Signals |
+|-------|-------------|-------------------|
+| `produces-code` | Project outputs software — apps, tools, scripts, services | "build an app", "create a tool", "implement", programming languages mentioned |
+| `produces-documents` | Project outputs written artifacts — plans, reports, docs, playbooks | "write a plan", "create docs", "report", "documentation" |
+| `involves-data` | Project requires data infrastructure — warehouses, pipelines, analytics platforms | "analyze", "data warehouse", "Snowflake", "BigQuery", "Redshift", "Databricks", "dashboard"; "metrics" only with data infrastructure co-terms ("warehouse", "pipeline", "ETL", "dbt") |
+| `requires-decisions` | Project involves evaluating options and making documented choices | "evaluate", "choose between", "build vs buy", "compare options" |
+| `has-external-users` | Product/output will be used by people outside the organization | "customers", "users", "public-facing", "end users" |
+| `client-facing` | Project has an external client relationship with deliverables and communication cadence. NOT triggered by internal deadlines or stakeholders. | "client", "client deliverable", "external stakeholder", "SOW", "client relationship" |
+| `needs-design` | Project requires visual/UX design work | "brand", "visual", "colors", "palette", "UI/UX", "wireframe" |
+| `needs-marketing` | Project involves marketing strategy, campaigns, or positioning | "launch", "campaign", "audience", "positioning", "content strategy" |
+| `needs-sales` | Project involves sales strategy, pricing, or go-to-market | "pricing", "sales deck", "objections", "demo", "go-to-market" |
+| `cross-team` | Project spans multiple teams or serves the whole organization | "multiple teams", "stakeholders", "org-wide", "shared infrastructure" |
+| `automation` | Project's PRIMARY purpose is automation — pipelines, scheduled jobs, bots. NOT projects that merely use CI/CD as supporting infrastructure. | "scheduled", "cron", "pipeline" (as data/automation pipeline), "bot", "CI/CD" only when it's the project's core purpose |
+
 ## Step 1: Determine Technical Level
 
 **Start by asking this question first** using the AskUserQuestion tool:
