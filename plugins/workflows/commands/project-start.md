@@ -6,7 +6,7 @@ You are my dedicated software engineer. Before we build anything, conduct a thor
 
 ## Trait Definitions
 
-> **Reference table for trait classification (BC-2128).** This section is not used by the current interview flow — it defines the 11 project traits that will be detected during the interview and confirmed with the user in a future step.
+> **Reference table.** These 11 traits are detected after the interview and confirmed with the user in the "Classify Project Traits" step below.
 
 | Trait | Description | Detection Signals |
 |-------|-------------|-------------------|
@@ -101,6 +101,73 @@ If the user selects "Technical collaborator", you'll work together on technical 
 
 ---
 
+## Classify Project Traits
+
+After the interview is complete — before generating any files — analyze the conversation to classify the project's traits. This is additive to the Path A/B selection (do not replace it).
+
+### Detect Traits
+
+Batch-analyze the completed interview against the trait definition table above. For each of the 11 traits, assign a confidence level:
+
+- **High** — 2 or more direct signals from the conversation
+- **Medium** — 1 signal, or ambiguous/indirect signal
+- **Low** — Inferred from context with no direct signal
+
+**Signal accuracy overrides** (from BC-2124 validation):
+- `involves-data`: The word "metrics" alone does NOT trigger this trait. It requires co-occurrence with data infrastructure terms ("warehouse", "pipeline", "ETL", "dbt", "Snowflake").
+- `client-facing`: Generic mentions of "deadline" or "stakeholder" do NOT trigger this trait. It requires explicit external client signals ("client deliverable", "SOW", "external stakeholder").
+- `automation`: "CI/CD" only triggers this trait when it is the project's PRIMARY purpose, not when it is supporting infrastructure for another project type.
+
+Auto-detect all High and Medium confidence traits. Present Low confidence traits as optional "possible" additions.
+
+### Present Traits
+
+Show detected traits grouped by category with confidence and evidence:
+
+```
+## Project Traits Detected
+
+**Technical**
+- [checkmark] produces-code (High) — "building a Next.js dashboard"
+- [checkmark] involves-data (Medium) — mentioned Snowflake warehouse
+
+**Business**
+- [checkmark] has-external-users (High) — "serving paying customers"
+- [square] client-facing (Low) — possible: mentioned a deadline but no explicit client relationship
+
+**Domain**
+- [square] needs-design (Low) — possible: wants "clean UI" but no design discussion
+
+**Not detected**: produces-documents, requires-decisions, needs-marketing, needs-sales, cross-team, automation
+```
+
+Use `[checkmark]` for High/Medium confidence (auto-included). Use `[square]` for Low confidence (opt-in). List all undetected traits at the bottom for completeness.
+
+### Confirm Traits
+
+Use the AskUserQuestion tool with these options:
+
+- **Yes, looks good** — proceed with the detected traits as-is
+- **Let me adjust** — ask which traits to add or remove, then re-present the updated list. Allow up to 3 adjustment rounds before proceeding.
+- **I'm not sure what these mean** — give a plain-language explanation of each detected trait and what it means for the project, then re-present
+
+**Edge cases:**
+- **0 traits detected**: Suggest 2-3 plausible Low-confidence traits based on the conversation and ask the user to confirm or add their own.
+- **7+ traits detected**: Note the breadth ("This project touches many areas") and suggest the user consider whether all traits are primary concerns or if some are secondary.
+- **User wants to add a trait not in the table**: Decline politely — "The trait system uses a fixed set of 11 traits. The closest match might be [suggest nearest]."
+- **User adds a trait from the table**: Mark it as "User-added" in the evidence map.
+
+### Store Confirmed Traits
+
+Hold the following in conversation context for use by downstream steps (CLAUDE.md generation, project plan, ADRs):
+
+- **Active trait list** — the confirmed set of trait names
+- **Path A/B selection** — still relevant, preserved alongside traits
+- **Evidence map** — one line per trait explaining why it was detected
+- **Downstream consumers** — BC-1944 (trait-conditional doc scaffolding), BC-1945 (dynamic CLAUDE.md @imports), BC-2131 (trait-aware project plan)
+
+---
+
 ## After the Interview
 
 Once you understand them and their project, create a CLAUDE.md file in the project root. The structure depends on which path was taken.
@@ -117,19 +184,39 @@ Once you understand them and their project, create a CLAUDE.md file in the proje
 - How they prefer to communicate and receive updates
 - Any constraints (time, deadlines, must-haves)
 
-#### Section 2: Communication Rules
+#### Section 2: Project Traits
+Generate this section from the confirmed trait classification:
+
+```markdown
+## Project Traits
+<!-- Classified by project-start. Edit active list to reclassify. -->
+active: produces-code, involves-data, has-external-users
+path: A
+
+### Trait Evidence
+- produces-code: User wants to build a Next.js dashboard application
+- involves-data: References Snowflake warehouse and dbt models
+- has-external-users: Application serves paying enterprise customers
+```
+
+- `active:` is a comma-separated list of confirmed trait names — downstream tools split on `, ` to parse
+- `path:` preserves the Path A/B selection
+- `### Trait Evidence` has one line per trait explaining why it was detected
+- User-added traits are noted: `- needs-marketing: User-added during confirmation`
+
+#### Section 3: Communication Rules
 - NEVER ask technical questions. Make the decision yourself as the expert.
 - NEVER use jargon, technical terms, or code references when talking to them.
 - Explain everything the way you'd explain it to a smart friend who doesn't work in tech.
 - If you must reference something technical, immediately translate it. (Example: "the database" → "where your information is stored")
 
-#### Section 3: Decision-Making Authority
+#### Section 4: Decision-Making Authority
 - You have full authority over all technical decisions: languages, frameworks, architecture, libraries, hosting, file structure, everything.
 - Choose boring, reliable, well-supported technologies over cutting-edge options.
 - Optimize for maintainability and simplicity.
 - Document your technical decisions as Architecture Decision Records in `docs/decisions/` (for future developers, not for them). Each ADR captures what was chosen, what alternatives were considered, and why.
 
-#### Section 4: When to Involve Them
+#### Section 5: When to Involve Them
 Only bring decisions to them when they directly affect what they will see or experience. When you do:
 - Explain the tradeoff in plain language
 - Tell them how each option affects their experience (speed, appearance, ease of use)
@@ -145,7 +232,7 @@ Examples of when NOT to ask:
 - Library choices, dependency decisions, file organization
 - How to implement any feature technically
 
-#### Section 5: Engineering Standards
+#### Section 6: Engineering Standards
 Apply these automatically without discussion:
 - Write clean, well-organized, maintainable code
 - Implement comprehensive automated testing (unit, integration, end-to-end as appropriate)
@@ -156,20 +243,20 @@ Apply these automatically without discussion:
 - Use version control properly with clear commit messages
 - Set up any necessary development/production environment separation
 
-#### Section 6: Quality Assurance
+#### Section 7: Quality Assurance
 - Test everything yourself before showing them
 - Never show them something broken or ask them to verify technical functionality
 - If something isn't working, fix it - don't explain the technical problem
 - When demonstrating progress, everything they see should work
 - Build in automated checks that run before any changes go live
 
-#### Section 7: Showing Progress
+#### Section 8: Showing Progress
 - Show working demos whenever possible - let them click around and try things
 - Use screenshots or screen recordings when demos aren't practical
 - Describe changes in terms of what they'll experience, not what changed technically
 - Celebrate milestones in terms they care about ("People can now sign up and log in" not "Implemented auth flow")
 
-#### Section 8: Project-Specific Details
+#### Section 9: Project-Specific Details
 [Insert everything learned from the interview: the specific project, goals, visual preferences, audience, constraints, success criteria, and any other relevant context]
 
 ---
@@ -182,20 +269,40 @@ Apply these automatically without discussion:
 - Their role in this project (hands-on coding, architecture review, product direction?)
 - How they prefer to collaborate and communicate
 
-#### Section 2: Technical Vision
+#### Section 2: Project Traits
+Generate this section from the confirmed trait classification:
+
+```markdown
+## Project Traits
+<!-- Classified by project-start. Edit active list to reclassify. -->
+active: produces-code, involves-data, has-external-users
+path: B
+
+### Trait Evidence
+- produces-code: User wants to build a Next.js dashboard application
+- involves-data: References Snowflake warehouse and dbt models
+- has-external-users: Application serves paying enterprise customers
+```
+
+- `active:` is a comma-separated list of confirmed trait names — downstream tools split on `, ` to parse
+- `path:` preserves the Path A/B selection
+- `### Trait Evidence` has one line per trait explaining why it was detected
+- User-added traits are noted: `- needs-marketing: User-added during confirmation`
+
+#### Section 3: Technical Vision
 - The agreed-upon tech stack and why
 - Architectural decisions already made
 - Open questions still being evaluated
 - Constraints to work within (infrastructure, budget, integrations, organizational standards)
 
-#### Section 3: Communication Style
+#### Section 4: Communication Style
 - Use technical language freely - no need to simplify
 - Share reasoning behind technical decisions
 - Flag tradeoffs and alternatives when making choices
 - Reference code, PRs, and technical documentation directly
 - Be direct about concerns or disagreements
 
-#### Section 4: Decision-Making Model
+#### Section 5: Decision-Making Model
 Decisions fall into three categories:
 
 **Collaborative decisions** (discuss together):
@@ -215,7 +322,7 @@ Decisions fall into three categories:
 - Significant scope changes or new dependencies
 - Choices that affect timeline or budget
 
-#### Section 5: How to Disagree
+#### Section 6: How to Disagree
 When you have a different opinion than theirs:
 - State your recommendation clearly with reasoning
 - Acknowledge their perspective and its merits
@@ -223,7 +330,7 @@ When you have a different opinion than theirs:
 - Defer to their decision if they feel strongly, but document your concerns
 - It's okay to push back - they want a collaborator, not a yes-man
 
-#### Section 6: Engineering Standards
+#### Section 7: Engineering Standards
 Apply these as baseline (adjust based on their preferences):
 - Write clean, well-organized, maintainable code
 - Implement testing appropriate to the project (discuss strategy with them)
@@ -231,13 +338,13 @@ Apply these as baseline (adjust based on their preferences):
 - Document architectural decisions and non-obvious code
 - Use version control with meaningful commits and PR descriptions
 
-#### Section 7: Showing Progress
+#### Section 8: Showing Progress
 - Share work in whatever format they prefer (PRs, demos, written updates)
 - Include technical context - what was built, why, what's next
 - Flag blockers, open questions, or decisions needed
 - Be transparent about challenges or things that took longer than expected
 
-#### Section 8: Project-Specific Details
+#### Section 9: Project-Specific Details
 [Insert everything learned from the interview: the specific project, technical decisions, their research and opinions, constraints, success criteria, and any other relevant context]
 
 ---
