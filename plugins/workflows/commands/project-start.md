@@ -276,16 +276,86 @@ After the interview but before writing files, set up the project repo.
 
 ### If `produces-code` Is Active
 
-Extend the baseline `.gitignore` with tech-stack entries based on the interview:
+> **Stack detection**: throughout this section, use `package.json` → Node/JS/TS, `pyproject.toml` or `setup.py` → Python, otherwise apply conventional defaults for the detected languages.
+
+#### 1. Extend `.gitignore`
+
+Add tech-stack entries based on the interview:
 - **Node/Next.js**: `node_modules/`, `.next/`, `dist/`, `.turbo/`
 - **Python**: `__pycache__/`, `.venv/`, `*.pyc`
 - Other stacks: use conventional ignores for the detected languages
 
-Ask if the user has a GitHub remote to add (`git remote add origin <url>`). Note: full GitHub organization setup (branch protection, team access) is handled by BC-1946.
+#### 2. Create GitHub Repository
+
+1. Check `gh auth status` — if it fails, skip to the **Fallback** section below.
+2. Derive the repo name from the project name (slugified, e.g., "My Cool App" → `my-cool-app`).
+3. Confirm with the user: **"Create GitHub repo `Brite-Nites/<repo-name>` (private)?"**
+4. If yes: run `gh repo create Brite-Nites/<repo-name> --private --source . --remote origin`
+5. If no: skip to the **Fallback** section below.
+
+#### 3. Install Pre-Commit Hook
+
+Generate a `.git/hooks/pre-commit` script based on the detected stack. The hook should:
+- Detect project type (`package.json` → JS/TS, `pyproject.toml`/`setup.py` → Python)
+- Get staged files (excluding deleted) via `git diff --cached --name-only --diff-filter=d`
+- **JS/TS projects**: run ESLint on staged `.js/.jsx/.ts/.tsx` files (via `npx --no-install eslint`), then `tsc --noEmit` if `tsconfig.json` exists
+- **Python projects**: run Ruff on staged `.py` files (via `ruff check`)
+- Exit non-zero if any linter fails, zero if all pass or no linters are installed
+- Degrade gracefully: if linters aren't installed, skip silently
+- **All projects**: scan staged file contents for common secret patterns (`sk-proj-`, `AKIA`, `ghp_`, `ghs_`, `sk_live_`, `sk_test_`). If any match, print a warning and exit non-zero. This mirrors the plugin's own PreToolUse secret detection hooks.
+
+Reference `scripts/pre-commit.sh` in the britenites-claude-plugins repo as the canonical pattern. The new project gets a freshly generated hook — do not copy the file directly.
+
+Set executable: `chmod +x .git/hooks/pre-commit`
+
+Also create `scripts/pre-commit.sh` (a committed copy of the hook) so other contributors can install it:
+- For Node projects: suggest adding a `prepare` script in `package.json`: `"prepare": "cp scripts/pre-commit.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit"`
+- For Python projects: add a note in the README or CLAUDE.md: `cp scripts/pre-commit.sh .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit`
+
+#### 4. Create `.vscode/settings.json`
+
+Create `.vscode/settings.json` with baseline settings for all `produces-code` projects:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}
+```
+
+Add stack-specific settings:
+- **Node/Next.js**: add `"eslint.enable": true` and `"typescript.tsdk": "node_modules/typescript/lib"`
+- **Python**: add `"python.analysis.typeCheckingMode": "basic"` and `"editor.defaultFormatter": "charliermarsh.ruff"`
+
+Also create `.vscode/extensions.json` with recommended extensions:
+- **Baseline**: `editorconfig.editorconfig`
+- **Node/Next.js**: `dbaeumer.vscode-eslint`, `esbenp.prettier-vscode`
+- **Python**: `charliermarsh.ruff`, `ms-python.python`
+
+#### 5. Fallback (gh unavailable or org access denied)
+
+If `gh auth status` failed or the user declined repo creation:
+- Warn: "GitHub CLI not available (or org access denied). Falling back to local git setup."
+- Ask if the user has a remote URL to add (`git remote add origin <url>`)
+
+#### 6. Push Initial Commit
+
+Stage only the files created during this setup step — do **not** use `git add -A` or `git add .`, which risk committing secrets or unwanted files. Stage explicitly:
+
+```
+git add .gitignore .vscode/
+```
+
+Plus any other files scaffolded by later steps (e.g., `CLAUDE.md`, `docs/`). Run `git status` to verify nothing unexpected is staged before committing.
+
+- If the repo was created via `gh repo create`: run `git commit -m "Initial commit" && git push -u origin main`
+- Otherwise: run `git commit -m "Initial commit"` (do not auto-push — the user may need to configure the remote first, or there may be no remote)
 
 ### If `produces-code` + `automation` Are Both Active
 
-Note that CI/CD scaffolding is needed — this is handled by BC-1946. Do not scaffold CI/CD in this step.
+Note that CI/CD workflow scaffolding (e.g., `.github/workflows/ci.yml`) is a separate concern.
+If CI/CD is needed, flag it for manual setup or a future issue. Do not scaffold CI/CD in this step.
 
 ---
 
@@ -359,10 +429,10 @@ After scaffolding trait-conditional docs but before generating CLAUDE.md, determ
 
 | Trait(s) | Infrastructure Action | Handled By |
 |----------|----------------------|------------|
-| `produces-code` | Extend `.gitignore` with tech-stack entries; prompt for GitHub remote | Git Setup (above) |
-| `produces-code` + `automation` | Flag CI/CD scaffold needed | BC-1946 [planned] |
+| `produces-code` | Create GitHub repo in Brite-Nites org; extend `.gitignore`; install pre-commit hook; create `.vscode` settings | Git Setup (above) |
+| `produces-code` + `automation` | Flag CI/CD scaffold needed | Future issue |
 | `involves-data` | Verify Snowflake MCP connectivity | BC-1949 [planned] |
-| `has-external-users` | Flag deployment scaffold needed | BC-1946 [planned] |
+| `has-external-users` | Flag deployment scaffold needed | Future issue |
 | `requires-decisions` | Generate ADRs from interview decisions | Generate ADRs (below) |
 
 Traits not listed above (`produces-documents`, `needs-design`, `needs-marketing`, `needs-sales`, `client-facing`, `cross-team`, `automation` solo) require no infrastructure beyond their trait-conditional docs and CLAUDE.md sections. Future domain plugins will handle `needs-design`, `needs-marketing`, and `needs-sales`.
