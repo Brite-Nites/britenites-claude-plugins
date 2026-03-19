@@ -1075,19 +1075,20 @@ Techniques:
 
 After the interview, Claude classifies the project into **traits** that combine freely. A project can have any combination of traits. Traits determine all downstream setup: plugins, documentation, infrastructure, review agents.
 
+<!-- Canonical detection signals: plugins/workflows/commands/project-start.md § Trait Definitions. This table is a design-time snapshot. -->
 | Trait | Detection Signals | What It Activates |
 |-------|-------------------|-------------------|
 | `produces-code` | "build an app", "create a tool", "implement", programming languages mentioned | Git + GitHub repo (Brite-Nites org), CI, CLAUDE.md coding conventions, pre-commit, .vscode |
 | `produces-documents` | "write a plan", "create docs", "report", "proposal" | docs/ scaffold, markdown structure, @imports, brief.md + outline.md templates |
-| `involves-data` | "analyze", "BigQuery", "metrics", "dashboard", "data pipeline" | BigQuery MCP verification, data source configuration, data context in CLAUDE.md |
+| `involves-data` | "analyze", "data warehouse", "Snowflake", "BigQuery", "Redshift", "Databricks", "dashboard"; "metrics" only with data infrastructure co-terms | Snowflake MCP verification, data source configuration, data context in CLAUDE.md |
 | `requires-decisions` | "evaluate", "choose between", "build vs buy", multiple options discussed | docs/decisions/ + ADR template, CDR INDEX @import for conflict checking |
 | `has-external-users` | "customers", "users", "public-facing", "sign up" | Deployment config, monitoring, accessibility requirements, performance budgets |
-| `client-facing` | "client", "deadline", "deliverable", "stakeholder" | Communication cadence, deliverable milestones in Linear, status update templates |
+| `client-facing` | "client", "client deliverable", "external stakeholder", "SOW", "client relationship" (NOT triggered by internal deadlines or stakeholders) | Communication cadence, deliverable milestones in Linear, status update templates |
 | `needs-design` | "brand", "look and feel", "visual", "colors", "palette" | Design plugin activation, `design-context` skill, brand/token context |
 | `needs-marketing` | "launch", "campaign", "audience", "positioning", "landing page" | Marketing plugin activation, `product-marketing-context` skill, ICP/voice context |
 | `needs-sales` | "pricing", "sales deck", "objections", "demo", "proposal" | Sales plugin activation, `sales-context` skill, ICP/competitors context |
 | `cross-team` | "multiple teams", "stakeholders", "org-wide", "cross-functional" | Stakeholder map, broader Linear labels, org structure @import |
-| `automation` | "scheduled", "cron", "pipeline", "CI/CD", "bot", "script" | Script structure, scheduler config, integration testing patterns |
+| `automation` | "scheduled", "cron", "pipeline" (as data/automation pipeline), "bot", "CI/CD" only when it's the project's core purpose | Script structure, scheduler config, integration testing patterns |
 
 ### What Project-Start Generates
 
