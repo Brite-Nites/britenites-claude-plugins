@@ -1103,7 +1103,7 @@ After the interview, Claude classifies the project into **traits** that combine 
 |-------|---------------|---------------|---------|
 | `produces-code` | GitHub repo in Brite-Nites org, `.gitignore`, pre-commit hook, `.vscode/` | `docs/engineering-context.md` | Engineering plugin |
 | `produces-documents` | — | `docs/brief.md`, `docs/outline.md` scaffold | — |
-| `involves-data` | Snowflake MCP verified | Data source noted in CLAUDE.md | — |
+| `involves-data` | Snowflake MCP verified | `docs/data-context.md` | — |
 | `requires-decisions` | — | CDR INDEX @imported for conflict checking | — |
 | `has-external-users` | Deployment scaffold | Accessibility requirements noted | — |
 | `client-facing` | — | Communication cadence in CLAUDE.md | — |

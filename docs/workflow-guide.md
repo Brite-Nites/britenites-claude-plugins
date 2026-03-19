@@ -312,7 +312,7 @@ Autonomy level (A = autonomous, B = collaborative) is orthogonal to traits — i
 | Step | Name | What happens |
 |------|------|-------------|
 | 0 | Determine Technical Level | Choose autonomy level (A or B) |
-| 1 | Conduct Interview | Socratic discovery — 2-5 questions about the project |
+| 1 | Conduct Interview | Three-phase interview (Understand → Define → Classify) with gating to skip Phase 2 for simple projects |
 | 2 | Classify Project Traits | Detect traits from interview with confidence levels, confirm with user |
 | 3 | Git Repository Setup | Baseline (git init, .gitignore) + trait-gated extensions (tech-stack, CI/CD) |
 | 4 | Scaffold Trait-Conditional Documentation | Create docs per trait-to-doc mapping |
