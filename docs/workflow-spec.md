@@ -1299,7 +1299,7 @@ steps:
   - id: 4
     name: "Scaffold Trait-Conditional Documentation"
     required: false
-    skip-condition: "0 active traits after classification"
+    skip-condition: "0 active traits after classification (baseline dirs docs/ and docs/decisions/ are always created regardless of skip)"
     skip-target: 5
     jump-on-fail: null
     activates-skill: null

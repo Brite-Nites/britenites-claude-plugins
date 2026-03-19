@@ -93,12 +93,12 @@ Maps each of the 11 traits to what the PRD says project-start should generate (f
 
 ### Trait Coverage Matrix
 
-<!-- Canonical trait definitions: plugins/workflows/commands/project-start.md § Trait Definitions. This table quotes the PRD at time of analysis. -->
+<!-- Canonical trait definitions: plugins/workflows/commands/project-start.md § Trait Definitions. This table quotes the PRD at time of analysis (2026-03-17). Detection signals and infrastructure details may have been refined since — consult the canonical source for current values. -->
 | Trait | PRD: Documentation to Generate | PRD: Infrastructure | Current Template Section | Gap? |
 |-------|-------------------------------|--------------------|--------------------------|----- |
 | `produces-code` | `docs/engineering-context.md` | GitHub repo, CI, pre-commit, .vscode | Engineering Standards (Sec 7A / 7B) | **Partial** -- section exists but is generic. Missing: CI/deployment specifics, tech stack documentation, pre-commit configuration, .vscode setup details. The template says "write clean code" but doesn't scaffold `engineering-context.md`. |
 | `produces-documents` | `docs/brief.md`, `docs/outline.md` scaffold | -- | -- | **GAP** -- No document structure section. No mention of brief, outline, or document workflow. A `produces-documents` project needs: document purpose/audience, outline structure, review/approval workflow, output format (markdown, PDF, slides). |
-| `involves-data` | Data source noted in CLAUDE.md | BigQuery MCP verified | -- | **GAP** -- No data context section. Should include: data sources and access methods, key tables/models, data freshness expectations, query patterns, warehouse-specific conventions (Snowflake, not BigQuery per BC-2124). |
+| `involves-data` | Data source noted in CLAUDE.md | Warehouse MCP verified | -- | **GAP** -- No data context section. Should include: data sources and access methods, key tables/models, data freshness expectations, query patterns, warehouse-specific conventions (Snowflake, not BigQuery per BC-2124). |
 | `requires-decisions` | CDR INDEX @imported, `docs/decisions/` | -- | Decision-Making (Sec 4A / 5B) | **Partial** -- Decision-making authority exists but covers WHO decides, not HOW to document decisions. Missing: ADR methodology, CDR INDEX reference, evaluation framework templates, decision criteria. |
 | `has-external-users` | Accessibility requirements | Deployment config, monitoring | -- | **GAP** -- No user-facing requirements section. Should include: accessibility standards (WCAG level), performance budgets (LCP, CLS), browser/device support matrix, error handling for end-users, monitoring/alerting thresholds. |
 | `client-facing` | Communication cadence in CLAUDE.md | -- | -- | **GAP** -- No client management section. Should include: client communication cadence (weekly updates, milestone demos), deliverable format expectations, escalation path, status update templates, SOW/timeline references. |

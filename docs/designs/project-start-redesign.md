@@ -104,6 +104,8 @@ Phase 5: Issue Creation
 
 ### Key Insight: Corrected Execution Order
 
+> **V1 deviation:** The V1 implementation (Steps 0-8 in `project-start.md`) does not yet follow this proposed ordering. V1 generates CLAUDE.md at Step 5 (before Plan and ADRs), then patches it when ADRs are generated at Step 8. The full reordering with review gates is planned for Wave 2.
+
 The fundamental ordering change is that **CLAUDE.md is generated LAST among file artifacts** because it references everything else via @imports.
 
 | Step | Current order | Proposed order | Why |
