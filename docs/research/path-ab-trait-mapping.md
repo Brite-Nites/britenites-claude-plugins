@@ -104,7 +104,7 @@ Maps each of the 11 traits to what the PRD says project-start should generate (f
 | `needs-design` | `docs/design-context.md` | Design plugin | -- | **GAP** -- No design approach section. Should include: brand guidelines reference, color palette/tokens, typography choices, component library, design review process, Figma/design tool links. |
 | `needs-marketing` | `docs/marketing-context.md` | Marketing plugin | -- | **GAP** -- No marketing approach section. Should include: target audience/ICP, positioning statement, key messages, channel strategy, launch timeline, competitive context. |
 | `needs-sales` | `docs/sales-context.md` | Sales plugin | -- | **GAP** -- No sales approach section. Should include: ICP definition, competitive landscape, pricing strategy, objection handling, demo script structure, proposal templates. |
-| `cross-team` | `org/stakeholders.md` @imported | -- | -- | **GAP** -- No stakeholder coordination section. Should include: stakeholder map (who cares about what), RACI matrix, communication channels per stakeholder, decision escalation path, cross-team dependency tracking. |
+| `cross-team` | `docs/stakeholders.md` @imported | -- | -- | **GAP** -- No stakeholder coordination section. Should include: stakeholder map (who cares about what), RACI matrix, communication channels per stakeholder, decision escalation path, cross-team dependency tracking. |
 | `automation` | Script/scheduler patterns in CLAUDE.md | -- | -- | **GAP** -- No automation patterns section. Should include: scheduler configuration (cron syntax, trigger conditions), retry/failure handling strategy, logging/monitoring for automated processes, integration points and API contracts. |
 
 ### Gap Summary
@@ -303,7 +303,7 @@ Each section appears only when its controlling trait(s) are active. Content with
 # RACI or responsibility model
 # Cross-team dependency tracking
 # Escalation path
-# @import org/stakeholders.md
+# @import docs/stakeholders.md
 
 ## Automation Patterns                     <!-- trait: automation -->
 # Scheduler configuration (cron expressions, triggers)

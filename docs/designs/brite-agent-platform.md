@@ -1109,7 +1109,7 @@ After the interview, Claude classifies the project into **traits** that combine 
 | `needs-design` | — | `docs/design-context.md` | Design plugin |
 | `needs-marketing` | — | `docs/marketing-context.md` | Marketing plugin |
 | `needs-sales` | — | `docs/sales-context.md` | Sales plugin |
-| `cross-team` | — | `org/stakeholders.md` @imported | — |
+| `cross-team` | — | `docs/stakeholders.md` @imported | — |
 | `automation` | — | Script/scheduler patterns in CLAUDE.md | — |
 
 **Moved OUT of project-start:**
