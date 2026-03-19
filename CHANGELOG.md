@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- Dynamic MCP verification in project-start (BC-1949)
+  - Two-tier: global MCPs (Linear, Sequential-thinking, Context7) + trait-gated (`involves-data` → data warehouse)
+  - Non-blocking WARN with setup instructions; missing MCPs noted in generated CLAUDE.md
+
 ## [3.26.0] - 2026-03-13
 
 ### Added

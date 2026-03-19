@@ -1304,7 +1304,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-    note: "Sub-step 4b: Trait-to-Infrastructure Dispatch. After scaffolding docs, applies trait-gated infrastructure actions (produces-code → .gitignore extensions + GitHub remote; requires-decisions → ADR generation is deferred to Step 8). Planned infrastructure (BC-1946, BC-1949) is flagged but not executed."
+    note: "Sub-step 4b: Trait-to-Infrastructure Dispatch. After scaffolding docs, applies trait-gated infrastructure actions (produces-code → .gitignore extensions + GitHub remote; requires-decisions → ADR generation is deferred to Step 8). Sub-step 4c: MCP Verification (BC-1949). Verifies global + trait-gated MCP connectivity. All failures non-blocking (WARN)."
   - id: 5
     name: "Generate CLAUDE.md"
     required: true
@@ -2160,6 +2160,9 @@ error-handling:
   - failure-point: "Trait label creation fails (Step 6)"
     action: degrade
     detail: "Label creation is best-effort. Skip failed labels silently, continue with remaining traits. Note missing labels for manual creation."
+  - failure-point: "MCP verification fails (Sub-step 4c)"
+    action: degrade
+    detail: "All MCP failures are non-blocking. Record status, present WARN table, continue. Missing MCPs noted in generated CLAUDE.md."
   - failure-point: "ADR trait gate not met (Step 8)"
     action: skip
     detail: "ADR generation skipped. Show: Run /workflows:architecture-decision later."
@@ -2181,7 +2184,7 @@ stages:
     how: "Interview + write + trait dispatch"
     tier: [1, 2]
     status: implemented
-    note: "Infrastructure gates: .gitignore extensions (produces-code), GitHub remote (produces-code), CI/CD flag (produces-code + automation), Snowflake MCP (involves-data), deployment flag (has-external-users), ADR generation (requires-decisions or produces-code with 2+ decisions)"
+    note: "Infrastructure gates: .gitignore extensions (produces-code), GitHub remote (produces-code), CI/CD flag (produces-code + automation), data warehouse MCP verification (involves-data), deployment flag (has-external-users), ADR generation (requires-decisions or produces-code with 2+ decisions)"
 
   - stage: session-start
     skill: session-start.md

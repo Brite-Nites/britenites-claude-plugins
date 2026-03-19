@@ -315,7 +315,7 @@ Autonomy level (A = autonomous, B = collaborative) is orthogonal to traits — i
 | 1 | Conduct Interview | Three-phase interview (Understand → Define → Classify) with gating to skip Phase 2 for simple projects |
 | 2 | Classify Project Traits | Detect traits from interview with confidence levels, confirm with user |
 | 3 | Git Repository Setup | Baseline (git init, .gitignore) + trait-gated extensions (tech-stack, CI/CD) |
-| 4 | Scaffold Trait-Conditional Documentation | Create docs per trait-to-doc mapping |
+| 4 | Scaffold Docs + Verify MCPs | Create docs per trait-to-doc mapping; verify global + trait-gated MCP connectivity |
 | 5 | Generate CLAUDE.md | Always-include sections + trait-conditional + autonomy-conditional |
 | 6 | Create Linear Project | Project + `trait:<name>` labels (skipped if Linear unavailable) |
 | 7 | Write Project Plan | `docs/project-plan-v1.md` |
