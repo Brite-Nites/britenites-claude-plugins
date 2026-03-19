@@ -22,7 +22,7 @@ You are my dedicated software engineer. Before we build anything, conduct a thor
 | `cross-team` | Business | Project spans multiple teams or serves the whole organization | "multiple teams", "stakeholders", "org-wide", "shared infrastructure" |
 | `automation` | Technical | Project's PRIMARY purpose is automation — pipelines, scheduled jobs, bots. NOT projects that merely use CI/CD as supporting infrastructure. | "scheduled", "cron", "pipeline" (as data/automation pipeline), "bot", "CI/CD" only when it's the project's core purpose |
 
-## Step 1: Determine Technical Level
+## Step 0: Determine Technical Level
 
 **Start by asking this question first** using the AskUserQuestion tool:
 
@@ -113,11 +113,6 @@ Batch-analyze the completed interview against the trait definition table above. 
 - **Medium** — 1 signal, or ambiguous/indirect signal
 - **Low** — Inferred from context with no direct signal
 
-**Signal accuracy overrides** (from BC-2124 validation):
-- `involves-data`: The word "metrics" alone does NOT trigger this trait. It requires co-occurrence with data infrastructure terms ("warehouse", "pipeline", "ETL", "dbt", "Snowflake").
-- `client-facing`: Generic mentions of "deadline" or "stakeholder" do NOT trigger this trait. It requires explicit external client signals ("client deliverable", "SOW", "external stakeholder").
-- `automation`: "CI/CD" only triggers this trait when it is the project's PRIMARY purpose, not when it is supporting infrastructure for another project type.
-
 Auto-detect all High and Medium confidence traits. Present Low confidence traits as optional "possible" additions.
 
 ### Present Traits
@@ -167,16 +162,11 @@ Hold the following in conversation context for use by downstream steps (CLAUDE.m
 
 ### Trait Interface Contract
 
-> **Full contract**: See `docs/workflow-spec.md` Section 3d for the machine-readable parsing algorithm and consumer list.
+> **Full contract**: See `docs/workflow-spec.md` Section 3d for the machine-readable parsing algorithm, invariants, and consumer list.
 
-**Invariants (must hold for downstream tools to parse correctly):**
-- `active:` is always a single line (never multi-line)
-- Trait names are kebab-case, from the fixed set of 11
-- Delimiter is always `, ` (comma followed by a single space)
-- Every active trait has a corresponding evidence line
-- `autonomy:` is always `A` or `B`
+**Key rule**: `active:` is always a single comma-space-delimited line of kebab-case trait names from the fixed set of 11.
 
-**Example (canonical template):**
+**Canonical template:**
 
 ```markdown
 ## Project Traits
@@ -296,17 +286,12 @@ After scaffolding trait-conditional docs but before generating CLAUDE.md, determ
 | Trait(s) | Infrastructure Action | Handled By |
 |----------|----------------------|------------|
 | `produces-code` | Extend `.gitignore` with tech-stack entries; prompt for GitHub remote | Git Setup (above) |
-| `produces-code` + `automation` | Flag CI/CD scaffold needed | BC-1946 |
-| `involves-data` | Verify Snowflake MCP connectivity | BC-1949 |
-| `has-external-users` | Flag deployment scaffold needed | BC-1946 |
+| `produces-code` + `automation` | Flag CI/CD scaffold needed | BC-1946 [planned] |
+| `involves-data` | Verify Snowflake MCP connectivity | BC-1949 [planned] |
+| `has-external-users` | Flag deployment scaffold needed | BC-1946 [planned] |
 | `requires-decisions` | Generate ADRs from interview decisions | Generate ADRs (below) |
-| `needs-design` | Activate design plugin | Future |
-| `needs-marketing` | Activate marketing plugin | Future |
-| `needs-sales` | Activate sales plugin | Future |
-| `produces-documents` | No infra beyond docs/CLAUDE.md | — |
-| `client-facing` | No infra beyond docs/CLAUDE.md | — |
-| `cross-team` | No infra beyond docs/CLAUDE.md | — |
-| `automation` (solo) | No infra beyond docs/CLAUDE.md | — |
+
+Traits not listed above (`produces-documents`, `needs-design`, `needs-marketing`, `needs-sales`, `client-facing`, `cross-team`, `automation` solo) require no infrastructure beyond their trait-conditional docs and CLAUDE.md sections. Future domain plugins will handle `needs-design`, `needs-marketing`, and `needs-sales`.
 
 **Infrastructure gating rule**: Before executing any infrastructure step (Git setup extensions, ADR generation, CI/CD scaffolding), verify that at least one trait in the active set justifies it. If no trait maps to the step, skip it with a note explaining why.
 
@@ -481,6 +466,7 @@ For each confirmed trait in the active trait list, create Linear labels so downs
    - `name`: `trait:<trait-name>` (e.g., `trait:produces-code`)
    - `parent`: `"Trait"` (the group created above)
    - `team`: The team from the project creation step
+   - **Parallelization**: These calls are independent — issue all `create_issue_label` calls in parallel (multiple tool calls in a single response).
 4. **Idempotency**: If a label already exists (error from Linear), skip silently and continue with the next trait.
 5. **Apply labels to the project**: Call `save_project` to update the project with the created trait labels.
 

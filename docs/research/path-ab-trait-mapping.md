@@ -29,7 +29,7 @@ All 18 sections across both paths, categorized by when they should appear.
 | # | Path A Section | Path B Section | Category | Controlling Trait(s) | Notes |
 |---|----------------|----------------|----------|---------------------|-------|
 | 1 | User Profile | Collaborator Profile | Always (autonomy-varied) | -- | Same purpose, different framing. A: goals in plain language, constraints. B: technical background, preferred technologies, role in project. |
-| 2 | Project Traits | Project Traits | Always (identical) | -- | Identical structure in both paths. Lists `active:` traits, `path:`, and trait evidence. |
+| 2 | Project Traits | Project Traits | Always (identical) | -- | Identical structure in both paths. Lists `active:` traits, `autonomy:`, and trait evidence. |
 | 3 | Communication Rules | Communication Style | Always (autonomy-varied) | -- | A: never use jargon, translate technical terms. B: use technical language freely, share reasoning. |
 | 4 | Decision-Making Authority | Decision-Making Model | Always (autonomy-varied) | -- | A: full technical authority, choose boring tech, document as ADRs. B: three-tier model (collaborative / autonomous / deferred). |
 | 5 | When to Involve Them | -- | Autonomy-conditional (A only) | -- | When to surface decisions to non-technical users. Includes examples of ask/don't-ask. |

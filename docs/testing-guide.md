@@ -126,7 +126,10 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Test | Command | Setup | Steps | Expected |
 |------|---------|-------|-------|----------|
 | T3.13 | `/workflows:create-plugin` | In the plugin repo | Run with `test-plugin` → provide description → scaffold created → validate.sh passes | Verify: `plugins/test-plugin/` created, marketplace.json updated, validation passes. **Cleanup:** remove `plugins/test-plugin/`, revert marketplace.json |
-| T3.14 | `/workflows:project-start` | `mkdir /tmp/test-project && cd /tmp/test-project` | Run → select "Technical collaborator" → answer 2-3 questions | Abort before file creation. Verify: interview follows Path B |
+| T3.14 | `/workflows:project-start` | `mkdir /tmp/test-project && cd /tmp/test-project` | Run → select "Technical collaborator" → answer 2-3 questions about building an API | Abort after trait confirmation. Verify: autonomy set to B, `produces-code` detected (High), trait confirmation prompt shown |
+| T3.14a | `/workflows:project-start` (code-heavy) | `mkdir /tmp/test-api && cd /tmp/test-api` | Run → describe "Build an internal API with scheduled jobs" → complete interview → confirm traits | Verify: traits = `produces-code` (High), `automation` (Medium). Git: baseline + tech-stack .gitignore + CI/CD flag. Docs: `docs/engineering-context.md`, `docs/automation-patterns.md`. CLAUDE.md: Always-include (6) + Engineering Standards + Automation Patterns. Labels: `trait:produces-code`, `trait:automation`. ADR gate: met. **Cleanup:** `rm -rf /tmp/test-api` |
+| T3.14b | `/workflows:project-start` (doc-heavy) | `mkdir /tmp/test-marketing && cd /tmp/test-marketing` | Run → describe "Write a marketing plan for product launch" → complete interview → confirm traits | Verify: traits = `produces-documents` (High), `needs-marketing` (High). Git: baseline only (no tech-stack extensions). Docs: `docs/brief.md`, `docs/outline.md`, `docs/marketing-context.md`. CLAUDE.md: Always-include (6) + Document Structure + Marketing Context, NO Engineering Standards. Labels: `trait:produces-documents`, `trait:needs-marketing`. ADR gate: NOT met — skipped. **Cleanup:** `rm -rf /tmp/test-marketing` |
+| T3.14c | `/workflows:project-start` (multi-trait) | `mkdir /tmp/test-portal && cd /tmp/test-portal` | Run → describe "Build a customer portal with brand design" → complete interview → confirm traits | Verify: traits = `produces-code` (High), `has-external-users` (High), `needs-design` (Medium+). `client-facing` NOT auto-detected. Git: baseline + tech-stack .gitignore. Docs: `docs/engineering-context.md`, `docs/user-requirements.md`, `docs/design-context.md`. CLAUDE.md: Always-include (6) + Engineering Standards + User-Facing Requirements + Design Approach. Labels: `trait:produces-code`, `trait:has-external-users`, `trait:needs-design`. **Cleanup:** `rm -rf /tmp/test-portal` |
 | T3.15 | `/workflows:setup-claude-md` | Any project | Run | CLAUDE.md generated/updated with required sections. Agent dispatched |
 
 ### Visual Commands (generates HTML files)
@@ -177,7 +180,13 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 **Prerequisites:** Empty directory, Linear MCP
 
 1. `/workflows:project-start` → complete full interview
-2. Verify: CLAUDE.md created, `docs/project-plan-v1.md` created, Linear project created
+2. Verify trait classification and scaffolding:
+   - Trait classification shown with confidence levels (High/Medium/Low)
+   - `## Project Traits` section in CLAUDE.md with active trait list, autonomy level, and per-trait evidence
+   - Trait-conditional docs scaffolded per trait-to-doc mapping (e.g., `docs/engineering-context.md` for `produces-code`)
+   - Linear `trait:<name>` labels created for each active trait
+   - CLAUDE.md structure: always-include sections (6) + trait-conditional sections + autonomy-conditional sections (Technical Vision only if Autonomy B)
+   - `docs/project-plan-v1.md` created, Linear project created
 3. `/workflows:post-plan-setup` → refine-plan runs → approve → create-issues runs → approve → setup-claude-md runs → approve
 4. Verify: `docs/project-plan-refined.md` exists, Linear issues created with dependencies, CLAUDE.md updated
 
@@ -275,11 +284,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/13
-Layer 3 (Commands):   __/31
+Layer 3 (Commands):   __/34
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/25
 
-Total:  __/85
+Total:  __/88
 Notes:  ____
 ```
