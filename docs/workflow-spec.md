@@ -1259,10 +1259,11 @@ steps:
 <!-- spec:steps:project-start -->
 ```yaml
 command: project-start
+note: "Step ordering reflects the current implementation. The design doc (docs/designs/project-start-redesign.md) proposes a reordered flow — that will be applied in Wave 2 sub-issues of BC-1942."
 prereqs:
   - "None — project-start initializes from scratch"
 steps:
-  - id: 1
+  - id: 0
     name: "Determine Technical Level"
     required: true
     skip-condition: null
@@ -1270,7 +1271,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 2
+  - id: 1
     name: "Conduct Interview"
     required: true
     skip-condition: null
@@ -1278,7 +1279,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 3
+  - id: 2
     name: "Classify Project Traits"
     required: true
     skip-condition: null
@@ -1286,7 +1287,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 4
+  - id: 3
     name: "Git Repository Setup"
     required: true
     skip-condition: null
@@ -1295,15 +1296,15 @@ steps:
     activates-skill: null
     visual-gating: false
     note: "Baseline (git init, minimal .gitignore) is unconditional. Tech-stack .gitignore extensions and GitHub remote prompt gated on produces-code. CI/CD flag gated on produces-code + automation."
-  - id: 5
+  - id: 4
     name: "Scaffold Trait-Conditional Documentation"
     required: false
     skip-condition: "0 active traits after classification"
-    skip-target: 6
+    skip-target: 5
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 6
+  - id: 5
     name: "Generate CLAUDE.md"
     required: true
     skip-condition: null
@@ -1311,15 +1312,15 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 7
+  - id: 6
     name: "Create Linear Project"
     required: false
     skip-condition: "Linear MCP inaccessible"
-    skip-target: 8
+    skip-target: 7
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 8
+  - id: 7
     name: "Write Project Plan"
     required: true
     skip-condition: null
@@ -1327,7 +1328,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-  - id: 9
+  - id: 8
     name: "Generate ADRs"
     required: false
     skip-condition: "requires-decisions not active AND (produces-code not active OR interview produced fewer than 2 major technical decisions)"
@@ -2136,25 +2137,28 @@ error-handling:
 ```yaml
 command: project-start
 error-handling:
-  - failure-point: "Technical level question unanswered (Step 1)"
+  - failure-point: "Technical level question unanswered (Step 0)"
     action: escalate
     detail: "Re-ask with simplified options. Default to Autonomy A if no response after 2 attempts."
-  - failure-point: "Interview stalls or user disengages (Step 2)"
+  - failure-point: "Interview stalls or user disengages (Step 1)"
     action: degrade
     detail: "Summarize what's been gathered, confirm it's enough to proceed, skip remaining questions."
-  - failure-point: "0 traits detected after interview (Step 3)"
+  - failure-point: "0 traits detected after interview (Step 2)"
     action: escalate
     detail: "Suggest 2-3 plausible Low-confidence traits based on conversation. AskUserQuestion to confirm."
-  - failure-point: "Git init fails (Step 4)"
+  - failure-point: "Git init fails (Step 3)"
     action: escalate
     detail: "AskUserQuestion: Retry / Skip git setup and proceed with file creation / Stop"
-  - failure-point: "Trait-conditional doc write fails (Step 5)"
+  - failure-point: "Trait-conditional doc write fails (Step 4)"
     action: degrade
     detail: "Log failed file, continue with remaining docs. Note missing doc in manifest."
-  - failure-point: "Linear MCP inaccessible (Step 7)"
+  - failure-point: "Linear MCP inaccessible (Step 6)"
     action: skip
     detail: "Skip Linear project creation. Note: user should create project manually."
-  - failure-point: "ADR trait gate not met (Step 9)"
+  - failure-point: "Trait label creation fails (Step 6)"
+    action: degrade
+    detail: "Label creation is best-effort. Skip failed labels silently, continue with remaining traits. Note missing labels for manual creation."
+  - failure-point: "ADR trait gate not met (Step 8)"
     action: skip
     detail: "ADR generation skipped. Show: Run /workflows:architecture-decision later."
 ```

@@ -36,7 +36,7 @@ All 18 sections across both paths, categorized by when they should appear.
 | 6 | -- | How to Disagree | Autonomy-conditional (B only) | -- | Protocol for technical disagreements with collaborator. |
 | 7 | Engineering Standards | Engineering Standards | Trait-conditional (autonomy-varied) | `produces-code` | A: apply automatically, comprehensive testing, security, maintainability. B: baseline standards, adjust based on collaborator preferences. |
 | 8 | Quality Assurance | -- | Trait-conditional (A only) | `produces-code` | Never show broken things, test before demoing, automated checks. Only makes sense for A because B collaborators can handle broken states. |
-| 9 | -- | Technical Vision | Trait-conditional (B only) | `produces-code` + `requires-decisions` | Agreed tech stack, architectural decisions, open questions, constraints. Only B because A users don't engage with tech stack discussions. |
+| 9 | -- | Technical Vision | Trait-conditional (B only) | `produces-code` (+ autonomy B) | Agreed tech stack, architectural decisions, open questions, constraints. Only B because A users don't engage with tech stack discussions. |
 | 10 | Showing Progress | Showing Progress | Always (autonomy-varied) | -- | A: working demos, screenshots, experience-terms. B: PRs, technical context, blockers, transparency. |
 | 11 | Project-Specific Details | Project-Specific Details | Always (identical purpose) | -- | Catch-all for interview context. Same structure, different content emphasis. |
 
@@ -93,6 +93,7 @@ Maps each of the 11 traits to what the PRD says project-start should generate (f
 
 ### Trait Coverage Matrix
 
+<!-- Canonical trait definitions: plugins/workflows/commands/project-start.md § Trait Definitions. This table quotes the PRD at time of analysis. -->
 | Trait | PRD: Documentation to Generate | PRD: Infrastructure | Current Template Section | Gap? |
 |-------|-------------------------------|--------------------|--------------------------|----- |
 | `produces-code` | `docs/engineering-context.md` | GitHub repo, CI, pre-commit, .vscode | Engineering Standards (Sec 7A / 7B) | **Partial** -- section exists but is generic. Missing: CI/deployment specifics, tech stack documentation, pre-commit configuration, .vscode setup details. The template says "write clean code" but doesn't scaffold `engineering-context.md`. |

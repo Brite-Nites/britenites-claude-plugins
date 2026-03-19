@@ -167,40 +167,18 @@ Hold the following in conversation context for use by downstream steps (CLAUDE.m
 
 ### Trait Interface Contract
 
-> **Contract for downstream consumers**: BC-1944 (context-skill standard), BC-1945 (dynamic @imports), BC-1966 (plugin discovery).
+> **Full contract**: See `docs/workflow-spec.md` Section 3d for the machine-readable parsing algorithm and consumer list.
 
-The `## Project Traits` section in the generated CLAUDE.md is a machine-readable interface. Downstream tools parse it using this algorithm:
-
-1. **Find** the `active:` line inside `## Project Traits`
-2. **Split** on `, ` (comma-space) to get an array of trait names
-3. **Validate** each name against the 11 canonical traits: `produces-code`, `produces-documents`, `involves-data`, `requires-decisions`, `has-external-users`, `client-facing`, `needs-design`, `needs-marketing`, `needs-sales`, `cross-team`, `automation`
-4. **Read** the `autonomy:` line to get `A` or `B`
-5. **Parse** `### Trait Evidence` — one line per active trait in `- <trait-name>: <reason>` format
-
-**Invariants:**
+**Invariants (must hold for downstream tools to parse correctly):**
 - `active:` is always a single line (never multi-line)
 - Trait names are kebab-case, from the fixed set of 11
 - Delimiter is always `, ` (comma followed by a single space)
 - Every active trait has a corresponding evidence line
 - `autonomy:` is always `A` or `B`
 
-**Examples:**
+**Example (canonical template):**
 
-Minimal (1 trait):
-
-```
-## Project Traits
-<!-- Classified by project-start. Edit active list to reclassify. -->
-active: produces-documents
-autonomy: A
-
-### Trait Evidence
-- produces-documents: User wants to create a strategic plan for Q3
-```
-
-Typical (3 traits):
-
-```
+```markdown
 ## Project Traits
 <!-- Classified by project-start. Edit active list to reclassify. -->
 active: produces-code, involves-data, has-external-users
@@ -212,40 +190,6 @@ autonomy: B
 - has-external-users: Dashboard serves enterprise clients
 ```
 
-Max breadth (7 traits):
-
-```
-## Project Traits
-<!-- Classified by project-start. Edit active list to reclassify. -->
-active: produces-code, produces-documents, involves-data, requires-decisions, has-external-users, needs-design, cross-team
-autonomy: B
-
-### Trait Evidence
-- produces-code: Full-stack Next.js application with API routes
-- produces-documents: API documentation and onboarding guides
-- involves-data: Snowflake analytics pipeline with dbt transformations
-- requires-decisions: Evaluating auth providers and hosting options
-- has-external-users: Public-facing SaaS product
-- needs-design: Brand refresh with new design system
-- cross-team: Involves engineering, design, and data teams
-```
-
-### Project Traits Section Template
-
-Both autonomy levels use the same Project Traits section in the generated CLAUDE.md. Generate it from the confirmed trait classification:
-
-```markdown
-## Project Traits
-<!-- Classified by project-start. Edit active list to reclassify. -->
-active: produces-code, involves-data, has-external-users
-autonomy: A
-
-### Trait Evidence
-- produces-code: User wants to build a Next.js dashboard application
-- involves-data: References Snowflake warehouse and dbt models
-- has-external-users: Application serves paying enterprise customers
-```
-
 - `active:` is a comma-separated list of confirmed trait names — downstream tools split on `, ` to parse
 - `autonomy:` set to A or B based on the interview
 - `### Trait Evidence` has one line per trait explaining why it was detected
@@ -253,11 +197,37 @@ autonomy: A
 
 ---
 
+## Git Repository Setup
+
+After the interview but before writing files, set up the project repo.
+
+### Baseline (All Projects)
+
+1. **If no git repo exists** (`git rev-parse --is-inside-work-tree` fails):
+   - `git init`
+   - Create a minimal `.gitignore`: `.DS_Store`, `.env`, `*.swp`
+   - Initial commit: `git commit --allow-empty -m "Initial commit"`
+
+2. **If a repo exists**: Verify it's clean and on the default branch.
+
+### If `produces-code` Is Active
+
+Extend the baseline `.gitignore` with tech-stack entries based on the interview:
+- **Node/Next.js**: `node_modules/`, `.next/`, `dist/`, `.turbo/`
+- **Python**: `__pycache__/`, `.venv/`, `*.pyc`
+- Other stacks: use conventional ignores for the detected languages
+
+Ask if the user has a GitHub remote to add (`git remote add origin <url>`). Note: full GitHub organization setup (branch protection, team access) is handled by BC-1946.
+
+### If `produces-code` + `automation` Are Both Active
+
+Note that CI/CD scaffolding is needed — this is handled by BC-1946. Do not scaffold CI/CD in this step.
+
+---
+
 ## Scaffold Trait-Conditional Documentation
 
-After traits are confirmed, scaffold documentation files based on the active trait set. These files hold detailed context that CLAUDE.md will later `@import`, keeping CLAUDE.md within its ~100 line budget.
-
-> **Prerequisite**: If Git Repository Setup has not yet occurred (greenfield project), perform it first before creating any files. This ensures all scaffolded docs are tracked from the start.
+After Git setup, scaffold documentation files based on the active trait set. These files hold detailed context that CLAUDE.md will later `@import`, keeping CLAUDE.md within its ~100 line budget.
 
 ### Baseline (Always Created)
 
@@ -325,7 +295,7 @@ After scaffolding trait-conditional docs but before generating CLAUDE.md, determ
 
 | Trait(s) | Infrastructure Action | Handled By |
 |----------|----------------------|------------|
-| `produces-code` | Extend `.gitignore` with tech-stack entries; prompt for GitHub remote | Git Setup (below) |
+| `produces-code` | Extend `.gitignore` with tech-stack entries; prompt for GitHub remote | Git Setup (above) |
 | `produces-code` + `automation` | Flag CI/CD scaffold needed | BC-1946 |
 | `involves-data` | Verify Snowflake MCP connectivity | BC-1949 |
 | `has-external-users` | Flag deployment scaffold needed | BC-1946 |
@@ -491,34 +461,6 @@ Inline note: teams involved, key stakeholders, and coordination cadence from int
 Inline note: what's being automated, trigger/schedule, and integration points from interview.
 @docs/automation-patterns.md
 
----
-
-## Git Repository Setup
-
-After the interview but before writing files, set up the project repo.
-
-### Baseline (All Projects)
-
-1. **If no git repo exists** (`git rev-parse --is-inside-work-tree` fails):
-   - `git init`
-   - Create a minimal `.gitignore`: `.DS_Store`, `.env`, `*.swp`
-   - Initial commit: `git commit --allow-empty -m "Initial commit"`
-
-2. **If a repo exists**: Verify it's clean and on the default branch.
-
-### If `produces-code` Is Active
-
-Extend the baseline `.gitignore` with tech-stack entries based on the interview:
-- **Node/Next.js**: `node_modules/`, `.next/`, `dist/`, `.turbo/`
-- **Python**: `__pycache__/`, `.venv/`, `*.pyc`
-- Other stacks: use conventional ignores for the detected languages
-
-Ask if the user has a GitHub remote to add (`git remote add origin <url>`). Note: full GitHub organization setup (branch protection, team access) is handled by BC-1946.
-
-### If `produces-code` + `automation` Are Both Active
-
-Note that CI/CD scaffolding is needed — this is handled by BC-1946. Do not scaffold CI/CD in this step.
-
 ## Create Linear Project
 
 Use the Linear MCP to create a project for tracking this work:
@@ -528,6 +470,21 @@ Use the Linear MCP to create a project for tracking this work:
 3. **Note the project ID** — downstream skills (`/workflows:create-issues`) will use it.
 
 If Linear MCP isn't accessible, skip and note that the user should create the project manually.
+
+### Create Trait Labels
+
+For each confirmed trait in the active trait list, create Linear labels so downstream workflows (`session-start`, `create-issues`) can tag issues by trait:
+
+1. **List existing labels**: Call `list_issue_labels` for the team to check what already exists.
+2. **Create a label group** (if it doesn't exist): `create_issue_label` with `name: "Trait"`, `isGroup: true`, `team: <team name>`.
+3. **For each active trait**, call `create_issue_label` with:
+   - `name`: `trait:<trait-name>` (e.g., `trait:produces-code`)
+   - `parent`: `"Trait"` (the group created above)
+   - `team`: The team from the project creation step
+4. **Idempotency**: If a label already exists (error from Linear), skip silently and continue with the next trait.
+5. **Apply labels to the project**: Call `save_project` to update the project with the created trait labels.
+
+If Linear MCP isn't accessible, skip with a note that trait labels should be created manually.
 
 ## Write the Project Plan
 
