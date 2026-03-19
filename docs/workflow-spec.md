@@ -1254,6 +1254,89 @@ steps:
     visual-gating: false
 ```
 
+### 2h. project-start
+
+<!-- spec:steps:project-start -->
+```yaml
+command: project-start
+prereqs:
+  - "None — project-start initializes from scratch"
+steps:
+  - id: 1
+    name: "Determine Technical Level"
+    required: true
+    skip-condition: null
+    skip-target: null
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 2
+    name: "Conduct Interview"
+    required: true
+    skip-condition: null
+    skip-target: null
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 3
+    name: "Classify Project Traits"
+    required: true
+    skip-condition: null
+    skip-target: null
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 4
+    name: "Git Repository Setup"
+    required: true
+    skip-condition: null
+    skip-target: null
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+    note: "Baseline (git init, minimal .gitignore) is unconditional. Tech-stack .gitignore extensions and GitHub remote prompt gated on produces-code. CI/CD flag gated on produces-code + automation."
+  - id: 5
+    name: "Scaffold Trait-Conditional Documentation"
+    required: false
+    skip-condition: "0 active traits after classification"
+    skip-target: 6
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 6
+    name: "Generate CLAUDE.md"
+    required: true
+    skip-condition: null
+    skip-target: null
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 7
+    name: "Create Linear Project"
+    required: false
+    skip-condition: "Linear MCP inaccessible"
+    skip-target: 8
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 8
+    name: "Write Project Plan"
+    required: true
+    skip-condition: null
+    skip-target: null
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+  - id: 9
+    name: "Generate ADRs"
+    required: false
+    skip-condition: "requires-decisions not active AND (produces-code not active OR interview produced fewer than 2 major technical decisions)"
+    skip-target: null
+    jump-on-fail: null
+    activates-skill: null
+    visual-gating: false
+```
+
 ---
 
 ## 3. Cross-Skill Contracts
@@ -1520,6 +1603,24 @@ artifacts:
     producer: create-issues
     consumers: []
     persistence: permanent
+
+  - id: project-traits
+    path: "CLAUDE.md (## Project Traits section)"
+    producer: "project-start (command)"
+    consumers: ["BC-1944 (context-skill standard)", "BC-1945 (dynamic @imports)", "BC-1966 (plugin discovery)"]
+    persistence: permanent
+
+  - id: v1-plan
+    path: "docs/project-plan-v1.md"
+    producer: "project-start (command)"
+    consumers: [post-plan-setup, refine-plan]
+    persistence: permanent
+
+  - id: trait-conditional-docs
+    path: "docs/<trait-specific>.md"
+    producer: "project-start (command)"
+    consumers: ["session-start (via @import)", "BC-1945 (dynamic @imports)"]
+    persistence: permanent
 ```
 
 ### 3c. Post-Plan Chain
@@ -1562,6 +1663,40 @@ sequence:
       - "CLAUDE.md in project root"
     requires:
       - "claude-code-best-practices.md reference readable"
+```
+
+### 3d. Project-Start Chain
+
+<!-- spec:contract:project-start-chain -->
+```yaml
+chain: project-start
+trait-interface:
+  format:
+    active: "comma-space separated trait names on a single line"
+    autonomy: "A or B"
+    evidence: "one line per active trait in ### Trait Evidence"
+  valid-traits:
+    - produces-code
+    - produces-documents
+    - involves-data
+    - requires-decisions
+    - has-external-users
+    - client-facing
+    - needs-design
+    - needs-marketing
+    - needs-sales
+    - cross-team
+    - automation
+  consumers:
+    - "BC-1944 (context-skill standard): reads active traits to select domain-specific context"
+    - "BC-1945 (dynamic @imports): reads active traits to resolve trait-conditional @imports"
+    - "BC-1966 (plugin discovery): reads active traits to activate domain plugins"
+  invariants:
+    - "active: is always a single line"
+    - "Trait names are kebab-case from the fixed set of 11"
+    - "Delimiter is always comma-space (, )"
+    - "Every active trait has an evidence line"
+    - "autonomy: is always A or B"
 ```
 
 ---
@@ -1997,6 +2132,33 @@ error-handling:
     detail: "Skip CLAUDE.md update, note: add @import when CLAUDE.md is created"
 ```
 
+<!-- spec:errors:project-start -->
+```yaml
+command: project-start
+error-handling:
+  - failure-point: "Technical level question unanswered (Step 1)"
+    action: escalate
+    detail: "Re-ask with simplified options. Default to Autonomy A if no response after 2 attempts."
+  - failure-point: "Interview stalls or user disengages (Step 2)"
+    action: degrade
+    detail: "Summarize what's been gathered, confirm it's enough to proceed, skip remaining questions."
+  - failure-point: "0 traits detected after interview (Step 3)"
+    action: escalate
+    detail: "Suggest 2-3 plausible Low-confidence traits based on conversation. AskUserQuestion to confirm."
+  - failure-point: "Git init fails (Step 4)"
+    action: escalate
+    detail: "AskUserQuestion: Retry / Skip git setup and proceed with file creation / Stop"
+  - failure-point: "Trait-conditional doc write fails (Step 5)"
+    action: degrade
+    detail: "Log failed file, continue with remaining docs. Note missing doc in manifest."
+  - failure-point: "Linear MCP inaccessible (Step 7)"
+    action: skip
+    detail: "Skip Linear project creation. Note: user should create project manually."
+  - failure-point: "ADR trait gate not met (Step 9)"
+    action: skip
+    detail: "ADR generation skipped. Show: Run /workflows:architecture-decision later."
+```
+
 ## 6. Context Loading Cascade
 
 Authoritative specification for when context loads during the inner loop. Governs what each stage should load and at what tier. See `docs/designs/BRI-2006-context-loading-cascade.md` for rationale and design decisions.
@@ -2009,10 +2171,11 @@ principle: "Load context at the narrowest scope that still informs the decision"
 stages:
   - stage: project-start
     skill: project-start.md
-    what-loads: "Trait classification, CLAUDE.md generation with @imports"
-    how: "Interview + write"
+    what-loads: "Trait classification, trait-conditional infrastructure, CLAUDE.md generation with @imports"
+    how: "Interview + write + trait dispatch"
     tier: [1, 2]
     status: implemented
+    note: "Infrastructure gates: .gitignore extensions (produces-code), GitHub remote (produces-code), CI/CD flag (produces-code + automation), Snowflake MCP (involves-data), deployment flag (has-external-users), ADR generation (requires-decisions or produces-code with 2+ decisions)"
 
   - stage: session-start
     skill: session-start.md

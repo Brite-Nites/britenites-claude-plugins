@@ -165,6 +165,71 @@ Hold the following in conversation context for use by downstream steps (CLAUDE.m
 - **Autonomy level** — still relevant, preserved alongside traits
 - **Evidence map** — one line per trait explaining why it was detected
 
+### Trait Interface Contract
+
+> **Contract for downstream consumers**: BC-1944 (context-skill standard), BC-1945 (dynamic @imports), BC-1966 (plugin discovery).
+
+The `## Project Traits` section in the generated CLAUDE.md is a machine-readable interface. Downstream tools parse it using this algorithm:
+
+1. **Find** the `active:` line inside `## Project Traits`
+2. **Split** on `, ` (comma-space) to get an array of trait names
+3. **Validate** each name against the 11 canonical traits: `produces-code`, `produces-documents`, `involves-data`, `requires-decisions`, `has-external-users`, `client-facing`, `needs-design`, `needs-marketing`, `needs-sales`, `cross-team`, `automation`
+4. **Read** the `autonomy:` line to get `A` or `B`
+5. **Parse** `### Trait Evidence` — one line per active trait in `- <trait-name>: <reason>` format
+
+**Invariants:**
+- `active:` is always a single line (never multi-line)
+- Trait names are kebab-case, from the fixed set of 11
+- Delimiter is always `, ` (comma followed by a single space)
+- Every active trait has a corresponding evidence line
+- `autonomy:` is always `A` or `B`
+
+**Examples:**
+
+Minimal (1 trait):
+
+```
+## Project Traits
+<!-- Classified by project-start. Edit active list to reclassify. -->
+active: produces-documents
+autonomy: A
+
+### Trait Evidence
+- produces-documents: User wants to create a strategic plan for Q3
+```
+
+Typical (3 traits):
+
+```
+## Project Traits
+<!-- Classified by project-start. Edit active list to reclassify. -->
+active: produces-code, involves-data, has-external-users
+autonomy: B
+
+### Trait Evidence
+- produces-code: Building a Next.js analytics dashboard
+- involves-data: Connecting to Snowflake warehouse via dbt models
+- has-external-users: Dashboard serves enterprise clients
+```
+
+Max breadth (7 traits):
+
+```
+## Project Traits
+<!-- Classified by project-start. Edit active list to reclassify. -->
+active: produces-code, produces-documents, involves-data, requires-decisions, has-external-users, needs-design, cross-team
+autonomy: B
+
+### Trait Evidence
+- produces-code: Full-stack Next.js application with API routes
+- produces-documents: API documentation and onboarding guides
+- involves-data: Snowflake analytics pipeline with dbt transformations
+- requires-decisions: Evaluating auth providers and hosting options
+- has-external-users: Public-facing SaaS product
+- needs-design: Brand refresh with new design system
+- cross-team: Involves engineering, design, and data teams
+```
+
 ### Project Traits Section Template
 
 Both autonomy levels use the same Project Traits section in the generated CLAUDE.md. Generate it from the confirmed trait classification:
@@ -251,6 +316,29 @@ Each line: file path + the trait that triggered its creation. For `produces-docu
 - **`requires-decisions`**: Creates `docs/decision-methodology.md` which is complementary to the ADR generation step later. Methodology covers process and evaluation framework; ADRs capture individual decisions.
 - **`produces-documents`**: Creates two files (`docs/brief.md` + `docs/outline.md`). Both appear in the manifest as separate entries.
 - **Missing interview data**: Use reasonable project-contextual defaults and mark with `<!-- needs-review -->`. Never leave a section completely empty — always provide at least a placeholder that indicates what information is needed.
+
+---
+
+## Trait-to-Infrastructure Dispatch
+
+After scaffolding trait-conditional docs but before generating CLAUDE.md, determine which infrastructure steps apply based on the active trait set. This table maps traits to infrastructure actions — **no infrastructure is created that isn't justified by a detected trait.**
+
+| Trait(s) | Infrastructure Action | Handled By |
+|----------|----------------------|------------|
+| `produces-code` | Extend `.gitignore` with tech-stack entries; prompt for GitHub remote | Git Setup (below) |
+| `produces-code` + `automation` | Flag CI/CD scaffold needed | BC-1946 |
+| `involves-data` | Verify Snowflake MCP connectivity | BC-1949 |
+| `has-external-users` | Flag deployment scaffold needed | BC-1946 |
+| `requires-decisions` | Generate ADRs from interview decisions | Generate ADRs (below) |
+| `needs-design` | Activate design plugin | Future |
+| `needs-marketing` | Activate marketing plugin | Future |
+| `needs-sales` | Activate sales plugin | Future |
+| `produces-documents` | No infra beyond docs/CLAUDE.md | — |
+| `client-facing` | No infra beyond docs/CLAUDE.md | — |
+| `cross-team` | No infra beyond docs/CLAUDE.md | — |
+| `automation` (solo) | No infra beyond docs/CLAUDE.md | — |
+
+**Infrastructure gating rule**: Before executing any infrastructure step (Git setup extensions, ADR generation, CI/CD scaffolding), verify that at least one trait in the active set justifies it. If no trait maps to the step, skip it with a note explaining why.
 
 ---
 
@@ -407,15 +495,29 @@ Inline note: what's being automated, trigger/schedule, and integration points fr
 
 ## Git Repository Setup
 
-After the interview but before writing files, set up the project repo:
+After the interview but before writing files, set up the project repo.
+
+### Baseline (All Projects)
 
 1. **If no git repo exists** (`git rev-parse --is-inside-work-tree` fails):
    - `git init`
-   - Create a `.gitignore` appropriate for the tech stack (Node: `node_modules`, `.env`, `.next`, etc.)
+   - Create a minimal `.gitignore`: `.DS_Store`, `.env`, `*.swp`
    - Initial commit: `git commit --allow-empty -m "Initial commit"`
-   - Ask if the user has a GitHub remote to add (`git remote add origin <url>`)
 
 2. **If a repo exists**: Verify it's clean and on the default branch.
+
+### If `produces-code` Is Active
+
+Extend the baseline `.gitignore` with tech-stack entries based on the interview:
+- **Node/Next.js**: `node_modules/`, `.next/`, `dist/`, `.turbo/`
+- **Python**: `__pycache__/`, `.venv/`, `*.pyc`
+- Other stacks: use conventional ignores for the detected languages
+
+Ask if the user has a GitHub remote to add (`git remote add origin <url>`). Note: full GitHub organization setup (branch protection, team access) is handled by BC-1946.
+
+### If `produces-code` + `automation` Are Both Active
+
+Note that CI/CD scaffolding is needed — this is handled by BC-1946. Do not scaffold CI/CD in this step.
 
 ## Create Linear Project
 
@@ -464,6 +566,8 @@ on their behalf and why.]
 Create the `docs/` directory if it doesn't exist. This plan file is separate from CLAUDE.md — the CLAUDE.md guides agent behavior, the plan file captures what to build.
 
 ---
+
+> **Trait gate**: Activates when `requires-decisions` is active, OR when `produces-code` is active AND the interview produced 2+ major technical decisions. Skip entirely if neither condition is met — show: "ADR generation skipped (no trait gate met). Run `/workflows:architecture-decision` later to document decisions individually."
 
 ## Generate Architecture Decision Records
 
