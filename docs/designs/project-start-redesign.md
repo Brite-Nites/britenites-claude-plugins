@@ -161,10 +161,10 @@ After the interview, Claude analyzes the conversation for trait signals and prop
 |-------|------------------|---------------|----------------|
 | `produces-code` | "build an app", "implement", programming languages | `docs/engineering-context.md` | GitHub repo, CI, pre-commit, .vscode |
 | `produces-documents` | "write a plan", "create docs", "report" | `docs/brief.md`, `docs/outline.md` | — |
-| `involves-data` | "analyze", "BigQuery", "metrics", "dashboard" | Data source in CLAUDE.md | BigQuery MCP verified |
+| `involves-data` | "analyze", "data warehouse", "Snowflake", "BigQuery", "Redshift", "Databricks", "dashboard"; "metrics" only with data infrastructure co-terms | Data source in CLAUDE.md | Warehouse MCP verified |
 | `requires-decisions` | "evaluate", "choose between", "build vs buy" | CDR INDEX @imported | docs/decisions/ |
 | `has-external-users` | "customers", "users", "public-facing" | Accessibility requirements | Deployment config, monitoring |
-| `client-facing` | "client", "deadline", "deliverable" | Communication cadence in CLAUDE.md | — |
+| `client-facing` | "client", "client deliverable", "external stakeholder", "SOW", "client relationship" | Communication cadence in CLAUDE.md | — |
 | `needs-design` | "brand", "visual", "colors", "palette" | `docs/design-context.md` | Design plugin |
 | `needs-marketing` | "launch", "campaign", "audience", "positioning" | `docs/marketing-context.md` | Marketing plugin |
 | `needs-sales` | "pricing", "sales deck", "objections", "demo" | `docs/sales-context.md` | Sales plugin |
