@@ -1259,7 +1259,7 @@ steps:
 <!-- spec:steps:project-start -->
 ```yaml
 command: project-start
-note: "Step ordering reflects the current implementation. The design doc (docs/designs/project-start-redesign.md) proposes a reordered flow — that will be applied in Wave 2 sub-issues of BC-1942."
+note: "Step ordering reflects the V1 implementation delivered across BC-2124 through BC-2131. Trait classification, conditional doc scaffolding, trait labels, and infrastructure dispatch are all implemented."
 prereqs:
   - "None — project-start initializes from scratch"
 steps:
@@ -1304,6 +1304,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
+    note: "Sub-step 4b: Trait-to-Infrastructure Dispatch. After scaffolding docs, applies trait-gated infrastructure actions (produces-code → .gitignore extensions + GitHub remote; requires-decisions → ADR generation is deferred to Step 8). Planned infrastructure (BC-1946, BC-1949) is flagged but not executed."
   - id: 5
     name: "Generate CLAUDE.md"
     required: true
@@ -1320,6 +1321,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
+    note: "Sub-step 6b: Create Trait Labels. For each active trait, creates trait:<name> labels under a Trait label group. Labels are created in parallel. Idempotent — skips existing labels silently."
   - id: 7
     name: "Write Project Plan"
     required: true

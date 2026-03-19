@@ -292,6 +292,37 @@ Create PR, update Linear, capture learnings, audit CLAUDE.md, suggest next issue
 | 6 | Worktree Cleanup | Remove worktree and local branch if applicable |
 | 7 | Session Close | Summary of what shipped, learnings captured, suggested next issue |
 
+### Direction-Setting Commands
+
+#### `/workflows:project-start`
+
+Start a new project with a guided interview. Produces trait-based classification, conditional documentation, CLAUDE.md, Linear project, project plan, and ADRs.
+
+**Trait-Based Classification**
+
+The interview produces a set of project traits from a fixed vocabulary of 11 (e.g., `produces-code`, `produces-documents`, `needs-design`, `has-external-users`, `automation`). Traits control:
+
+- Which docs are scaffolded (e.g., `produces-code` → `docs/engineering-context.md`)
+- Which CLAUDE.md sections are included (always-include + trait-conditional + autonomy-conditional)
+- Which infrastructure is set up (e.g., tech-stack .gitignore, CI/CD flags)
+- Which Linear labels are created (`trait:<name>` per active trait)
+
+Autonomy level (A = autonomous, B = collaborative) is orthogonal to traits — it controls how much the agent decides vs. asks.
+
+| Step | Name | What happens |
+|------|------|-------------|
+| 0 | Determine Technical Level | Choose autonomy level (A or B) |
+| 1 | Conduct Interview | Socratic discovery — 2-5 questions about the project |
+| 2 | Classify Project Traits | Detect traits from interview with confidence levels, confirm with user |
+| 3 | Git Repository Setup | Baseline (git init, .gitignore) + trait-gated extensions (tech-stack, CI/CD) |
+| 4 | Scaffold Trait-Conditional Documentation | Create docs per trait-to-doc mapping |
+| 5 | Generate CLAUDE.md | Always-include sections + trait-conditional + autonomy-conditional |
+| 6 | Create Linear Project | Project + `trait:<name>` labels (skipped if Linear unavailable) |
+| 7 | Write Project Plan | `docs/project-plan-v1.md` |
+| 8 | Generate ADRs | Gated on `produces-code` or `requires-decisions` with 2+ decisions |
+
+After project-start, run `/workflows:post-plan-setup` to refine the plan, create Linear issues, and finalize CLAUDE.md.
+
 ### Outer Loop Commands
 
 | Command | Description |
@@ -353,4 +384,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 78-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 88-test validation suite.

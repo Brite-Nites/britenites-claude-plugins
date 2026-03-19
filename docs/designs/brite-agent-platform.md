@@ -1015,8 +1015,8 @@ The current `project-start.md` (415 lines) follows this flow:
 | Fixed interview questions | Three-phase methodology (JTBD + MI + SPIN) | Structured discovery reveals true needs, not just stated requirements |
 | Code-only setup | Universal project setup | Any project type, not just code |
 | Isolated project | Connected to company knowledge | @imports from handbook, CDR awareness |
-| V1 plan generated | Plan deferred to brainstorm flow | Project-start creates infrastructure; brainstorm creates plans |
-| ADRs generated immediately | ADRs generated organically | Premature ADRs lack real implementation context |
+| V1 plan generated inline | V1 plan still generated, reordered to after CLAUDE.md | Plan created at setup; refined later by `/workflows:post-plan-setup` |
+| ADRs generated unconditionally | ADRs gated on `produces-code` or `requires-decisions` | Only generate ADRs when project has real technical decisions |
 | `git init` only | GitHub repo in Brite-Nites org | Full repo setup, not just local git |
 | No plugin awareness | Plugin discovery + activation | Right domain plugins activate based on traits |
 | No MCP verification | Dynamic MCP verification | Confirm required tools are connected before proceeding |
@@ -1114,9 +1114,11 @@ After the interview, Claude classifies the project into **traits** that combine 
 | `automation` | — | Script/scheduler patterns in CLAUDE.md | — |
 
 **Moved OUT of project-start:**
-- V1 project plan → happens in brainstorm → plan flow (project-start creates the seed; brainstorm fills the plan)
-- ADR content → generated organically during development (not prematurely at setup)
 - Look-and-feel details → design plugin's context-skill handles this
+
+**Reordered within project-start:**
+- V1 project plan → still generated, but after CLAUDE.md and Linear setup (consumed by `/workflows:post-plan-setup`)
+- ADRs → gated on `produces-code` or `requires-decisions` with 2+ major decisions (not generated unconditionally)
 
 ### Express Mode
 
@@ -1607,7 +1609,7 @@ project-root/
 └── .gitignore
 ```
 
-**Key difference:** `involves-data` triggers BigQuery MCP verification during setup. Project-start confirms the MCP connection works, identifies relevant datasets, notes them in `engineering-context.md`. Review agents: Tier 1 + `python-reviewer` + `data-reviewer` + `performance-reviewer`.
+**Key difference:** `involves-data` triggers Snowflake MCP verification during setup. Project-start confirms the MCP connection works, identifies relevant datasets, notes them in `engineering-context.md`. Review agents: Tier 1 + `python-reviewer` + `data-reviewer` + `performance-reviewer`.
 
 ### Scenario 9: Database Migration
 
