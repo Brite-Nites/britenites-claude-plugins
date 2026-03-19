@@ -168,7 +168,7 @@ After the interview, Claude analyzes the conversation for trait signals and prop
 | `needs-design` | "brand", "visual", "colors", "palette" | `docs/design-context.md` | Design plugin |
 | `needs-marketing` | "launch", "campaign", "audience", "positioning" | `docs/marketing-context.md` | Marketing plugin |
 | `needs-sales` | "pricing", "sales deck", "objections", "demo" | `docs/sales-context.md` | Sales plugin |
-| `cross-team` | "multiple teams", "stakeholders", "org-wide" | `org/stakeholders.md` @imported | — |
+| `cross-team` | "multiple teams", "stakeholders", "org-wide" | `docs/stakeholders.md` @imported | — |
 | `automation` | "scheduled", "cron", "pipeline", "CI/CD", "bot" | Script/scheduler patterns in CLAUDE.md | — |
 
 **Always created** (regardless of traits): CLAUDE.md, Linear project, `docs/decisions/` directory.
