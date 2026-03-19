@@ -40,6 +40,7 @@ plugins/
       *.md                         # Command definitions (markdown format)
       _shared/                     # Shared templates referenced by commands
         company-context-template.md  # Company Context Interview template
+        trait-doc-templates.md       # Trait-conditional documentation templates (12 traits)
     skills/
       */SKILL.md                   # Skill definitions (auto-invoked by Claude)
       _shared/                     # Shared utilities referenced by skills
