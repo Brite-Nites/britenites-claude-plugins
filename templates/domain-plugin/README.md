@@ -29,6 +29,17 @@ hooks/hooks.json              # Lifecycle hooks (SessionStart only — see note)
 .mcp.json                     # MCP server configurations
 ```
 
+## Context-Skill Pattern
+
+Every domain plugin has a foundational **context-skill** that creates `docs/<domain>-context.md` in the target project. This context doc:
+
+- Is triggered by `project-start` when the plugin's trait is detected
+- Contains project-specific domain knowledge enriched by SoR queries (if available)
+- Is read by ALL other skills in this plugin before they act
+- Includes `last_refreshed` / `refresh_cadence` frontmatter for staleness tracking
+
+The template at `skills/domain-context/SKILL.md` provides the starting skeleton. See `docs/designs/BC-1966-context-skill-standard.md` for the full specification.
+
 ## Conventions
 
 ### plugin.json

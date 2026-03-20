@@ -103,7 +103,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T3.5 | `/workflows:bug-report` | Run with a test bug title → fill in details → approve draft | Verify: Linear issue created with Bug label, structured description, environment table. **Cleanup:** delete the test issue in Linear |
 | T3.16 | `/workflows:sprint-planning` | Run → Step 0 passes → project resolved → velocity shown → backlog displayed → select issues via sequential-thinking | Abort after selection. Verify: MCP prereqs pass, cycle data loads, backlog shows Todo + Backlog issues, velocity calculation uses completed cycles only |
 | T3.17 | `/workflows:retrospective` | Run → Step 0 passes → cycle resolved → delivery summary shown → retro discussion flows → status update draft presented | Abort before posting. Verify: MCP prereqs pass, cycle data loads, completed/carried-over tables render, sequential-thinking drives discussion, health indicator suggested |
-| T3.18 | `/workflows:project-start` MCP verification | Run → interview mentions data/analytics → confirm `involves-data` trait → observe MCP verification | Verify: table shows global MCPs + data warehouse status. Non-blocking — continues after WARN. |
+| T3.25 | `/workflows:project-start` MCP verification | Run → interview mentions data/analytics → confirm `involves-data` trait → observe MCP verification | Verify: table shows global MCPs + data warehouse status. Non-blocking — continues after WARN. |
 
 ### Requires Changes on a Branch
 
@@ -285,11 +285,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/13
-Layer 3 (Commands):   __/34
+Layer 3 (Commands):   __/35
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/25
 
-Total:  __/88
+Total:  __/89
 Notes:  ____
 ```

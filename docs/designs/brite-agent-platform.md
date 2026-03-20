@@ -1152,7 +1152,7 @@ Every domain plugin MUST have one foundational context-skill. This is the standa
 3. Read by ALL other skills in the domain before they act
 4. Contains foundational context specific to that domain + this project
 5. May query SoRs via MCP to populate context (e.g., Salesforce for customer data)
-6. Includes a `last_generated` timestamp for freshness tracking
+6. Includes a `last_refreshed` timestamp for freshness tracking
 
 **Context-skill invocation pattern:**
 ```

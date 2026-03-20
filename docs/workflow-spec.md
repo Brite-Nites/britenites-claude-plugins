@@ -1610,7 +1610,7 @@ artifacts:
   - id: project-traits
     path: "CLAUDE.md (## Project Traits section)"
     producer: "project-start (command)"
-    consumers: ["BC-1944 (context-skill standard)", "BC-1945 (dynamic @imports)", "BC-1966 (plugin discovery)"]
+    consumers: ["BC-1944 (trait-conditional doc scaffolding)", "BC-1945 (dynamic @imports)", "BC-1966 (context-skill standard)"]
     persistence: permanent
 
   - id: v1-plan
@@ -1691,15 +1691,75 @@ trait-interface:
     - cross-team
     - automation
   consumers:
-    - "BC-1944 (context-skill standard): reads active traits to select domain-specific context"
+    - "BC-1944 (trait-conditional doc scaffolding): reads active traits to scaffold trait-doc templates"
     - "BC-1945 (dynamic @imports): reads active traits to resolve trait-conditional @imports"
-    - "BC-1966 (plugin discovery): reads active traits to activate domain plugins"
+    - "BC-1966 (context-skill standard): defines the contract format that domain context-skills must follow"
   invariants:
     - "active: is always a single line"
     - "Trait names are kebab-case from the fixed set of 11"
     - "Delimiter is always comma-space (, )"
     - "Every active trait has an evidence line"
     - "autonomy: is always A or B"
+```
+
+### 3e. Context-Skill Standard
+
+<!-- spec:contract:context-skill-standard -->
+```yaml
+contract: context-skill-standard
+issue: BC-1966
+spec: docs/designs/BC-1966-context-skill-standard.md
+
+context-doc-frontmatter:
+  required:
+    - name: domain
+      type: string
+      values: [engineering, marketing, design, sales, data]  # product planned but no trait yet
+    - name: trait
+      type: string
+      values: [produces-code, needs-marketing, needs-design, needs-sales, involves-data]  # subset: domain-linked traits only (5 of 11)
+    - name: last_refreshed
+      type: string
+      format: "YYYY-MM-DD (ISO 8601)"
+      note: "CRITICAL: must be last_refreshed, not last_generated — session-start line 39 parses this exact key"
+    - name: refresh_cadence
+      type: string
+      values: [quarterly, monthly, weekly, on-change]
+      default: quarterly
+    - name: generated_by
+      type: string
+      pattern: "^[a-z][a-z0-9-]*$"
+      description: "Name of the context-skill that produced this file. Must be valid kebab-case."
+
+trait-to-domain:
+  produces-code: engineering
+  needs-marketing: marketing
+  needs-design: design
+  needs-sales: sales
+  involves-data: data
+
+trait-to-context-doc:
+  produces-code: docs/engineering-context.md
+  needs-marketing: docs/marketing-context.md
+  needs-design: docs/design-context.md
+  needs-sales: docs/sales-context.md
+  involves-data: docs/data-context.md
+
+sor-fallback-tiers:
+  - tier: full-enrichment
+    available: "MCP + SoR access + interview data"
+    experience: "Complete context doc with SoR-sourced data"
+  - tier: partial-enrichment
+    available: "MCP available but SoR query fails or times out"
+    experience: "Interview data + <!-- needs-enrichment --> markers"
+  - tier: interview-only
+    available: "No MCP available"
+    experience: "All content from project-start interview data"
+  - tier: no-sor-dependency
+    available: "Domain has no relevant SoR"
+    experience: "Context doc from interview data; no SoR Sources section"
+
+budget: "~80-200 lines per context doc (Tier 2)"
 ```
 
 ---
@@ -2269,8 +2329,9 @@ layers:
     examples: "engineering-context.md, design-context.md"
     loaded-at: project-start
     refresh: per-context-skill-standard
-    status: planned
-    issue: BRI-1966
+    status: specified
+    spec: docs/designs/BC-1966-context-skill-standard.md
+    issue: BC-1966
 
   - layer: project
     tier: 1

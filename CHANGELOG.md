@@ -7,6 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
+- Trait-based classification system in project-start (BC-2127)
+  - Three-phase interview methodology (Discovery → Classification → Configuration)
+  - 11 project traits with detection signals and evidence tracking
+  - Trait-conditional documentation scaffolding from shared templates
+  - Trait-to-infrastructure dispatch (Git, Linear, CI/CD gated by traits)
+- Context-skill standard specification (BC-1966)
+  - Formal contract for domain plugin context-skills
+  - YAML contract block in workflow-spec.md (section 3e)
+  - Domain plugin template skeleton with context-skill placeholder
+  - Data Safety rules for SoR integration (sanitization, structural defense)
 - Dynamic MCP verification in project-start (BC-1949)
   - Two-tier: global MCPs (Linear, Sequential-thinking, Context7) + trait-gated (`involves-data` → data warehouse)
   - Non-blocking WARN with setup instructions; missing MCPs noted in generated CLAUDE.md
