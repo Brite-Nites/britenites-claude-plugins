@@ -1434,6 +1434,8 @@ sequence:
       - "CLAUDE.md updates (entries added/updated/pruned)"
       - "Fact-check results"
       - "Session summary in auto-memory"
+      - "Decision traces written to docs/precedents/<ISSUE-ID>.md"
+      - "Precedent INDEX updated at docs/precedents/INDEX.md"
     requires:
       - "Diff exists on branch"
       - "CLAUDE.md exists"
@@ -1624,6 +1626,18 @@ artifacts:
     producer: "project-start (command)"
     consumers: ["session-start (via @import)", "BC-1945 (dynamic @imports)"]
     persistence: permanent
+
+  - id: precedent-file
+    path: "docs/precedents/<ISSUE-ID>.md"
+    producer: compound-learnings
+    consumers: ["precedent-search (skill)", "brainstorming"]
+    persistence: permanent
+
+  - id: precedent-index
+    path: "docs/precedents/INDEX.md"
+    producer: compound-learnings
+    consumers: ["precedent-search (skill)", "brainstorming", "writing-plans"]
+    persistence: permanent
 ```
 
 ### 3c. Post-Plan Chain
@@ -1760,6 +1774,93 @@ sor-fallback-tiers:
     experience: "Context doc from interview data; no SoR Sources section"
 
 budget: "~80-200 lines per context doc (Tier 2)"
+```
+
+### 3f. Decision Trace Standard
+
+<!-- spec:contract:decision-trace -->
+```yaml
+contract: decision-trace
+issue: BC-1955
+spec: docs/designs/BC-1955-decision-trace-spec.md
+
+decision-trace-markdown:
+  heading: "## Trace — <ISSUE-ID>/task-<N> — <YYYY-MM-DD>"
+  fields:
+    - name: Decision
+      type: string
+      max-length: 120
+      required: true
+    - name: Category
+      type: enum
+      values: [architecture, library-selection, pattern-choice, trade-off, bug-resolution, scope-change]
+      required: true
+    - name: Confidence
+      type: integer
+      range: [1, 10]
+      required: true
+    - name: Inputs
+      type: bullet-list
+      min-items: 1
+      max-item-length: 200
+      required: true
+    - name: Alternatives Considered
+      type: numbered-list
+      min-items: 2
+      required: true
+      note: "Exactly 1 chosen + at least 1 rejected"
+    - name: Precedent Referenced
+      type: bullet-list
+      max-item-length: 200
+      required: true
+      note: "'None' allowed as single item"
+    - name: "Outcome: Files changed"
+      type: string-list
+      max-items: 20
+      required: true
+      note: "Relative paths only"
+    - name: "Outcome: Tests"
+      type: string
+      required: true
+      note: "Format: '<N> added, <N> passed, <N> failed' or 'N/A'"
+    - name: "Outcome: Approved by"
+      type: enum
+      values: [PR review, human checkpoint, auto-verified]
+      required: true
+
+execution-trace-yaml:
+  task-pattern: "^[A-Z]+-[0-9]+/task-[0-9]+$"
+  required-keys: [task, agent, timestamp, duration, context_used, files_changed, tests, verification]
+  decisions-made-entry:
+    required: [type, chose, over, reason, confidence]
+    type-values: [architecture, library-selection, pattern-choice, trade-off, bug-resolution, scope-change]
+    confidence-range: [1, 10]
+
+storage:
+  project-level: "docs/precedents/<ISSUE-ID>.md"
+  org-level: "handbook/precedents/<ISSUE-ID>.md"
+  index: "docs/precedents/INDEX.md"
+
+thresholds:
+  storage-confidence: 6
+  promotion-confidence: 8
+  max-traces-per-task: 3
+
+limits:
+  per-trace-lines: 30
+  per-issue-traces: 15
+  decision-chars: 120
+  bullet-item-chars: 200
+  outcome-files-max: 20
+  tags-per-entry: 5
+
+integration:
+  emitter: executing-plans
+  consumer: compound-learnings
+  transport: "conversation context (fenced YAML block)"
+  trigger: "task checkpoint, after task completion"
+  extraction: "compound-learnings scans for fenced YAML starting with # execution-trace-v1 marker and task: as second key"
+  promotion: "Linear issue with label precedent-promotion; never auto-promoted"
 ```
 
 ---
@@ -2320,7 +2421,8 @@ layers:
     examples: "Past ADRs, decision traces, search results"
     loaded-at: "brainstorm, plan"
     refresh: continuous
-    status: planned
+    status: specified
+    spec: docs/designs/BC-1955-decision-trace-spec.md
     issue: BRI-1960
 
   - layer: domain

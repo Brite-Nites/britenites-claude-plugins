@@ -157,6 +157,15 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T3.25f | @imported file with `refresh_cadence: on-change` | No freshness output (skip) |
 | T3.25g | No @imported files in CLAUDE.md | No freshness output (silent pass) |
 
+### Decision Trace Tests (requires full inner loop)
+
+| Test | What | Expected |
+|------|------|----------|
+| T3.26a | Inner loop on architecture issue → ship → check `docs/precedents/` | Precedent file created at `docs/precedents/<ISSUE-ID>.md`, INDEX.md updated, trace matches markdown template (H2 heading, Decision, Category, Confidence, Inputs, Alternatives, Precedent Referenced, Outcome) |
+| T3.26b | Inner loop on trivial issue (single-file rename) → ship | No precedent file created (no qualifying decisions emitted) |
+| T3.26c | Issue with 5+ decisions (mix of confidence >= 6 and < 6) → ship | Traces with confidence >= 6 present in precedent file (max 3 per task); decisions with confidence < 6 absent from file but visible in checkpoint output |
+| T3.26d | Trace with confidence >= 8, category `architecture`, establishes reusable pattern | Flagged for org-level promotion: Linear issue created with `precedent-promotion` label |
+
 ---
 
 ## Layer 4: End-to-End Flow Tests (~30+ min each)
@@ -262,7 +271,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 24 | T1.1, T3.1–T3.25g |
+| Commands | 24 | T1.1, T3.1–T3.26d |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
@@ -285,11 +294,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/13
-Layer 3 (Commands):   __/35
+Layer 3 (Commands):   __/39
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/25
 
-Total:  __/89
+Total:  __/93
 Notes:  ____
 ```
