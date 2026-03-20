@@ -217,6 +217,12 @@ output-artifacts:
   - path: "docs/ updates"
     type: file
     optional: true
+  - path: "docs/precedents/<ISSUE-ID>.md"
+    type: file
+    optional: true
+  - path: "docs/precedents/INDEX.md"
+    type: file
+    optional: true
 handoff:
   next: best-practices-audit
   marker: "**Compound learnings complete.**"
@@ -2069,6 +2075,18 @@ error-handling:
   - failure-point: "CLAUDE.md write fails"
     action: escalate
     detail: "AskUserQuestion: Retry write / Skip CLAUDE.md updates / Stop compounding"
+  - failure-point: "No execution traces in conversation"
+    action: skip
+    detail: "Phase 2 skipped: No execution traces found — skipping trace extraction"
+  - failure-point: "Context7 MCP unavailable for CDR cross-reference"
+    action: degrade
+    detail: "CDR cross-reference skipped; traces written without CDR lookup"
+  - failure-point: "Linear MCP unavailable for promotion flagging"
+    action: degrade
+    detail: "Promotion candidates logged in report but not created as Linear issues"
+  - failure-point: "Precedent file write fails"
+    action: escalate
+    detail: "AskUserQuestion: Retry write / Skip trace storage / Stop compounding"
 ```
 
 <!-- spec:errors:best-practices-audit -->
