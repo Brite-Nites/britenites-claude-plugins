@@ -112,12 +112,13 @@ Convert each qualifying entry to decision trace markdown per spec Section 1:
    - `reason` → incorporated into the chosen alternative's description
    - `files_changed` → **Outcome: Files changed**
    - `tests` → **Outcome: Tests** (format: `N added, N passed, N failed`)
+   - (no YAML source) → **Outcome: Approved by** (default: `auto-verified` — traces are emitted after 4-level verification passes)
 
 2. **Apply data safety rules** (spec Section 8):
    - Sanitize single-line fields: strip newlines, allow only `[a-zA-Z0-9 _./@#:()'\"-]`, enforce length caps
    - Sanitize bullet-list fields: same character allowlist, strip markdown links and HTML tags, max 200 chars per item
    - Validate file paths: must be relative (no `/Users/...`, no `~/...`, no `..` segments)
-   - Redact secret patterns: `sk-[a-zA-Z0-9]{20,}`, `AKIA[A-Z0-9]{12,}`, `ghp_[a-zA-Z0-9]{20,}`, `sk_(live|test)_[a-zA-Z0-9]{10,}`
+   - Redact secret patterns: `sk-[a-zA-Z0-9]{20,}`, `sk-proj-[a-zA-Z0-9]{10,}`, `AKIA[A-Z0-9]{12,}`, `gh[ps]_[a-zA-Z0-9]{20,}`, `sk_(live|test)_[a-zA-Z0-9]{10,}`
 
 3. **Derive tags** — up to 5 tags per trace, lowercase kebab-case, max 30 chars each. Derive from category + key nouns in the decision summary
 

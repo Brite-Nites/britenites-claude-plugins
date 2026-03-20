@@ -288,7 +288,7 @@ Decision traces contain agent-generated content from execution. The primary risk
 **Secrets and credentials:**
 - Never include raw tokens, API keys, or credentials in any trace field
 - If a decision involves a secret (e.g., "chose environment variable over hardcoded key"), reference the pattern, not the value
-- Match and redact known patterns: `sk-[a-zA-Z0-9]{20,}`, `AKIA[A-Z0-9]{12,}`, `ghp_[a-zA-Z0-9]{20,}`, `sk_(live|test)_[a-zA-Z0-9]{10,}`
+- Match and redact known patterns: `sk-[a-zA-Z0-9]{20,}`, `sk-proj-[a-zA-Z0-9]{10,}`, `AKIA[A-Z0-9]{12,}`, `gh[ps]_[a-zA-Z0-9]{20,}`, `sk_(live|test)_[a-zA-Z0-9]{10,}`
 
 **Tags:**
 - Lowercase, kebab-case only: `[a-z0-9-]`

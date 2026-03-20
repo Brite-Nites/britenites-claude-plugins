@@ -92,11 +92,12 @@ Narrate: `Step 4/7: Compounding learnings...`
 
 The `compound-learnings` skill activates to capture what was learned. It will verify its own preconditions (diff exists, CLAUDE.md exists) before proceeding.
 
-1. **Accuracy pass** — Verify existing CLAUDE.md claims (file paths, commands, function refs) against the codebase. Auto-remove confirmed-gone references; flag moved or ambiguous paths for review.
-2. **CLAUDE.md updates** — Add durable learnings (new patterns, conventions, gotchas). Prune stale entries.
-3. **Decision trace extraction** — Scan for execution traces, extract qualifying decisions (confidence >= 6), write to `docs/precedents/`, update INDEX, and flag high-confidence traces for org-level promotion. Skipped if no execution traces in conversation.
-4. **Session summary to memory** — What was built, what was learned, what's next.
-5. **Documentation updates** — Update `docs/` if architecture or API changed.
+1. **Analysis** — Analyze what was learned from the diff, plan, and design doc.
+2. **Decision trace extraction** — Scan for execution traces, extract qualifying decisions (confidence >= 6), write to `docs/precedents/`, update INDEX, and flag high-confidence traces for org-level promotion. Skipped if no execution traces in conversation.
+3. **Accuracy pass** — Verify existing CLAUDE.md claims (file paths, commands, function refs) against the codebase. Auto-remove confirmed-gone references; flag moved or ambiguous paths for review.
+4. **CLAUDE.md updates** — Add durable learnings (new patterns, conventions, gotchas). Prune stale entries.
+5. **Session summary to memory** — What was built, what was learned, what's next.
+6. **Documentation updates** — Update `docs/` if architecture or API changed.
 
 Only durable knowledge gets recorded. No session-specific noise.
 

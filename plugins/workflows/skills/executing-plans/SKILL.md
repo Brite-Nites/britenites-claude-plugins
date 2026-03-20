@@ -126,6 +126,11 @@ After completing the task, run:
 - [lint command]
 
 Report: what you changed, test results, any issues encountered.
+
+## Decision Reporting
+If you make any non-trivial decisions during this task, report them in your completion output.
+
+Report decisions in these categories: `architecture`, `library-selection`, `pattern-choice`, `trade-off`, `bug-resolution`, `scope-change`. For each, include what you chose, what you rejected (with brief reasons), your confidence (1-10), and the category. Skip trivial choices (naming, formatting, standard patterns). If none, state: "No non-trivial decisions."
 ```
 
 ### Parallel Execution
@@ -178,6 +183,91 @@ Narrate: `Task [N/M] complete. Running verification...`
 
    Next: Task [N+1]: [title]
    ```
+
+5. **Emit execution trace**:
+
+   After the progress report, construct and emit an execution trace YAML block. This block is consumed by compound-learnings during `/workflows:ship` (see spec: `docs/designs/BC-1955-decision-trace-spec.md`, Section 9).
+
+   Narrate: `Emitting execution trace for task [N]...`
+
+   Construct the block from the subagent's completion report and the verification results:
+
+   ````
+   ```yaml
+   # execution-trace-v1
+   task: <ISSUE-ID>/task-<N>
+   agent: execute-subagent
+   timestamp: <ISO-8601>
+   duration: <N>m <N>s
+
+   context_used:
+     - <relative file paths and doc references the subagent read>
+
+   decisions_made:
+     - type: <category>
+       chose: "<chosen option — max 120 chars>"
+       over: ["<rejected option 1>", "<rejected option 2>"]
+       reason: "<why chosen — max 200 chars>"
+       confidence: <1-10>
+
+   files_changed:
+     - <relative path> (<action>, +<added> -<removed>)
+
+   tests:
+     added: <N>
+     passed: <N>
+     failed: <N>
+
+   verification:
+     build: pass | fail
+     tests: pass | fail
+     acceptance_criteria: pass | fail | partial
+     integration: pass | fail | skipped
+   ```
+   ````
+
+   **Construction rules:**
+   - `task`: Derive from issue ID + sequential task number (pattern: `^[A-Z]+-[0-9]+/task-[0-9]+$`)
+   - `context_used`: List files the subagent read, as relative paths (no absolute paths, no `..` segments)
+   - `decisions_made`: Map the subagent's reported decisions to this schema. If no decisions were reported, use an empty array `[]`. **If more than 3 decisions are reported, keep the 3 with highest confidence and combine or drop the rest (see Limits below).**
+   - `files_changed`: From `git diff --stat` for the task's changes. Max 20 items
+   - `tests` and `verification`: From the 4-level verification results in step 1
+
+   **Emission timing:** The trace block is emitted AFTER verification passes, AFTER the progress report, BEFORE the next task begins. This ensures all verification data is captured.
+
+   **If the task had no decisions:** Still emit the trace with `decisions_made: []` — the trace captures context_used, files_changed, tests, and verification regardless.
+
+## Trace Emission Rules
+
+> Spec: `docs/designs/BC-1955-decision-trace-spec.md`
+
+### Emission Categories
+
+| Category | Trigger | Example |
+|----------|---------|---------|
+| `architecture` | Choosing between structural approaches | "Chose row-level security over app-level filtering" |
+| `library-selection` | Picking a dependency when alternatives exist | "Chose Resend over SendGrid for email" |
+| `pattern-choice` | Selecting a coding pattern or API design | "Chose Result type over try/catch for domain layer" |
+| `trade-off` | Choosing between competing concerns | "Chose denormalized table for read perf" |
+| `bug-resolution` | Root cause identified, fix approach chosen | "Root cause: race condition; fix: explicit teardown" |
+| `scope-change` | Implementation diverges from plan | "Dropped real-time sync; will follow up" |
+
+### When to Emit
+
+**EMIT when:** The decision falls into one of the 6 categories above AND is non-trivial (affects multiple files, changes architecture, or involves rejected alternatives).
+
+**DO NOT EMIT when:** Variable naming, formatting, import ordering, using standard project patterns, following CDR/ADR exactly as written, or trivially equivalent choices.
+
+### Limits
+
+- **Max 3 `decisions_made` entries per task.** If more than 3 qualifying decisions, combine related ones or escalate to a design doc.
+- **Confidence threshold:** Traces with confidence < 6 are ephemeral (shown in checkpoint output for transparency but NOT persisted by compound-learnings). Traces >= 6 are persisted. Traces >= 8 in categories `architecture`, `library-selection`, or `trade-off` are candidates for org-level promotion.
+
+### Data Safety
+
+- **Single-line fields** (chose, over, reason): Strip newlines, allow only `[a-zA-Z0-9 _./@#:()'\"-]`, enforce length caps
+- **File paths**: Must be relative (no `/Users/...`, no `~/...`, no `..` segments)
+- **Secrets**: Never include raw tokens or API keys. Redact patterns: `sk-[a-zA-Z0-9]{20,}`, `sk-proj-[a-zA-Z0-9]{10,}`, `AKIA[A-Z0-9]{12,}`, `gh[ps]_[a-zA-Z0-9]{20,}`, `sk_(live|test)_[a-zA-Z0-9]{10,}`
 
 ## TDD Enforcement
 
@@ -259,3 +349,4 @@ Proceeding to → /workflows:review
 - Save progress after each task — if the session dies, the next session can resume from the last checkpoint
 - Independent tasks should be parallelized when possible
 - Reference `_shared/validation-pattern.md` for the self-check protocol
+- Emit an execution-trace-v1 YAML block at every task checkpoint after verification — even if `decisions_made` is empty
