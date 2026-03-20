@@ -163,6 +163,9 @@ output-artifacts:
   - path: "implemented code + tests"
     type: code
     optional: false
+  - path: "execution trace YAML blocks (conversation context)"
+    type: context
+    optional: false
 handoff:
   next: "/workflows:review"
   marker: "**Execution complete.**"
@@ -1404,6 +1407,7 @@ sequence:
       - "Implemented code and tests"
       - "Commit history on branch"
       - "Per-task verification reports"
+      - "Per-task execution trace YAML blocks (consumed by compound-learnings via conversation context)"
     requires:
       - "Plan file at docs/plans/<issue-id>-plan.md"
       - "Design doc at docs/designs/<issue-id>-*.md (if brainstorming ran)"
@@ -1632,6 +1636,12 @@ artifacts:
     producer: "project-start (command)"
     consumers: ["session-start (via @import)", "BC-1945 (dynamic @imports)"]
     persistence: permanent
+
+  - id: execution-trace
+    path: "conversation context (fenced YAML blocks with # execution-trace-v1 marker)"
+    producer: executing-plans
+    consumers: [compound-learnings]
+    persistence: session
 
   - id: precedent-file
     path: "docs/precedents/<ISSUE-ID>.md"

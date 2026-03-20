@@ -20,6 +20,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 - Dynamic MCP verification in project-start (BC-1949)
   - Two-tier: global MCPs (Linear, Sequential-thinking, Context7) + trait-gated (`involves-data` → data warehouse)
   - Non-blocking WARN with setup instructions; missing MCPs noted in generated CLAUDE.md
+- Decision trace format specification (BC-1955)
+  - Execution trace YAML and decision trace markdown schemas
+  - Field validation, size limits, data safety, and integration contract
+  - Accumulation flow: emit → extract → store → promote
+- Execution trace emission in executing-plans (BC-1956)
+  - Subagent decision reporting in task prompt template
+  - Checkpoint step 5: construct and emit execution-trace-v1 YAML blocks
+  - Emission rules, categories, limits, and data safety enforcement
+- Decision trace extraction in compound-learnings (BC-1957)
+  - Phase 2: scan, parse, filter, convert, cross-reference, write, and promote
+  - CDR/ADR cross-reference via Context7 MCP with graceful degradation
+  - Precedent storage in docs/precedents/ with INDEX.md
 
 ## [3.26.0] - 2026-03-13
 
