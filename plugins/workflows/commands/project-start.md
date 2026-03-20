@@ -32,6 +32,98 @@ You are my dedicated software engineer. Before we build anything, conduct a thor
 
 This answer determines the autonomy level (A or B) and how the project CLAUDE.md will be structured.
 
+### Express Mode
+
+Express mode bypasses the full three-phase interview for experienced developers onboarding existing projects. It auto-detects traits from codebase file markers, confirms with the user, and skips directly to setup.
+
+#### Eligibility Check
+
+Express mode activates when either condition is met:
+
+1. **Explicit**: `$ARGUMENTS` contains "express"
+2. **Auto-detected**: At least one project file marker exists in the working directory (`package.json`, `pyproject.toml`, `setup.py`, `Cargo.toml`, `go.mod`, `Gemfile`, `CLAUDE.md`, or `.git/`)
+
+**If explicit** (from `$ARGUMENTS`): Enter express mode directly — skip the eligibility offer below.
+
+**If auto-detected**: Use AskUserQuestion to offer:
+- **"Yes, use express mode"** — proceed with express mode below
+- **"No, run full interview"** — skip this section entirely. Continue to Interview Behavioral Guidelines and Phase 1 as normal.
+
+**If no file markers found**: Do not offer express mode. Continue to Interview Behavioral Guidelines and Phase 1 as normal.
+
+**If only Medium confidence markers found**: Offer express mode but note: "Some traits detected with medium confidence — consider the full interview for more accurate classification."
+
+#### File Marker Scanning
+
+Scan the working directory for the following markers using the Glob tool. For each match, record the trait(s) and confidence level:
+
+| File/Directory | Trait(s) Detected | Confidence |
+|---|---|---|
+| `package.json` | `produces-code` | High |
+| `tsconfig.json` | `produces-code` | High |
+| `pyproject.toml` or `setup.py` | `produces-code` | High |
+| `Cargo.toml` | `produces-code` | High |
+| `go.mod` | `produces-code` | High |
+| `Gemfile` | `produces-code` | High |
+| `prisma/` | `produces-code`, `involves-data` | High |
+| `dbt_project.yml` | `involves-data`, `automation` | High |
+| `.github/workflows/` | `automation` | Medium |
+| `Dockerfile` or `docker-compose.yml` | `produces-code` | Medium |
+| `docs/` directory (with 3+ files) | `produces-documents` | Medium |
+| `design/` directory or Figma links in README | `needs-design` | Medium |
+| Existing `CLAUDE.md` with `## Project Traits` | Extract `active:` line traits | High |
+| `.git/config` with GitHub remote | Infer Brite-Nites org membership | — |
+
+**Scanning instructions:**
+
+1. Use Glob to check for each file/directory marker in the table above.
+2. If `CLAUDE.md` exists, read it and look for a `## Project Traits` section. If found, extract the `active:` line and parse trait names — these are pre-populated as High confidence.
+3. Check `.git/config` for a GitHub remote URL containing `Brite-Nites` to infer org membership context.
+4. Combine all detected traits, deduplicating. A trait detected by multiple markers keeps its highest confidence level.
+
+#### Quick Confirmation
+
+Present detected traits using the same grouped format as the "Present Traits" section, but with file evidence instead of interview evidence:
+
+```
+## Express Mode: Detected Traits
+
+**Technical**
+- [checkmark] produces-code (High) — found package.json, tsconfig.json
+- [checkmark] involves-data (High) — found prisma/ directory
+
+**Business**
+(none detected)
+
+**Domain**
+(none detected)
+
+**Not detected**: produces-documents, requires-decisions, has-external-users, client-facing, needs-design, needs-marketing, needs-sales, cross-team, automation
+```
+
+Use `[checkmark]` for High/Medium confidence (auto-included). List all 11 traits — group detected traits by category with file evidence, then list undetected traits at the bottom.
+
+Then use AskUserQuestion with these options:
+- **"Yes, looks good"** — proceed to trait storage below
+- **"Let me adjust"** — ask which traits to add or remove, then re-present the updated list. Allow up to 3 adjustment rounds. User-added traits are noted as "User-added" in the evidence map.
+- **"Run full interview instead"** — abandon express mode. Continue to Interview Behavioral Guidelines and Phase 1 as normal.
+
+**Edge cases:**
+- **0 traits detected** (e.g., `$ARGUMENTS` = "express" but empty directory): Show empty detection with all traits under "Not detected". Let the user manually add traits or select "Run full interview instead."
+- **7+ traits detected**: Note the breadth ("This project touches many areas") and suggest the user consider whether all traits are primary concerns.
+- **User wants to add a trait not in the table**: Decline politely — "The trait system uses a fixed set of 11 traits. The closest match might be [suggest nearest]."
+
+#### Store Traits and Skip to Setup
+
+After confirmation:
+
+1. **Store confirmed traits** using the Trait Interface Contract (same format as the "Store Confirmed Traits" section):
+   - **Active trait list** — the confirmed set of trait names
+   - **Autonomy level** — preserved from Step 0
+   - **Evidence map** — one line per trait with file marker evidence (e.g., `produces-code: Express mode — found package.json, tsconfig.json`)
+
+2. **Skip directive**: Skip Phases 1-2 (Interview Behavioral Guidelines, Phase 1: Understand, Phase 2: Define), Phase 3, and the "Classify Project Traits" section. Proceed directly to **Git Repository Setup**. All downstream steps (Git setup, doc scaffolding, CLAUDE.md generation, Linear project, ADRs, post-setup verification) consume the trait interface contract identically — no changes needed.
+
 ---
 
 ### Interview Behavioral Guidelines
@@ -933,4 +1025,4 @@ Present these as a numbered list:
 
 ## Begin Now
 
-Start by asking about their technical background (Step 0). After determining their autonomy level, begin Phase 1: understand who they are and what brought them here. Be warm and conversational — this should feel like a friendly conversation, not a form. Ask one or two questions at a time and let their answers guide your follow-ups.
+Start by asking about their technical background (Step 0). After determining their autonomy level, check for Express Mode eligibility — if `$ARGUMENTS` contains "express" or project file markers are detected, offer express mode. If express mode is accepted, scan file markers, confirm traits, and skip directly to Git Repository Setup. If express mode is declined or ineligible, begin Phase 1: understand who they are and what brought them here. Be warm and conversational — this should feel like a friendly conversation, not a form. Ask one or two questions at a time and let their answers guide your follow-ups.
