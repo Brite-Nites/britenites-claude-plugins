@@ -832,6 +832,105 @@ To document new decisions later, run `/workflows:architecture-decision`.
 
 ---
 
+## Post-Setup Verification
+
+Before handing off, verify that all artifacts were created successfully and present a summary. Use data already in conversation context (active traits, doc manifest, `mcp-status`, Git setup results) — no new infrastructure needed.
+
+### 1. Verify File Artifacts
+
+Check existence of required files using the Glob tool or `ls`:
+
+**Always required:**
+- `CLAUDE.md` exists in project root
+- `docs/` directory exists
+- `docs/decisions/` directory exists
+- `docs/project-plan-v1.md` exists
+
+**Trait-conditional** — for each trait in the doc manifest (built during the "Scaffold Trait-Conditional Documentation" step), verify the corresponding file exists:
+
+| Trait | Expected File |
+|-------|---------------|
+| `produces-code` | `docs/engineering-context.md` |
+| `produces-documents` | `docs/brief.md` + `docs/outline.md` |
+| `involves-data` | `docs/data-context.md` |
+| `requires-decisions` | `docs/decision-methodology.md` |
+| `has-external-users` | `docs/user-requirements.md` |
+| `client-facing` | `docs/client-management.md` |
+| `needs-design` | `docs/design-context.md` |
+| `needs-marketing` | `docs/marketing-context.md` |
+| `needs-sales` | `docs/sales-context.md` |
+| `cross-team` | `docs/stakeholders.md` |
+| `automation` | `docs/automation-patterns.md` |
+
+Only check traits present in the active set. Skip traits not active.
+
+**ADRs** — if `requires-decisions` is active (or ADR generation ran), verify at least one `docs/decisions/NNN-*.md` file exists.
+
+### 2. Verify Linear Project
+
+- Call `list_projects` and confirm the project name appears in results.
+- Check that `trait:*` labels were created by calling `list_issue_labels` and counting labels matching `trait:<trait-name>` for each active trait.
+- If Linear MCP was unavailable (from `mcp-status`), mark as SKIP with a note.
+
+### 3. Verify MCP Connectivity (re-check)
+
+Pull from the `mcp-status` conversation context variable stored during the "Verify MCP Connectivity" step. Do NOT re-ping — just include the recorded status in the summary table. For each MCP server, show its status (OK / NOT CONFIGURED / UNAVAILABLE).
+
+### 4. Verify Git Setup (if `produces-code`)
+
+Only run these checks when `produces-code` is in the active trait set:
+
+- `.gitignore` exists and contains expected entries (check with Grep for `node_modules` or `__pycache__` based on stack)
+- `.git/hooks/pre-commit` exists and is executable (`ls -la .git/hooks/pre-commit`)
+- `.vscode/settings.json` exists
+- If GitHub repo was created during setup, note the remote URL (`git remote get-url origin`)
+
+### 5. Present Summary Checklist
+
+Format results as a markdown table. Use PASS / FAIL / WARN / SKIP for status:
+
+```
+## Setup Summary
+
+| Category | Item | Status | Notes |
+|----------|------|--------|-------|
+| Core | CLAUDE.md | PASS | 87 lines |
+| Core | docs/ directory | PASS | |
+| Core | docs/decisions/ | PASS | 3 ADRs created |
+| Core | docs/project-plan-v1.md | PASS | |
+| Traits | docs/engineering-context.md | PASS | produces-code |
+| Traits | docs/data-context.md | PASS | involves-data |
+| Linear | Project created | PASS | BC project |
+| Linear | Trait labels | PASS | 4 labels |
+| MCP | Linear | OK | |
+| MCP | Context7 | OK | Handbook: OK |
+| MCP | Data warehouse | WARN | Not configured |
+| Git | GitHub repo | PASS | Brite-Nites/project-name |
+| Git | Pre-commit hook | PASS | |
+| Git | .vscode/settings.json | PASS | |
+```
+
+Adapt the table to the actual active traits and results — only include rows relevant to this project. Include line count for CLAUDE.md and ADR count for `docs/decisions/`.
+
+### 6. Flag Missing Items
+
+For any FAIL or WARN status:
+
+- **FAIL** (blocking): Describe what's missing and provide an immediate remediation command or instruction. Example: "CLAUDE.md not found — this should have been generated. Re-run the CLAUDE.md generation step."
+- **WARN** (advisory): Describe the gap and provide setup instructions for later. Example: "No data warehouse MCP configured. Run Snowflake MCP setup when ready — see Brite Handbook data platform docs."
+
+List all FAIL items first, then WARN items.
+
+### 7. Suggest Next Steps
+
+Present these as a numbered list:
+
+1. "Run `/workflows:session-start` to pick your first issue and begin work"
+2. "Run `/workflows:brainstorming` if you want to explore ideas before committing to issues"
+3. If any WARN items exist: "Address the warnings above when convenient — they won't block work but may limit some features"
+
+---
+
 ## Begin Now
 
 Start by asking about their technical background (Step 0). After determining their autonomy level, begin Phase 1: understand who they are and what brought them here. Be warm and conversational — this should feel like a friendly conversation, not a form. Ask one or two questions at a time and let their answers guide your follow-ups.
