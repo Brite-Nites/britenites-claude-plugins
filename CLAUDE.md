@@ -12,6 +12,7 @@ Project: Brite Plugin Marketplace
 
 ## Architecture Decisions
 @docs/decisions/001-cross-repo-import-solution.md
+@docs/decisions/002-trait-evolution-mechanism.md
 <!-- Context-Skill Standard: docs/designs/BC-1966-context-skill-standard.md (on-demand reference, not @imported — 431 lines exceeds Tier 1/2 budget) -->
 
 ## Company Context
@@ -207,7 +208,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
-- `docs/testing-guide.md` — comprehensive testing guide (88 tests across 7 layers).
+- `docs/testing-guide.md` — comprehensive testing guide (101 tests across 7 layers).
 
 ## ADR Convention
 
