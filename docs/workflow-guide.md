@@ -334,7 +334,7 @@ Express mode bypasses the three-phase interview by auto-detecting traits from fi
 
 **Brownfield Support**
 
-When running project-start on an existing project (detected by presence of CLAUDE.md, substantial README, or docs/ directory), brownfield mode is offered. If accepted:
+When running project-start on an existing project (detected by presence of CLAUDE.md, substantial README, docs/ directory, or established git history), brownfield mode is offered. If accepted:
 
 - **Context import**: Reads README, existing CLAUDE.md, and docs/ to extract project name, tech stack, conventions, and architecture
 - **Convention detection**: Scans the codebase for indentation style, test framework, linting config, naming patterns, and deployment setup
