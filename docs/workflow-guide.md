@@ -321,6 +321,28 @@ Autonomy level (A = autonomous, B = collaborative) is orthogonal to traits — i
 | 7 | Write Project Plan | `docs/project-plan-v1.md` |
 | 8 | Generate ADRs | Gated on `produces-code` or `requires-decisions` with 2+ decisions |
 
+**Express Mode**
+
+Express mode bypasses the three-phase interview by auto-detecting traits from file markers in the current directory.
+
+- **Explicit trigger**: Pass `express` as an argument — `/workflows:project-start express`
+- **Auto-detected**: When file markers are found (e.g., `package.json`, `tsconfig.json`, `prisma/`, `dbt_project.yml`, `.github/workflows/`), project-start offers express mode via AskUserQuestion
+- **What it does**: Scans file markers, maps them to traits with confidence levels (High/Medium), presents detected traits with file evidence for user confirmation
+- **User options at confirmation**: "Looks good" (accept), "Let me adjust" (add/remove traits, up to 3 rounds), or "Run full interview instead"
+- **What it skips**: Phases 1-2 (interview) and Phase 3 (classification). Proceeds directly to Git Repository Setup with confirmed traits
+- **When it's NOT offered**: No file markers detected and `express` not passed as argument — proceeds directly to the full interview
+
+**Brownfield Support**
+
+When running project-start on an existing project (detected by presence of CLAUDE.md, substantial README, or docs/ directory), brownfield mode is offered. If accepted:
+
+- **Context import**: Reads README, existing CLAUDE.md, and docs/ to extract project name, tech stack, conventions, and architecture
+- **Convention detection**: Scans the codebase for indentation style, test framework, linting config, naming patterns, and deployment setup
+- **CDR reconciliation**: Compares detected conventions against company decision records from the handbook (via Context7). Flags conflicts, confirms alignments
+- **Doc pre-fill**: Uses imported context to pre-fill trait-conditional documentation, reducing redundant questions
+
+Brownfield runs after express mode (if both active) and before the interview (if express was skipped). The user can always decline with "No, start fresh."
+
 After project-start, run `/workflows:post-plan-setup` to refine the plan, create Linear issues, and finalize CLAUDE.md.
 
 ### Outer Loop Commands

@@ -131,6 +131,14 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T3.14a | `/workflows:project-start` (code-heavy) | `mkdir /tmp/test-api && cd /tmp/test-api` | Run → describe "Build an internal API with scheduled jobs" → complete interview → confirm traits | Verify: traits = `produces-code` (High), `automation` (Medium). Git: baseline + tech-stack .gitignore + CI/CD flag. Docs: `docs/engineering-context.md`, `docs/automation-patterns.md`. CLAUDE.md: Always-include (6) + Engineering Standards + Automation Patterns. Labels: `trait:produces-code`, `trait:automation`. ADR gate: met. **Cleanup:** `rm -rf /tmp/test-api` |
 | T3.14b | `/workflows:project-start` (doc-heavy) | `mkdir /tmp/test-marketing && cd /tmp/test-marketing` | Run → describe "Write a marketing plan for product launch" → complete interview → confirm traits | Verify: traits = `produces-documents` (High), `needs-marketing` (High). Git: baseline only (no tech-stack extensions). Docs: `docs/brief.md`, `docs/outline.md`, `docs/marketing-context.md`. CLAUDE.md: Always-include (6) + Document Structure + Marketing Context, NO Engineering Standards. Labels: `trait:produces-documents`, `trait:needs-marketing`. ADR gate: NOT met — skipped. **Cleanup:** `rm -rf /tmp/test-marketing` |
 | T3.14c | `/workflows:project-start` (multi-trait) | `mkdir /tmp/test-portal && cd /tmp/test-portal` | Run → describe "Build a customer portal with brand design" → complete interview → confirm traits | Verify: traits = `produces-code` (High), `has-external-users` (High), `needs-design` (Medium+). `client-facing` NOT auto-detected. Git: baseline + tech-stack .gitignore. Docs: `docs/engineering-context.md`, `docs/user-requirements.md`, `docs/design-context.md`. CLAUDE.md: Always-include (6) + Engineering Standards + User-Facing Requirements + Design Approach. Labels: `trait:produces-code`, `trait:has-external-users`, `trait:needs-design`. **Cleanup:** `rm -rf /tmp/test-portal` |
+| T3.14d | `/workflows:project-start express` (explicit) | `mkdir /tmp/test-express && cd /tmp/test-express && npm init -y && touch tsconfig.json` | Run with `express` argument | Verify: express mode activates immediately (no offer prompt), `produces-code` detected (High) from package.json + tsconfig.json, trait confirmation shown with file evidence, after confirm skips directly to Git Repository Setup. **Cleanup:** `rm -rf /tmp/test-express` |
+| T3.14e | `/workflows:project-start` (express auto-detected) | `mkdir /tmp/test-auto && cd /tmp/test-auto && npm init -y` | Run without `express` argument | Verify: express mode offered via AskUserQuestion (file markers detected), select "Yes" triggers file marker scan, `produces-code` detected (High). **Cleanup:** `rm -rf /tmp/test-auto` |
+| T3.14f | `/workflows:project-start express` (trait adjustment) | `mkdir /tmp/test-adjust && cd /tmp/test-adjust && npm init -y && mkdir prisma` | Run with `express` argument | Verify: `produces-code` (High) + `involves-data` (High) detected, select "Let me adjust", add `automation`, re-presented list shows 3 traits with `automation` marked "User-added". **Cleanup:** `rm -rf /tmp/test-adjust` |
+| T3.14g | `/workflows:project-start` (express declined) | `mkdir /tmp/test-decline && cd /tmp/test-decline && npm init -y` | Run without `express` argument | Verify: express mode offered, select "No, run full interview", proceeds to Interview Behavioral Guidelines and Phase 1. **Cleanup:** `rm -rf /tmp/test-decline` |
+| T3.14h | `/workflows:project-start express` (brownfield + express) | `mkdir /tmp/test-bf && cd /tmp/test-bf && npm init -y && touch tsconfig.json && printf '# My Project\n\nA Next.js dashboard for analytics.\n\n## Setup\n\nnpm install && npm run dev\n\n## Architecture\n\nMonorepo with turborepo.\n\n' > README.md` (README > 50 lines via repetition) | Run with `express` argument, accept brownfield when offered | Verify: express activates first (traits detected), then brownfield offered, context imported from README (project name, tech stack, setup), conventions detected, brownfield summary shown before Git Setup. **Cleanup:** `rm -rf /tmp/test-bf` |
+| T3.14i | `/workflows:project-start` (brownfield without express) | `mkdir /tmp/test-bf2 && cd /tmp/test-bf2 && mkdir -p docs && for f in arch api design; do echo "# $f" > docs/$f.md; done && printf '# Existing Project\n%.0s\n' {1..60} > README.md` | Run without `express`, decline express if offered, accept brownfield | Verify: brownfield offered (README + docs/ detected), context imported, doc inventory shown (3 docs found), proceeds to full interview with seeded context. **Cleanup:** `rm -rf /tmp/test-bf2` |
+| T3.14j | `/workflows:project-start express` (brownfield CDR reconciliation) | Existing TypeScript project with non-standard conventions (4-space indent, no linting config) | Run with `express`, accept brownfield | Verify: CDR reconciliation runs (or skips gracefully if Context7 unavailable), any conflicts/alignments shown in brownfield summary. **Cleanup:** remove temp dir |
+| T3.14k | `/workflows:project-start` (brownfield declined) | `mkdir /tmp/test-bf3 && cd /tmp/test-bf3 && printf '# Project\n%.0s\n' {1..60} > README.md` | Run, accept or skip express, decline brownfield ("No, start fresh") | Verify: proceeds to interview (or Git Setup) with no brownfield context, no pre-filling of docs. **Cleanup:** `rm -rf /tmp/test-bf3` |
 | T3.15 | `/workflows:setup-claude-md` | Any project | Run | CLAUDE.md generated/updated with required sections. Agent dispatched |
 
 ### Visual Commands (generates HTML files)
@@ -271,7 +279,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 24 | T1.1, T3.1–T3.26d |
+| Commands | 24 | T1.1, T3.1–T3.25g (includes T3.14–T3.14k for project-start) |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
@@ -294,11 +302,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/13
-Layer 3 (Commands):   __/39
+Layer 3 (Commands):   __/47
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/25
 
-Total:  __/93
+Total:  __/101
 Notes:  ____
 ```

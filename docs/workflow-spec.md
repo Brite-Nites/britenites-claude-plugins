@@ -2355,6 +2355,21 @@ error-handling:
   - failure-point: "ADR trait gate not met (Step 8)"
     action: skip
     detail: "ADR generation skipped. Show: Run /workflows:architecture-decision later."
+  - failure-point: "Express mode: 0 file markers found but $ARGUMENTS = 'express'"
+    action: degrade
+    detail: "Show empty detection with all traits under 'Not detected'. Let user manually add traits or select 'Run full interview instead.'"
+  - failure-point: "Express mode: user adjustment exceeds 3 rounds"
+    action: escalate
+    detail: "After 3 adjustment rounds, confirm current trait set or offer 'Run full interview instead.'"
+  - failure-point: "Brownfield: existing CLAUDE.md conflicts with detected conventions"
+    action: escalate
+    detail: "Present both sources side-by-side via AskUserQuestion. Ask user which is current. Use their answer for doc pre-fill."
+  - failure-point: "Brownfield: Context7 unavailable for CDR reconciliation"
+    action: skip
+    detail: "Skip CDR reconciliation. Note: 'Company decision record check skipped — Context7 unavailable.'"
+  - failure-point: "Brownfield: README unreadable or binary"
+    action: skip
+    detail: "Skip README import. Note: 'README could not be parsed. Proceeding without README context.'"
 ```
 
 ## 6. Context Loading Cascade
