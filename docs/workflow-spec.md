@@ -1283,16 +1283,16 @@ steps:
   - id: 1
     name: "Conduct Interview"
     required: true
-    skip-condition: null
-    skip-target: null
+    skip-condition: "Express mode accepted (traits detected from file markers and confirmed by user)"
+    skip-target: 3
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
   - id: 2
     name: "Classify Project Traits"
     required: true
-    skip-condition: null
-    skip-target: null
+    skip-condition: "Express mode accepted (traits already confirmed during express flow)"
+    skip-target: 3
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
@@ -1313,7 +1313,7 @@ steps:
     jump-on-fail: null
     activates-skill: null
     visual-gating: false
-    note: "Sub-step 4b: Trait-to-Infrastructure Dispatch. After scaffolding docs, applies trait-gated infrastructure actions (produces-code → .gitignore extensions + GitHub remote; requires-decisions → ADR generation is deferred to Step 8). Sub-step 4c: MCP Verification (BC-1949). Verifies global + trait-gated MCP connectivity. All failures non-blocking (WARN)."
+    note: "Sub-step 4b: Trait-to-Infrastructure Dispatch (infrastructure gating defined in Step 3 note). Sub-step 4c: MCP Verification (BC-1949). Verifies global + trait-gated MCP connectivity. All failures non-blocking (WARN)."
   - id: 5
     name: "Generate CLAUDE.md"
     required: true
