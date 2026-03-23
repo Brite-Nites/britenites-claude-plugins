@@ -208,7 +208,8 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
-- `docs/testing-guide.md` — comprehensive testing guide (101 tests across 7 layers).
+- `scripts/test-scenarios.sh` — E2E scenario validation (225 sub-tests: 60 PRD scenarios + 12 false positive regressions + 6 express mode cases).
+- `docs/testing-guide.md` — comprehensive testing guide (102 tests across 7 layers, plus 225 scenario sub-tests in T0.6).
 
 ## ADR Convention
 

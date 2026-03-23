@@ -16,7 +16,7 @@ Use this guide when working on the plugin itself or when verifying behavior afte
 
 For fast validation after changes, run only these:
 
-1. T0.1 + T0.2 — automated scripts pass
+1. T0.1 + T0.2 + T0.6 — automated scripts pass
 2. T1.1 + T1.2 — plugin loads, SessionStart fires
 3. T1.3 — smoke-test command
 4. T2.1 + T2.7 + T2.9 — one skill from each category triggers
@@ -36,6 +36,7 @@ Run these outside Claude, from a regular terminal or CI.
 | T0.3 Prerequisites check | `bash scripts/check-prereqs.sh` | All PASS (or explained SKIPs) |
 | T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 24 commands found |
 | T0.5 CI workflow | Push to branch, check GitHub Actions | All steps green |
+| T0.6 Scenario validation | `bash scripts/test-scenarios.sh` | 225/225 pass (60 scenarios + 12 FP regressions + 6 express mode, 7 categories) |
 
 ---
 
@@ -287,7 +288,8 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Skills (Browser) | 1 | Not directly tested (requires browser MCP) |
 | Agents | 25 | T6.1–T6.25 |
 | Hooks | 4 types | T5.1–T5.4, T0.2 |
-| Scripts | 4 | T0.1–T0.4 |
+| Scripts | 5 | T0.1–T0.4, T0.6 |
+| Scenarios | 60 + 12 FP + 6 EM | T0.6 |
 
 ---
 
@@ -299,7 +301,7 @@ Version:    ____
 Tester:     ____
 Environment: macOS / Linux / WSL
 
-Layer 0 (Automated):  __/5
+Layer 0 (Automated):  __/6
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/13
 Layer 3 (Commands):   __/47
@@ -307,6 +309,6 @@ Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/25
 
-Total:  __/101
+Total:  __/102
 Notes:  ____
 ```
