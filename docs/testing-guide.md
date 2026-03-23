@@ -279,7 +279,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 24 | T1.1, T3.1–T3.25g (includes T3.14–T3.14k for project-start) |
+| Commands | 24 | T1.1, T3.1–T3.25g |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |

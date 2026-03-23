@@ -406,4 +406,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 88-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 101-test validation suite.
