@@ -292,6 +292,48 @@ Create PR, update Linear, capture learnings, audit CLAUDE.md, suggest next issue
 | 6 | Worktree Cleanup | Remove worktree and local branch if applicable |
 | 7 | Session Close | Summary of what shipped, learnings captured, suggested next issue |
 
+### Direction-Setting Commands
+
+#### `/workflows:project-start`
+
+Start a new project with a guided interview. Produces trait-based classification, conditional documentation, CLAUDE.md, Linear project, project plan, and ADRs.
+
+**Trait-Based Classification**
+
+The interview produces a set of project traits from a fixed vocabulary of 11 (e.g., `produces-code`, `produces-documents`, `needs-design`, `has-external-users`, `automation`). Traits control:
+
+- Which docs are scaffolded (e.g., `produces-code` → `docs/engineering-context.md`)
+- Which CLAUDE.md sections are included (always-include + trait-conditional + autonomy-conditional)
+- Which infrastructure is set up (e.g., tech-stack .gitignore, CI/CD flags)
+- Which Linear labels are created (`trait:<name>` per active trait)
+
+Autonomy level (A = autonomous, B = collaborative) is orthogonal to traits — it controls how much the agent decides vs. asks.
+
+| Step | Name | What happens |
+|------|------|-------------|
+| 0 | Determine Technical Level | Choose autonomy level (A or B) |
+| 1 | Conduct Interview | Three-phase interview (Understand → Define → Classify) with gating to skip Phase 2 for simple projects |
+| 2 | Classify Project Traits | Detect traits from interview with confidence levels, confirm with user |
+| 3 | Git Repository Setup | Baseline (git init, .gitignore) + trait-gated extensions (tech-stack, CI/CD) |
+| 4 | Scaffold Docs + Verify MCPs | Create docs per trait-to-doc mapping; verify global + trait-gated MCP connectivity |
+| 5 | Generate CLAUDE.md | Always-include sections + trait-conditional + autonomy-conditional |
+| 6 | Create Linear Project | Project + `trait:<name>` labels (skipped if Linear unavailable) |
+| 7 | Write Project Plan | `docs/project-plan-v1.md` |
+| 8 | Generate ADRs | Gated on `produces-code` or `requires-decisions` with 2+ decisions |
+
+**Express Mode**
+
+Express mode bypasses the three-phase interview by auto-detecting traits from file markers in the current directory.
+
+- **Explicit trigger**: Pass `express` as an argument — `/workflows:project-start express`
+- **Auto-detected**: When file markers are found (e.g., `package.json`, `tsconfig.json`, `prisma/`, `dbt_project.yml`, `.github/workflows/`), project-start offers express mode via AskUserQuestion
+- **What it does**: Scans file markers, maps them to traits with confidence levels (High/Medium), presents detected traits with file evidence for user confirmation
+- **User options at confirmation**: "Looks good" (accept), "Let me adjust" (add/remove traits, up to 3 rounds), or "Run full interview instead"
+- **What it skips**: Phases 1-2 (interview) and Phase 3 (classification). Proceeds directly to Git Repository Setup with confirmed traits
+- **When it's NOT offered**: No file markers detected and `express` not passed as argument — proceeds directly to the full interview
+
+After project-start, run `/workflows:post-plan-setup` to refine the plan, create Linear issues, and finalize CLAUDE.md.
+
 ### Outer Loop Commands
 
 | Command | Description |

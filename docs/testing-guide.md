@@ -126,7 +126,14 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Test | Command | Setup | Steps | Expected |
 |------|---------|-------|-------|----------|
 | T3.13 | `/workflows:create-plugin` | In the plugin repo | Run with `test-plugin` → provide description → scaffold created → validate.sh passes | Verify: `plugins/test-plugin/` created, marketplace.json updated, validation passes. **Cleanup:** remove `plugins/test-plugin/`, revert marketplace.json |
-| T3.14 | `/workflows:project-start` | `mkdir /tmp/test-project && cd /tmp/test-project` | Run → select "Technical collaborator" → answer 2-3 questions | Abort before file creation. Verify: interview follows Path B |
+| T3.14 | `/workflows:project-start` | `mkdir /tmp/test-project && cd /tmp/test-project` | Run → select "Technical collaborator" → answer 2-3 questions about building an API | Abort after trait confirmation. Verify: autonomy set to B, `produces-code` detected (High), trait confirmation prompt shown |
+| T3.14a | `/workflows:project-start` (code-heavy) | `mkdir /tmp/test-api && cd /tmp/test-api` | Run → describe "Build an internal API with scheduled jobs" → complete interview → confirm traits | Verify: traits = `produces-code` (High), `automation` (Medium). Git: baseline + tech-stack .gitignore + CI/CD flag. Docs: `docs/engineering-context.md`, `docs/automation-patterns.md`. CLAUDE.md: Always-include (6) + Engineering Standards + Automation Patterns. Labels: `trait:produces-code`, `trait:automation`. ADR gate: met. **Cleanup:** `rm -rf /tmp/test-api` |
+| T3.14b | `/workflows:project-start` (doc-heavy) | `mkdir /tmp/test-marketing && cd /tmp/test-marketing` | Run → describe "Write a marketing plan for product launch" → complete interview → confirm traits | Verify: traits = `produces-documents` (High), `needs-marketing` (High). Git: baseline only (no tech-stack extensions). Docs: `docs/brief.md`, `docs/outline.md`, `docs/marketing-context.md`. CLAUDE.md: Always-include (6) + Document Structure + Marketing Context, NO Engineering Standards. Labels: `trait:produces-documents`, `trait:needs-marketing`. ADR gate: NOT met. **Cleanup:** `rm -rf /tmp/test-marketing` |
+| T3.14c | `/workflows:project-start` (multi-trait) | `mkdir /tmp/test-portal && cd /tmp/test-portal` | Run → describe "Build a customer portal with brand design" → complete interview → confirm traits | Verify: traits = `produces-code` (High), `has-external-users` (High), `needs-design` (Medium+). `client-facing` NOT auto-detected. Git: baseline + tech-stack .gitignore. Docs: `docs/engineering-context.md`, `docs/user-requirements.md`, `docs/design-context.md`. Labels: `trait:produces-code`, `trait:has-external-users`, `trait:needs-design`. **Cleanup:** `rm -rf /tmp/test-portal` |
+| T3.14d | `/workflows:project-start express` (explicit) | `mkdir /tmp/test-express && cd /tmp/test-express && npm init -y && touch tsconfig.json` | Run with `express` argument | Verify: express mode activates immediately (no offer prompt), `produces-code` detected (High) from package.json + tsconfig.json, trait confirmation shown with file evidence, after confirm skips directly to Git Repository Setup. **Cleanup:** `rm -rf /tmp/test-express` |
+| T3.14e | `/workflows:project-start` (express auto-detected) | `mkdir /tmp/test-auto && cd /tmp/test-auto && npm init -y` | Run without `express` argument | Verify: express mode offered via AskUserQuestion (file markers detected), select "Yes" triggers file marker scan, `produces-code` detected (High). **Cleanup:** `rm -rf /tmp/test-auto` |
+| T3.14f | `/workflows:project-start express` (trait adjustment) | `mkdir /tmp/test-adjust && cd /tmp/test-adjust && npm init -y && mkdir prisma` | Run with `express` argument | Verify: `produces-code` (High) + `involves-data` (High) detected, select "Let me adjust", add `automation`, re-presented list shows 3 traits with `automation` marked "User-added". **Cleanup:** `rm -rf /tmp/test-adjust` |
+| T3.14g | `/workflows:project-start` (express declined) | `mkdir /tmp/test-decline && cd /tmp/test-decline && npm init -y` | Run without `express` argument | Verify: express mode offered, select "No, run full interview", proceeds to Interview Behavioral Guidelines and Phase 1. **Cleanup:** `rm -rf /tmp/test-decline` |
 | T3.15 | `/workflows:setup-claude-md` | Any project | Run | CLAUDE.md generated/updated with required sections. Agent dispatched |
 
 ### Visual Commands (generates HTML files)
@@ -252,7 +259,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 24 | T1.1, T3.1–T3.25g |
+| Commands | 24 | T1.1, T3.1–T3.25g (includes T3.14–T3.14g for project-start) |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
@@ -275,11 +282,11 @@ Environment: macOS / Linux / WSL
 Layer 0 (Automated):  __/5
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/13
-Layer 3 (Commands):   __/31
+Layer 3 (Commands):   __/38
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/25
 
-Total:  __/85
+Total:  __/92
 Notes:  ____
 ```

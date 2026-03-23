@@ -1997,6 +1997,45 @@ error-handling:
     detail: "Skip CLAUDE.md update, note: add @import when CLAUDE.md is created"
 ```
 
+<!-- spec:errors:project-start -->
+```yaml
+command: project-start
+error-handling:
+  - failure-point: "Technical level question unanswered (Step 0)"
+    action: escalate
+    detail: "Re-ask with simplified options. Default to Autonomy A if no response after 2 attempts."
+  - failure-point: "Interview stalls or user disengages (Step 1)"
+    action: degrade
+    detail: "Summarize what's been gathered, confirm it's enough to proceed, skip remaining questions."
+  - failure-point: "0 traits detected after interview (Step 2)"
+    action: escalate
+    detail: "Suggest 2-3 plausible Low-confidence traits based on conversation. AskUserQuestion to confirm."
+  - failure-point: "Git init fails (Step 3)"
+    action: escalate
+    detail: "AskUserQuestion: Retry / Skip git setup and proceed with file creation / Stop"
+  - failure-point: "Trait-conditional doc write fails (Step 4)"
+    action: degrade
+    detail: "Log failed file, continue with remaining docs. Note missing doc in manifest."
+  - failure-point: "Linear MCP inaccessible (Step 6)"
+    action: skip
+    detail: "Skip Linear project creation. Note: user should create project manually."
+  - failure-point: "Trait label creation fails (Step 6)"
+    action: degrade
+    detail: "Label creation is best-effort. Skip failed labels silently, continue with remaining traits. Note missing labels for manual creation."
+  - failure-point: "MCP verification fails (Sub-step 4c)"
+    action: degrade
+    detail: "All MCP failures are non-blocking. Record status, present WARN table, continue. Missing MCPs noted in generated CLAUDE.md."
+  - failure-point: "ADR trait gate not met (Step 8)"
+    action: skip
+    detail: "ADR generation skipped. Show: Run /workflows:architecture-decision later."
+  - failure-point: "Express mode: 0 file markers found but $ARGUMENTS = 'express'"
+    action: degrade
+    detail: "Show empty detection with all traits under 'Not detected'. Let user manually add traits or select 'Run full interview instead.'"
+  - failure-point: "Express mode: user adjustment exceeds 3 rounds"
+    action: escalate
+    detail: "After 3 adjustment rounds, confirm current trait set or offer 'Run full interview instead.'"
+```
+
 ## 6. Context Loading Cascade
 
 Authoritative specification for when context loads during the inner loop. Governs what each stage should load and at what tier. See `docs/designs/BRI-2006-context-loading-cascade.md` for rationale and design decisions.
