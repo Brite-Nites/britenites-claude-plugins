@@ -321,6 +321,10 @@ Autonomy level (A = autonomous, B = collaborative) is orthogonal to traits — i
 | 7 | Write Project Plan | `docs/project-plan-v1.md` |
 | 8 | Generate ADRs | Gated on `produces-code` or `requires-decisions` with 2+ decisions |
 
+**Express Mode**: Auto-detects traits from file markers, skips Steps 1-2 (interview + classification). Trigger: `/workflows:project-start express` or auto-offered when trait-mapping markers found. User confirms/adjusts detected traits before proceeding to Step 3.
+
+**Brownfield Support**: When an existing project is detected (CLAUDE.md, README >50 lines, docs/ with 3+ files, or 10+ git commits), offers to import context, detect conventions, reconcile with company CDRs, and pre-fill trait docs. Runs after express mode (if both active) or before the interview.
+
 After project-start, run `/workflows:post-plan-setup` to refine the plan, create Linear issues, and finalize CLAUDE.md.
 
 ### Outer Loop Commands
@@ -384,4 +388,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 88-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 101-test validation suite.
