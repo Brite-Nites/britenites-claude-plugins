@@ -767,6 +767,94 @@ for e in errors:
     warn "No files with step sequences found"
   fi
 
+  # ── Trait Definition Validation ────────────────────────────────
+  section "13b. Trait Definition Validation ($plugin_name)"
+
+  local project_start_md="$PLUGIN_ROOT/commands/project-start.md"
+  local trait_templates_md="$PLUGIN_ROOT/commands/_shared/trait-doc-templates.md"
+
+  if [ ! -f "$project_start_md" ]; then
+    pass "project-start.md not found — trait validation skipped"
+  else
+    trait_result=$(PROJECT_START="$project_start_md" TRAIT_TEMPLATES="$trait_templates_md" python3 << 'PYEOF'
+import os, re
+
+project_start = os.environ["PROJECT_START"]
+trait_templates = os.environ["TRAIT_TEMPLATES"]
+
+CANONICAL = {
+    "produces-code", "produces-documents", "involves-data", "requires-decisions",
+    "has-external-users", "client-facing", "needs-design", "needs-marketing",
+    "needs-sales", "cross-team", "automation",
+}
+
+errors = []
+
+with open(project_start) as f:
+    ps_lines = f.read().splitlines()
+
+def extract_table_traits(lines, section_marker):
+    """Find the first markdown table after a line starting with section_marker,
+    then extract backtick-wrapped names from the first column."""
+    traits = set()
+    in_section = False
+    in_table = False
+    for line in lines:
+        if line.strip().startswith(section_marker):
+            in_section = True
+            continue
+        if in_section:
+            if not in_table and line.startswith('|') and '---' in line:
+                in_table = True
+                continue
+            if in_table:
+                if not line.startswith('|'):
+                    break
+                m = re.match(r'\|\s*`([^`]+)`', line)
+                if m:
+                    traits.add(m.group(1))
+    return traits
+
+def check_traits(found, label):
+    """Validate found traits against CANONICAL set. Appends errors or prints OK."""
+    if not found:
+        errors.append(f'{label}: no traits found (section missing or table unparseable)')
+        return
+    missing = CANONICAL - found
+    extra = found - CANONICAL
+    for t in sorted(missing):
+        errors.append(f'{label}: missing trait "{t}"')
+    for t in sorted(extra):
+        errors.append(f'{label}: unknown trait "{t}"')
+    if not missing and not extra:
+        print(f"OK:{label} — {len(found)} traits match")
+
+check_traits(extract_table_traits(ps_lines, "## Trait Definitions"), "Trait definition table")
+check_traits(extract_table_traits(ps_lines, "### Trait-to-Documentation Mapping"), "Trait-to-doc mapping")
+check_traits(extract_table_traits(ps_lines, "**Trait-conditional**"), "Post-setup verification table")
+
+if not os.path.isfile(trait_templates):
+    errors.append("trait-doc-templates.md not found")
+else:
+    with open(trait_templates) as f:
+        tmpl_content = f.read()
+    tmpl_traits = set(re.findall(r'^## `([^`]+)`', tmpl_content, re.MULTILINE))
+    check_traits(tmpl_traits, "trait-doc-templates.md")
+
+for e in errors:
+    print(f"ERROR:{e}")
+PYEOF
+)
+
+    while IFS= read -r line; do
+      if [[ "$line" == OK:* ]]; then
+        pass "${line#OK:}"
+      elif [[ "$line" == ERROR:* ]]; then
+        fail "${line#ERROR:}"
+      fi
+    done <<< "$trait_result"
+  fi
+
   # ── Trigger Registry Validation ──────────────────────────────────
   section "14. Trigger Registry ($plugin_name)"
 
