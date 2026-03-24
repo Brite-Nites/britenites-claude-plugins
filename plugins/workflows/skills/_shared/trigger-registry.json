@@ -82,6 +82,14 @@
       "beats": []
     },
     {
+      "name": "handbook-drift-check",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["handbook drift", "handbook update", "handbook PR", "check handbook staleness"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
       "name": "post-plan-setup",
       "tier": "post-plan",
       "user_invocable": true,
@@ -443,6 +451,18 @@
       "expected": ["precedent-search"],
       "not_expected": [],
       "description": "Historical decisions keyword triggers precedent-search"
+    },
+    {
+      "phrase": "Check for handbook drift after shipping these changes",
+      "expected": ["handbook-drift-check"],
+      "not_expected": [],
+      "description": "Handbook drift check triggers on explicit keyword"
+    },
+    {
+      "phrase": "We should do a handbook update to reflect the new architecture",
+      "expected": ["handbook-drift-check"],
+      "not_expected": [],
+      "description": "Handbook update keyword triggers handbook-drift-check"
     }
   ]
 }
