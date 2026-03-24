@@ -140,7 +140,7 @@ flowchart LR
 
 **`/session-start`**: Pulls latest, queries Linear for open issues, helps pick one, creates an execution plan.
 
-**`/review`**: Haiku-powered diff triage gates trivial diffs, then dynamically selects Opus-powered review agents based on depth mode and stack (3-9 agents). Tier 1 always runs (code, security, performance); Tier 2 activates for detected stacks (TypeScript, Python, data); Tier 3 is conditional/opt-in (architecture, accessibility, test-quality). Per-finding validation (Opus for P1s, Sonnet for P2/P3s) confirms findings before auto-fixing P1s. Reports P2/P3s.
+**`/review`**: Haiku-powered diff triage gates trivial diffs, then dynamically selects Opus-powered review agents based on depth mode and stack (3-10 agents). Tier 1 always runs (code, security, performance); Tier 2 activates for detected stacks (TypeScript, Python, data); Tier 3 is conditional/opt-in (architecture, accessibility, test-quality, CDR compliance). Per-finding validation (Opus for P1s, Sonnet for P2/P3s) confirms findings before auto-fixing P1s. Reports P2/P3s.
 
 **`/ship`**: Creates PR, updates Linear issue status, compounds learnings to CLAUDE.md and memory, suggests next issue.
 

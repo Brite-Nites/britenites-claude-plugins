@@ -195,7 +195,7 @@ Control how many review agents run via `$ARGUMENTS`:
 /workflows:review fast            # Tier 1 only (3 agents) — quick checks
 /workflows:review                 # Tier 1 + Tier 2 (default, 3-6 agents)
 /workflows:review thorough        # Explicit default — same as bare invocation
-/workflows:review comprehensive   # All tiers (3-9 agents) — pre-release
+/workflows:review comprehensive   # All tiers (3-10 agents) — pre-release
 ```
 
 | Mode | Agents | When to use |
@@ -389,4 +389,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 101-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 102-test validation suite.

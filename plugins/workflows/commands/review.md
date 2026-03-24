@@ -188,7 +188,7 @@ Narrate: `Step 5/9: Merging findings...`
 
 Merge findings from all selected agents into a single report, deduplicated and sorted by severity:
 
-**Cross-agent deduplication**: When multiple agents flag the same `file:line`, keep the finding from the agent with the higher confidence score. If confidence is equal, use specialization order (most to least): security-reviewer > cdr-compliance-reviewer > data-reviewer > performance-reviewer > architecture-reviewer > test-quality-reviewer > python-reviewer > typescript-reviewer > accessibility-reviewer > code-reviewer. Remove the duplicate from the other agents' counts.
+**Cross-agent deduplication**: When multiple agents flag the same `file:line`, keep the finding from the agent with the higher confidence score. If confidence is equal, use specialization order (most to least): security-reviewer > data-reviewer > performance-reviewer > architecture-reviewer > cdr-compliance-reviewer > test-quality-reviewer > python-reviewer > typescript-reviewer > accessibility-reviewer > code-reviewer. Remove the duplicate from the other agents' counts.
 
 **Confidence filtering**: After deduplication, apply confidence threshold filtering.
 

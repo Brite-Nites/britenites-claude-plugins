@@ -308,7 +308,7 @@ Layer 2 (Skills):     __/13
 Layer 3 (Commands):   __/47
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
-Layer 6 (Agents):     __/25
+Layer 6 (Agents):     __/26
 
 Total:  __/102
 Notes:  ____
