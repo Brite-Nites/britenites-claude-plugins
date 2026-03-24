@@ -90,6 +90,14 @@
       "beats": []
     },
     {
+      "name": "precedent-search",
+      "tier": "inner-loop",
+      "user_invocable": false,
+      "keywords": ["search precedents", "precedent search", "past decisions", "prior decisions", "historical decisions", "decision trace search"],
+      "negative_keywords": [],
+      "beats": []
+    },
+    {
       "name": "python-best-practices",
       "tier": "backend-quality",
       "user_invocable": true,
@@ -423,6 +431,18 @@
       "expected": ["frontend-design"],
       "not_expected": ["ui-ux-pro-max"],
       "description": "Beats: frontend-design beats ui-ux-pro-max (both match via implement dashboard + explore UI styles, beats resolves)"
+    },
+    {
+      "phrase": "Search precedents for past decisions on multi-tenancy",
+      "expected": ["precedent-search"],
+      "not_expected": [],
+      "description": "Precedent search triggers on explicit keyword"
+    },
+    {
+      "phrase": "Find historical decisions about database architecture",
+      "expected": ["precedent-search"],
+      "not_expected": [],
+      "description": "Historical decisions keyword triggers precedent-search"
     }
   ]
 }
