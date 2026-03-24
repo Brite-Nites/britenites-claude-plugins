@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
-7. After you run `/workflows:review`, a Haiku-powered diff triage gates trivial diffs, then a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then Opus-powered review agents are dynamically selected based on depth mode and your stack (3-9 agents) and run in parallel, findings are validated by per-finding subagents, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
+7. After you run `/workflows:review`, a Haiku-powered diff triage gates trivial diffs, then a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then Opus-powered review agents are dynamically selected based on depth mode and your stack (3-10 agents) and run in parallel, findings are validated by per-finding subagents, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
 8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
 
 ### Artifacts produced
@@ -195,7 +195,7 @@ Control how many review agents run via `$ARGUMENTS`:
 /workflows:review fast            # Tier 1 only (3 agents) — quick checks
 /workflows:review                 # Tier 1 + Tier 2 (default, 3-6 agents)
 /workflows:review thorough        # Explicit default — same as bare invocation
-/workflows:review comprehensive   # All tiers (3-9 agents) — pre-release
+/workflows:review comprehensive   # All tiers (3-10 agents) — pre-release
 ```
 
 | Mode | Agents | When to use |
@@ -233,6 +233,7 @@ Depth can be combined with other flags: `/workflows:review fast skip triage skip
 | 3 (opt-in) | `architecture-reviewer` | Opus | CLAUDE.md enables, OR diff touches 5+ directories, OR `comprehensive` depth | Coupling, SOLID, dependency direction |
 | 3 (opt-in) | `test-quality-reviewer` | Opus | Diff includes test files OR CLAUDE.md enables | Coverage gaps, behavior vs implementation, flakiness risk |
 | 3 (opt-in) | `accessibility-reviewer` | Opus | CLAUDE.md enables, OR `comprehensive` depth | WCAG 2.1, keyboard nav, ARIA, screen reader |
+| 3 (opt-in) | `cdr-compliance-reviewer` | Opus | Company Context with `handbook-library` configured, CLAUDE.md enables, OR `comprehensive` depth | CDR compliance, missing exceptions, superseded patterns |
 
 **CLAUDE.md Review Agent Overrides**
 
@@ -272,7 +273,7 @@ The review pipeline uses three model tiers for cost-effective depth:
 | Tier | Model | Used for |
 |------|-------|----------|
 | Gating | Haiku | Diff triage (Step 2) — fast classification of trivial vs non-trivial diffs |
-| Review | Opus | All 9 review agents (Step 4) — deep reasoning for bug detection, security analysis, and architectural review |
+| Review | Opus | All 10 review agents (Step 4) — deep reasoning for bug detection, security analysis, and architectural review |
 | Validation | Opus/Sonnet | Per-finding verification (Step 6) — Opus for P1s, Sonnet for P2/P3s |
 
 This ensures expensive Opus inference only runs when the diff warrants it, and each finding is independently verified before entering the fix loop.
@@ -388,4 +389,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 101-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 102-test validation suite.

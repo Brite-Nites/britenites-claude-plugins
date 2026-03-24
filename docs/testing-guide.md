@@ -273,6 +273,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T6.23 | Validation — skip flag | `/workflows:review skip validation` | Step 6 narrates "Validation skipped (user request)", proceeds directly to Step 7 |
 | T6.24 | Validation — fast mode P2/P3 skip | `/workflows:review fast` with P2/P3 findings but no P1s | Step 6 narrates "Validation skipped (fast mode, no P1s)", proceeds to Step 7 without dispatching subagents |
 | T6.25 | Validation — fast mode P1 only | `/workflows:review fast` with P1 findings | Step 6 narrates "Validating P1s only (fast mode)", dispatches Opus subagents for P1s only, skips P2/P3 verification |
+| T6.26 | `cdr-compliance-reviewer` | `/workflows:review` (when project CLAUDE.md has `## Company Context` with `handbook-library`, CLAUDE.md enables, or `comprehensive` depth) | CDR compliance findings with CDR ID references (e.g., CDR-001), Why/Fix fields, compliance verdict (`Compliant` / `Violation Found` / `Review Needed`), CDRs Checked count. When Context7 unavailable: graceful skip with `CDR Compliance: N/A (CDR INDEX unavailable)`. When no handbook-library: skip with `CDR Compliance: N/A (no handbook configured)`. |
 
 ---
 
@@ -286,7 +287,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
 | Skills (Post-plan) | 4 | T4.2 (refine-plan, create-issues, setup-claude-md, post-plan-setup) |
 | Skills (Browser) | 1 | Not directly tested (requires browser MCP) |
-| Agents | 25 | T6.1–T6.25 |
+| Agents | 26 | T6.1–T6.26 |
 | Hooks | 4 types | T5.1–T5.4, T0.2 |
 | Scripts | 5 | T0.1–T0.4, T0.6 |
 | Scenarios | 60 + 12 FP + 6 EM | T0.6 |
@@ -307,7 +308,7 @@ Layer 2 (Skills):     __/13
 Layer 3 (Commands):   __/47
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
-Layer 6 (Agents):     __/25
+Layer 6 (Agents):     __/26
 
 Total:  __/102
 Notes:  ____
