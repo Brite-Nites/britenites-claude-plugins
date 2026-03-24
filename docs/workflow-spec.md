@@ -1877,6 +1877,19 @@ integration:
   trigger: "task checkpoint, after task completion"
   extraction: "compound-learnings scans for fenced YAML starting with # execution-trace-v1 marker and task: as second key"
   promotion: "Linear issue with label precedent-promotion; never auto-promoted"
+
+index:
+  path: "docs/precedents/INDEX.md"
+  archive-path: "docs/precedents/INDEX-archive.md"
+  columns: [Issue, Decision, Category, Date, Tags]
+  archive-threshold: 200
+  archive-age: "6 months"
+  sort: chronological-by-insertion
+  dedup-key: "Issue + Decision text"
+  tag-derivation: "category as tag-1, key nouns from Decision as tags 2-5"
+  tag-format: "^[a-z0-9]+(-[a-z0-9]+)*$"
+  tag-max-length: 30
+  tag-max-count: 5
 ```
 
 ---
