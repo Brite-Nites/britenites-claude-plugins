@@ -163,6 +163,9 @@ Per spec Section 9 (Storage):
      ```
    - Append new rows or replace existing rows (matched by Issue + Decision heading)
    - INDEX columns: Issue, Decision, Category, Date, Tags
+   - Preserve the HTML comment block above the table header when rewriting INDEX.md
+   - **Tag derivation:** category as tag #1, then up to 4 key nouns from the Decision field (lowercase kebab-case, max 30 chars each). Prefer technology names, domain concepts, pattern names. Avoid generic terms (code, fix, change).
+   - For full auto-update algorithm details (dedup, sort, archive rotation), see `docs/precedents/README.md`
 
 ### 2g. Promotion Flagging
 
