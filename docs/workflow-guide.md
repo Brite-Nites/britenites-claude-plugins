@@ -40,8 +40,8 @@ The inner loop is the core development workflow. You run **3 commands** — ever
 Between those 3 commands, skills activate in sequence based on the work:
 
 1. **session-start** pulls latest, reads CLAUDE.md and auto-memory, checks Context7 availability, gathers company context (or skips if already set up), queries Linear for your next issue
-2. **brainstorming** activates if complexity criteria are met (2+ modules, 4+ tasks, 2+ approaches, or new patterns) — produces a design document via Socratic discovery
-3. **writing-plans** checks Active CDRs from the handbook (when company context is configured), then breaks the work into 2-5 minute tasks with exact file paths, verification steps, and TDD structure
+2. **brainstorming** activates if complexity criteria are met (2+ modules, 4+ tasks, 2+ approaches, or new patterns) — searches past decision traces for prior art, then produces a design document via Socratic discovery
+3. **writing-plans** checks Active CDRs from the handbook and searches project-level precedent INDEX for relevant past decisions (when company context is configured), then breaks the work into 2-5 minute tasks with exact file paths, verification steps, and TDD structure
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution

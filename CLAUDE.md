@@ -116,6 +116,7 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 | Skill | Triggers on | Purpose |
 |-------|-------------|---------|
 | `brainstorming` | Non-trivial issue, before planning | Socratic discovery, design document |
+| `precedent-search` | During brainstorming or planning | Search past decision traces from project and org INDEX |
 | `writing-plans` | Multi-step task, before coding | Bite-sized tasks with TDD, verification |
 | `git-worktrees` | After plan approval, before coding | Isolated workspace with Linear issue ID |
 | `executing-plans` | Given an approved plan | Subagent-per-task + TDD + checkpoints |

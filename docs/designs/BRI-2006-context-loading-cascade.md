@@ -55,8 +55,8 @@ Tier 3 content (full CDR documents, precedent traces, analytical metrics) is NOT
 |-------|--------------|-----------------|-----|--------|
 | **project-start** | `project-start.md` | Trait classification, CLAUDE.md generation with @imports | Interview + write | Implemented |
 | **session-start** | `session-start.md` | CLAUDE.md (Tier 1+2), auto-memory, Company Context check, @import freshness check, Linear issues | Read + MCP queries | Implemented |
-| **brainstorm** | `brainstorming/SKILL.md` | Linear issue, CLAUDE.md, auto-memory, relevant source code | Read + Linear MCP | Implemented |
-| **plan** | `writing-plans/SKILL.md` | Design doc, Linear issue, CDR INDEX via Context7 (Tier 3 on-demand), source code, test patterns | Read + Context7 MCP | Implemented |
+| **brainstorm** | `brainstorming/SKILL.md` | Linear issue, CLAUDE.md, auto-memory, relevant source code, precedent INDEX search | Read + Linear MCP + Read INDEX + Context7 MCP | Implemented |
+| **plan** | `writing-plans/SKILL.md` | Design doc, Linear issue, CDR INDEX via Context7, precedent INDEX (Tier 3 on-demand), source code, test patterns | Read + Context7 MCP + Read INDEX | Implemented |
 | **execute** | `executing-plans/SKILL.md` | Design doc + plan file (parent); task description + relevant files + conventions (subagent) | Read; subagent gets narrowest scope | Implemented |
 | **review** | `review.md` | Diff stat, changed files; review agents read files themselves | git diff + agent dispatch | Implemented |
 | **ship** | `ship.md` + `compound-learnings/SKILL.md` | CLAUDE.md, diff, commit history; captures learnings back | Read + write | Implemented |
@@ -65,7 +65,6 @@ Tier 3 content (full CDR documents, precedent traces, analytical metrics) is NOT
 
 | Stage | What will load | Issue |
 |-------|---------------|-------|
-| brainstorm | Precedent search results from QMD/precedent DB | BRI-1960 |
 | plan | CDR conflict check with full CDR lazy-load | BRI-1939 (partial — CDR INDEX query implemented, full conflict flow planned) |
 | execute | Per-task context filtering (task-level, not project-level) | BC-2003 (delivered) |
 | review | CDR compliance check ("does this PR violate active CDRs?") | No issue yet |
@@ -76,7 +75,7 @@ Tier 3 content (full CDR documents, precedent traces, analytical metrics) is NOT
 | Layer | Scope | Examples | Loaded at | Refresh | Status |
 |-------|-------|---------|-----------|---------|--------|
 | **Company** | Organization-wide | CDR INDEX, org structure, brand guidelines | session-start (via CLAUDE.md @imports) | Quarterly | Partially implemented (Company Context pointers; @imports planned in BRI-1945) |
-| **Precedent** | Historical decisions | Past ADRs, decision traces, search results | brainstorm, plan | Continuous | Planned (BRI-1960) |
+| **Precedent** | Historical decisions | Past ADRs, decision traces, search results | brainstorm, plan | Continuous | Implemented (BC-1961) |
 | **Domain** | Plugin-specific | engineering-context.md, design-context.md | project-start (plugin activation) | Per context-skill standard | Planned (BRI-1966) |
 | **Project** | This project | CLAUDE.md, docs/, architecture decisions | session-start | Every session | Implemented |
 | **Task** | Current task | Relevant files, test results, Linear issue | execute (per subagent) | Every task | Implemented |
@@ -88,6 +87,7 @@ This spec is referenced by:
 - `plugins/workflows/skills/brainstorming/SKILL.md` — Tier 1+2 loading
 - `plugins/workflows/skills/writing-plans/SKILL.md` — Tier 1+2 + Tier 3 CDR on-demand
 - `plugins/workflows/skills/executing-plans/SKILL.md` — Task-scoped (Tier 5) loading
+- `plugins/workflows/skills/precedent-search/SKILL.md` — Precedent search algorithm (Tier 3 on-demand)
 
 Related issues:
 - BRI-1938 — Freshness tracking in session-start

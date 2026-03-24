@@ -2412,13 +2412,13 @@ stages:
 
   - stage: brainstorm
     skill: brainstorming/SKILL.md
-    what-loads: "Linear issue, CLAUDE.md, auto-memory, relevant source code"
-    how: "Read + Linear MCP"
-    tier: [1, 2]
+    what-loads: "Linear issue, CLAUDE.md, auto-memory, relevant source code, precedent INDEX search"
+    how: "Read + Linear MCP + Read INDEX + Context7 MCP"
+    tier: [1, 2, 3]
     status: implemented
-    planned:
-      - what: "Precedent search results from QMD/precedent DB"
-        issue: BRI-1960
+    implemented:
+      - what: "Precedent search results from INDEX + Context7"
+        issue: BC-1961
         tier: 3
 
   - stage: plan
@@ -2596,7 +2596,7 @@ offloading-strategy:
 
   in-filesystem:
     - "Full CDR documents — loaded on-demand via Context7 during plan stage"
-    - "Precedent search results — planned (BRI-1960), will live in filesystem until queried"
+    - "Precedent search results — implemented (BC-1961), INDEX at docs/precedents/INDEX.md + org-level via Context7"
     - "Design docs — loaded per-task by executing-plans parent agent"
     - "Domain context docs — @imported at session-start (Tier 2), not inlined"
     - "Architecture Decision Records — @imported via CLAUDE.md, not inlined"
@@ -2609,9 +2609,9 @@ progressive-disclosure:
     description: "writing-plans queries CDR INDEX via Context7; lazy-loads full CDR only on conflict"
 
   - pattern: "Precedent INDEX → full trace"
-    status: planned
-    issue: BRI-1960
-    description: "Brainstorm/plan will query precedent database; full traces loaded on match"
+    status: implemented
+    issue: BC-1961
+    description: "Brainstorm/plan query precedent INDEX; full traces lazy-loaded on match"
 
   - pattern: "Metric definitions → metric values"
     status: planned
