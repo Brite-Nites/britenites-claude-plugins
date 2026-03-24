@@ -1,5 +1,5 @@
 ---
-description: Create PR, update Linear, compound learnings, best-practices audit, suggest next issue
+description: Create PR, update Linear, compound learnings, best-practices audit, handbook drift check, suggest next issue
 ---
 
 # Ship & Compound
@@ -15,7 +15,7 @@ Before creating a PR, confirm `gh` is available and authenticated:
 
 ## Step 1: Pre-Ship Checks
 
-Narrate: `Step 1/7: Pre-ship checks...`
+Narrate: `Step 1/8: Pre-ship checks...`
 
 ### Context Anchor
 
@@ -35,11 +35,11 @@ Before creating a PR:
 
 If any check fails, use error recovery: AskUserQuestion with options: "Fix the failing check / Skip this check (requires confirmation) / Stop." If the user selects "Skip", require a second confirmation: "Shipping with a failing [check name]. Type CONFIRM SKIP to proceed." Do not proceed without explicit confirmation.
 
-Narrate: `Step 1/7: Pre-ship checks... done`
+Narrate: `Step 1/8: Pre-ship checks... done`
 
 ## Step 2: Create Pull Request
 
-Narrate: `Step 2/7: Creating pull request...`
+Narrate: `Step 2/8: Creating pull request...`
 
 Push the branch and create a PR:
 
@@ -70,11 +70,11 @@ Title: [concise imperative description, under 70 chars]
 
 If PR creation fails, use error recovery: AskUserQuestion with options: "Retry push and PR creation / Create PR manually / Stop."
 
-Narrate: `Step 2/7: Creating pull request... done`
+Narrate: `Step 2/8: Creating pull request... done`
 
 ## Step 3: Update Linear
 
-Narrate: `Step 3/7: Updating Linear...`
+Narrate: `Step 3/8: Updating Linear...`
 
 Use the Linear MCP tools:
 
@@ -84,11 +84,11 @@ Use the Linear MCP tools:
 
 If Linear MCP isn't accessible, provide manual steps.
 
-Narrate: `Step 3/7: Updating Linear... done`
+Narrate: `Step 3/8: Updating Linear... done`
 
 ## Step 4: Compound Learnings
 
-Narrate: `Step 4/7: Compounding learnings...`
+Narrate: `Step 4/8: Compounding learnings...`
 
 The `compound-learnings` skill activates to capture what was learned. It will verify its own preconditions (diff exists, CLAUDE.md exists) before proceeding.
 
@@ -101,11 +101,11 @@ The `compound-learnings` skill activates to capture what was learned. It will ve
 
 Only durable knowledge gets recorded. No session-specific noise.
 
-Narrate: `Step 4/7: Compounding learnings... done`
+Narrate: `Step 4/8: Compounding learnings... done`
 
 ## Step 5: Best Practices Audit
 
-Narrate: `Step 5/7: Running best-practices audit...`
+Narrate: `Step 5/8: Running best-practices audit...`
 
 The `best-practices-audit` skill activates to keep CLAUDE.md healthy. It will verify CLAUDE.md exists before proceeding.
 
@@ -119,11 +119,25 @@ The `best-practices-audit` skill activates to keep CLAUDE.md healthy. It will ve
 
 Skip this step if the compound-learnings skill (Step 4) reported no CLAUDE.md changes of any kind (no entries added, updated, pruned, and no stale claims auto-removed or flagged).
 
-Narrate: `Step 5/7: Running best-practices audit... done`
+Narrate: `Step 5/8: Running best-practices audit... done`
 
-## Step 6: Worktree Cleanup
+## Step 6: Handbook Drift Check
 
-Narrate: `Step 6/7: Cleaning up worktree...`
+Narrate: `Step 6/8: Checking handbook drift...`
+
+The `handbook-drift-check` skill activates to detect handbook content that has drifted from project reality. It will verify GitHub CLI access and handbook repo availability before proceeding.
+
+1. **Diff analysis** — Compare shipped changes against relevant handbook files
+2. **Drift detection** — Identify stale or missing handbook content
+3. **Proposed updates** — If drift found, present findings and optionally open a handbook PR
+
+Skip this step if the compound-learnings skill (Step 4) reported no CLAUDE.md changes and the diff is trivial (fewer than 5 files changed).
+
+Narrate: `Step 6/8: Checking handbook drift... done`
+
+## Step 7: Worktree Cleanup
+
+Narrate: `Step 7/8: Cleaning up worktree...`
 
 If working in a git worktree:
 
@@ -134,11 +148,11 @@ If working in a git worktree:
 
 If not in a worktree, skip this step.
 
-Narrate: `Step 6/7: Cleaning up worktree... done`
+Narrate: `Step 7/8: Cleaning up worktree... done`
 
-## Step 7: Session Close
+## Step 8: Session Close
 
-Narrate: `Step 7/7: Session summary...`
+Narrate: `Step 8/8: Session summary...`
 
 Present a session summary:
 
@@ -155,6 +169,8 @@ Present a session summary:
 - Docs: [list, or "none needed"]
 
 **Audit**: [clean / N issues auto-fixed / N items need your input]
+
+**Handbook**: [N drift items / handbook PR: URL / no drift detected / skipped]
 
 **Suggested next issue**: [Issue ID] — [Title] — [Why this one next]
 ```

@@ -123,6 +123,7 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 | `verification-before-completion` | Task checkpoints | 4-level verification before marking done |
 | `compound-learnings` | After completing work (via ship) | Knowledge capture to CLAUDE.md + memory |
 | `best-practices-audit` | After compound (via ship) | CLAUDE.md audit + auto-fix |
+| `handbook-drift-check` | After best-practices audit (via ship) | Detect handbook drift, open handbook PR |
 | `systematic-debugging` | Bug investigation (anytime) | 4-phase root-cause analysis |
 
 ### Backend Skills
@@ -205,7 +206,7 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 
 - `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs, step sequences, visual gating, trigger registry). Run pre-push and in CI.
 - `scripts/test-hooks.sh` — tests security and quality hook regex patterns against 37 known inputs. Run in CI.
-- `scripts/test-skill-triggers.sh` — tests skill trigger keyword matching, negative keywords, and precedence resolution against 38 test cases. Run in CI.
+- `scripts/test-skill-triggers.sh` — tests skill trigger keyword matching, negative keywords, and precedence resolution against 42 test cases. Run in CI.
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
