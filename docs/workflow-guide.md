@@ -233,7 +233,7 @@ Depth can be combined with other flags: `/workflows:review fast skip triage skip
 | 3 (opt-in) | `architecture-reviewer` | Opus | CLAUDE.md enables, OR diff touches 5+ directories, OR `comprehensive` depth | Coupling, SOLID, dependency direction |
 | 3 (opt-in) | `test-quality-reviewer` | Opus | Diff includes test files OR CLAUDE.md enables | Coverage gaps, behavior vs implementation, flakiness risk |
 | 3 (opt-in) | `accessibility-reviewer` | Opus | CLAUDE.md enables, OR `comprehensive` depth | WCAG 2.1, keyboard nav, ARIA, screen reader |
-| 3 (opt-in) | `cdr-compliance-reviewer` | Opus | Company Context configured, CLAUDE.md enables, OR `comprehensive` depth | CDR compliance, missing exceptions, superseded patterns |
+| 3 (opt-in) | `cdr-compliance-reviewer` | Opus | Company Context with `handbook-library` configured, CLAUDE.md enables, OR `comprehensive` depth | CDR compliance, missing exceptions, superseded patterns |
 
 **CLAUDE.md Review Agent Overrides**
 
