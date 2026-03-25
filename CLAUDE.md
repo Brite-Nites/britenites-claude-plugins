@@ -46,7 +46,7 @@ plugins/
     .mcp.json                      # MCP server configurations
 ```
 
-Hooks are auto-loaded from `hooks/hooks.json` — do NOT add a `hooks` field to `plugin.json`. See [CONTRIBUTING.md](CONTRIBUTING.md) for plugin development instructions, plugin.json schema, and testing commands.
+Hooks are auto-loaded from `hooks/hooks.json` — do NOT add a `hooks` field to `plugin.json`. **plugin.json uses a strict allowlist schema — any unrecognized field silently breaks the entire plugin with no error message.** See [CONTRIBUTING.md](CONTRIBUTING.md) for the full schema, plugin development instructions, and testing commands.
 
 ## Skill Routing
 

@@ -226,7 +226,7 @@ To use them, add to your skill's instructions:
 
 ```markdown
 ### Validation Criteria
-Read `.claude/skills/_shared/validation-pattern.md` and apply it.
+Reference `_shared/validation-pattern.md` and apply it.
 ```
 
 Do not duplicate the shared content into individual skills.

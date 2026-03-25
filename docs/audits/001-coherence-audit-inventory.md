@@ -161,7 +161,7 @@ Top files by imperative count:
 
 ### Path inconsistency
 
-Two skills reference validation-pattern with a different path prefix:
+Three skills reference validation-pattern with a different path prefix:
 - `create-issues/SKILL.md:89` — `Read .claude/skills/_shared/validation-pattern.md`
 - `refine-plan/SKILL.md:82` — `Read .claude/skills/_shared/validation-pattern.md`
 - `setup-claude-md/SKILL.md:64` — `Read .claude/skills/_shared/validation-pattern.md`
