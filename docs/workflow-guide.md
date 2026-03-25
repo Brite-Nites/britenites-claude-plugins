@@ -342,6 +342,8 @@ After project-start, run `/workflows:post-plan-setup` to refine the plan, create
 | Command | Description |
 |---------|-------------|
 | `/workflows:promote-precedent` | Review flagged decision traces and promote approved ones to the org-level handbook (`Brite-Nites/handbook`). Candidates are flagged during `/workflows:ship`. |
+| `/workflows:audit-trail <ISSUE-ID>` | Query the full context picture for any issue — what context was used, staleness status, and frequency analysis. Answers: "What context did the agent use to make decisions on this issue?" |
+| `/workflows:flywheel-metrics` | Compute and display the 5 compound knowledge flywheel metrics: precedent hit rate, decision confidence trend, CDR coverage, context freshness, and override rate. |
 
 ---
 

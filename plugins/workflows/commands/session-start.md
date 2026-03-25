@@ -43,6 +43,13 @@ Narrate: `Step 1/8: Environment setup...`
    - **Very stale** (ratio > 2.0): Log: "WARNING: `[filename]` is significantly overdue for refresh (last: [date], cadence: [cadence], ratio: [ratio]). Verify critical data before relying on it."
    - If no @imported files exist or all are fresh/skipped, log nothing.
    - Do NOT stop — advisory only.
+8. **Flywheel summary** — Check if `docs/precedents/INDEX.md` exists using Glob. If it exists, read it and count data rows (lines after the header separator `|---|`). If >0 data rows:
+   - Read each trace file (`docs/precedents/*.md`, excluding INDEX, INDEX-archive, README) and extract `**Confidence:** N/10` values and `**Precedent Referenced:**` values.
+   - Compute: total trace count, average confidence (across all traces), CDR coverage % (traces with `CDR-\d+` reference / total traces).
+   - Log a single condensed line: "Flywheel: [N] traces, [N.N]/10 avg confidence, [N]% CDR coverage. Run `/workflows:flywheel-metrics` for full dashboard."
+   - If no trace files exist (INDEX has rows but no .md files), log: "Flywheel: [N] precedent entries in INDEX. Run `/workflows:flywheel-metrics` for details."
+   - If INDEX.md doesn't exist or has 0 data rows, skip silently.
+   - Do NOT stop — advisory only.
 
 > Branch creation happens later in Step 7 (worktree setup) after plan approval.
 
