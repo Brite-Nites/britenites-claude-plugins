@@ -43,18 +43,18 @@ For each Linear issue found:
 
 If Linear MCP is unavailable, skip Source A and log: "Linear MCP unavailable — gathering candidates from INDEX scan only."
 
-### Source B: Direct INDEX scan
+### Source B: Direct INDEX scan (supplemental)
+
+Source B catches eligible traces that may not have a Linear issue (e.g., Linear MCP was unavailable during ship, or the issue was accidentally closed). It does NOT re-evaluate the generalizability criterion — only compound-learnings does that.
 
 Read `docs/precedents/INDEX.md` and parse the markdown table. For each row where Category is `architecture`, `library-selection`, or `trade-off`:
 
-1. Load the full trace file from `docs/precedents/<ISSUE-ID>.md`
-2. Parse the trace section matching this INDEX row
-3. Check if Confidence >= 8
-4. If yes, add as a candidate
+1. If this row's Issue ID + Decision text already matches a Source A candidate, skip it (already gathered)
+2. Otherwise, add as a candidate — but mark it as **"not flagged by compound-learnings"** (the confidence check is deferred to Phase 3a where the trace file is loaded anyway)
 
 ### Merge and deduplicate
 
-Merge candidates from Source A and Source B. Deduplicate by Issue ID + Decision text. Prefer Source A entries (they have Linear issue context).
+Merge candidates from Source A and Source B. Deduplicate by Issue ID + Decision text; keep the Source A entry when both sources have the same candidate (it carries Linear issue context).
 
 Sort candidates for review presentation by:
 1. Confidence descending (highest first)
@@ -68,24 +68,21 @@ If no candidates found from either source:
 
 Narrate: `Phase 1/7: Gathering promotion candidates... done ([N] candidates)`
 
-## Phase 2: Clone Handbook
+## Phase 2: Fetch Handbook INDEX
 
-Narrate: `Phase 2/7: Cloning handbook...`
+Narrate: `Phase 2/7: Fetching handbook INDEX...`
 
-Derive a unique clone path using the current timestamp:
+Fetch the handbook precedent INDEX via GitHub API (no full clone needed yet — that is deferred to Phase 4):
 
 ```bash
-CLONE_PATH="/tmp/handbook-promote-$(date +%s)"
-gh repo clone Brite-Nites/handbook "$CLONE_PATH" -- --depth 1
+gh api repos/Brite-Nites/handbook/contents/precedents/INDEX.md --jq '.content' | base64 -d
 ```
 
-If the clone fails, present via AskUserQuestion:
-- **Retry** — Try the clone again
-- **Stop** — Halt for manual intervention
+Parse the returned INDEX table for deduplication in Phase 3. If the API returns a 404 (file doesn't exist), note that the handbook precedents directory may need to be created and proceed with an empty dedup set.
 
-After cloning, read `$CLONE_PATH/precedents/INDEX.md` if it exists. Parse the existing handbook INDEX table for deduplication in Phase 3. If the file doesn't exist, note that the handbook precedents directory may need to be created.
+If the API call fails for a reason other than 404 (auth error, rate limit), warn: "Could not fetch handbook INDEX — deduplication check will be skipped." Proceed without dedup.
 
-Narrate: `Phase 2/7: Cloning handbook... done`
+Narrate: `Phase 2/7: Fetching handbook INDEX... done`
 
 ## Phase 3: Review Each Candidate
 
@@ -93,7 +90,9 @@ Narrate: `Phase 3/7: Reviewing candidates...`
 
 For each candidate (in sorted order):
 
-### 3a. Load the full trace
+### 3a. Validate and load the full trace
+
+**Validate ISSUE-ID format**: Confirm the Issue ID matches `^[A-Z]+-[0-9]+$` (e.g., `BC-1234`). If it does not match, skip with: "Invalid issue ID format: [value] — skipping." This prevents path traversal or shell metacharacter injection when the ID is used in file paths and git commands.
 
 Read the project-level trace from `docs/precedents/<ISSUE-ID>.md`. Extract the specific trace section matching this candidate (match by the `## Trace —` heading that contains the decision summary).
 
@@ -101,13 +100,15 @@ If the trace file is missing or the section cannot be found:
 - Log: "Trace file missing for [ISSUE-ID] — skipping this candidate."
 - Continue to next candidate.
 
+**For Source B candidates** (not flagged by compound-learnings): Check the trace's Confidence score. If Confidence < 8, skip with: "Confidence [N]/10 below promotion threshold — skipping." Also warn: "This candidate was not flagged by compound-learnings — assess generalizability carefully" in the Phase 3c presentation.
+
 ### 3b. Deduplication check
 
 Compare against the handbook INDEX parsed in Phase 2 using the composite key: Issue ID + Decision text (case-insensitive match on Decision text).
 
 If already present in the handbook:
 - Log: "Already promoted: [ISSUE-ID] — [Decision summary]. Skipping."
-- If a Linear issue exists for this candidate, add a comment: "Already present in handbook precedents. Closing as duplicate." and transition to Done.
+- If a Linear issue exists for this candidate, add a comment: "Already present in handbook precedents. Closing as duplicate." and transition to Cancelled (consistent with skip handling — the review was not completed, the entry pre-existed).
 - Continue to next candidate.
 
 ### 3c. Present for review
@@ -157,15 +158,30 @@ Record each decision (promote/skip) with the trace details for the summary repor
 
 Narrate: `Phase 3/7: Reviewing candidates... done ([N] promoted, [N] skipped)`
 
-If no candidates were promoted, clean up the handbook clone (`rm -r "$CLONE_PATH"`), then skip to Phase 6 (update Linear for skipped candidates) and Phase 7 (summary).
+If no candidates were promoted, skip to Phase 6 (update Linear for skipped candidates) and Phase 7 (summary). No clone cleanup is needed — the handbook is not cloned until Phase 4.
 
-## Phase 4: Write to Handbook Clone
+## Phase 4: Clone Handbook and Write Traces
 
-Narrate: `Phase 4/7: Writing promoted traces to handbook...`
+Narrate: `Phase 4/7: Cloning handbook and writing traces...`
+
+Only runs if at least one trace was promoted in Phase 3.
+
+### 4a. Clone handbook
+
+Create a secure temporary directory and shallow-clone:
+
+```bash
+CLONE_PATH=$(mktemp -d /tmp/handbook-promote-XXXXXX)
+gh repo clone Brite-Nites/handbook "$CLONE_PATH" -- --depth 1
+```
+
+Using `mktemp -d` prevents TOCTOU race conditions on the clone path. If the clone fails, present via AskUserQuestion:
+- **Retry** — Try the clone again
+- **Stop** — Halt for manual intervention
 
 For each promoted trace:
 
-### 4a. Write the trace file
+### 4b. Write the trace file
 
 Write to `$CLONE_PATH/precedents/<ISSUE-ID>.md`:
 
@@ -174,7 +190,7 @@ Write to `$CLONE_PATH/precedents/<ISSUE-ID>.md`:
 - **Generalize project-specific paths**: Replace absolute or project-relative paths with `<project>/path` notation (e.g., `src/middleware/auth.ts` → `<project>/src/middleware/auth.ts`)
 - **Preserve all other trace content** exactly as it appears in the project-level file
 
-### 4b. Update handbook INDEX
+### 4c. Update handbook INDEX
 
 Apply the auto-update algorithm from `docs/precedents/README.md` (Read → Parse → Match → Replace/Append → Sort → Archive → Write) to `$CLONE_PATH/precedents/INDEX.md`. If the file doesn't exist, create it with the standard header template:
 
@@ -217,12 +233,15 @@ git -C "$CLONE_PATH" push -u origin "$BRANCH_NAME"
 
 ### Create PR
 
+**IMPORTANT**: Pass the `--body` value via a HEREDOC to prevent shell metacharacter injection from trace content (decision summaries and issue IDs are user-derived data). Do not use string interpolation for these values in shell arguments.
+
 ```bash
 gh pr create --repo Brite-Nites/handbook \
   --base main \
   --head "$BRANCH_NAME" \
   --title "Promote [N] decision traces to org precedents" \
-  --body "## Precedent Promotion
+  --body "$(cat <<'EOF'
+## Precedent Promotion
 
 Source: [project-repo]
 Reviewed by: [developer name] via /workflows:promote-precedent
@@ -235,7 +254,9 @@ Reviewed by: [developer name] via /workflows:promote-precedent
 - [links to precedent-promotion Linear issues, if any]
 
 ---
-*Auto-generated by `/workflows:promote-precedent`*"
+*Auto-generated by `/workflows:promote-precedent`*
+EOF
+)"
 ```
 
 Record the PR URL for the summary report and Linear issue updates.
@@ -249,10 +270,10 @@ If the push or PR creation fails, present via AskUserQuestion:
 
 ### Clean up
 
-**Always** clean up the shallow clone, even if any prior step failed:
+**Always** clean up the shallow clone, even if any prior step failed. Guard against empty variable:
 
 ```bash
-rm -r "$CLONE_PATH"
+[ -n "$CLONE_PATH" ] && [ -d "$CLONE_PATH" ] && rm -r "$CLONE_PATH"
 ```
 
 Exception: if the user chose "Skip PR", do NOT clean up — they need the clone for manual push. Log: "Handbook clone preserved at: $CLONE_PATH"
