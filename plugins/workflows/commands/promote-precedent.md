@@ -56,9 +56,11 @@ Read `docs/precedents/INDEX.md` and parse the markdown table. For each row where
 
 Merge candidates from Source A and Source B. Deduplicate by Issue ID + Decision text. Prefer Source A entries (they have Linear issue context).
 
-Sort candidates by:
+Sort candidates for review presentation by:
 1. Confidence descending (highest first)
 2. Date descending (newest first)
+
+Note: this sort order is for review presentation only. The handbook INDEX uses chronological insertion order per `docs/precedents/README.md`.
 
 If no candidates found from either source:
 - Narrate: "No promotion candidates found. Decision traces are flagged for promotion during `/workflows:ship` when they meet all criteria: confidence >= 8, category in {architecture, library-selection, trade-off}, and generalizable pattern."
@@ -155,7 +157,7 @@ Record each decision (promote/skip) with the trace details for the summary repor
 
 Narrate: `Phase 3/7: Reviewing candidates... done ([N] promoted, [N] skipped)`
 
-If no candidates were promoted, clean up the handbook clone (`rm -rf "$CLONE_PATH"`), then skip to Phase 6 (update Linear for skipped candidates) and Phase 7 (summary).
+If no candidates were promoted, clean up the handbook clone (`rm -r "$CLONE_PATH"`), then skip to Phase 6 (update Linear for skipped candidates) and Phase 7 (summary).
 
 ## Phase 4: Write to Handbook Clone
 
@@ -197,12 +199,12 @@ Only runs if at least one trace was promoted in Phase 3.
 
 ### Branch and commit
 
-Derive the project repo name from `basename $(git rev-parse --show-toplevel)` (run in the project directory, not the clone). Compute the promotion date once: `PROMO_DATE=$(date +%Y-%m-%d)`.
+Derive the project repo name from `basename $(git rev-parse --show-toplevel)` (run in the project directory, not the clone). Compute identifiers once: `PROMO_DATE=$(date +%Y-%m-%d)` and `BRANCH_NAME="precedent-promotion/$PROMO_DATE-$(date +%s)"` (epoch suffix prevents same-day collisions).
 
 All git commands must use `git -C "$CLONE_PATH"` since shell working directory does not persist between Bash calls:
 
 ```bash
-git -C "$CLONE_PATH" checkout -b "precedent-promotion/$PROMO_DATE"
+git -C "$CLONE_PATH" checkout -b "$BRANCH_NAME"
 git -C "$CLONE_PATH" add precedents/INDEX.md
 # Stage each promoted trace file by name (do not use git add -A)
 git -C "$CLONE_PATH" add precedents/<ISSUE-ID>.md  # repeat for each promoted trace
@@ -210,7 +212,7 @@ git -C "$CLONE_PATH" commit -m "Promote [N] decision traces from [project-repo]
 
 Traces promoted via /workflows:promote-precedent.
 Source project: [project-repo]"
-git -C "$CLONE_PATH" push -u origin "precedent-promotion/$PROMO_DATE"
+git -C "$CLONE_PATH" push -u origin "$BRANCH_NAME"
 ```
 
 ### Create PR
@@ -218,7 +220,7 @@ git -C "$CLONE_PATH" push -u origin "precedent-promotion/$PROMO_DATE"
 ```bash
 gh pr create --repo Brite-Nites/handbook \
   --base main \
-  --head "precedent-promotion/$PROMO_DATE" \
+  --head "$BRANCH_NAME" \
   --title "Promote [N] decision traces to org precedents" \
   --body "## Precedent Promotion
 
@@ -250,7 +252,7 @@ If the push or PR creation fails, present via AskUserQuestion:
 **Always** clean up the shallow clone, even if any prior step failed:
 
 ```bash
-rm -rf "$CLONE_PATH"
+rm -r "$CLONE_PATH"
 ```
 
 Exception: if the user chose "Skip PR", do NOT clean up — they need the clone for manual push. Log: "Handbook clone preserved at: $CLONE_PATH"
