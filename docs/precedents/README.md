@@ -102,7 +102,7 @@ The `/workflows:promote-precedent` command handles the human-reviewed promotion 
 2. **Review** — Developer runs `/workflows:promote-precedent` to review flagged candidates one at a time. Each candidate is presented with full trace context and a generalizability assessment
 3. **Promote** — Approved traces are copied to a shallow clone of `Brite-Nites/handbook`, with project-specific paths generalized (e.g., `src/foo.ts` → `<project>/src/foo.ts`)
 4. **PR** — A PR is opened against the handbook repo with all promoted traces. The handbook INDEX is updated using the same auto-update algorithm as the project-level INDEX
-5. **Close** — Linear issues are updated with the PR link and transitioned to Done (promoted) or Cancelled (skipped)
+5. **Close** — Promoted issues are linked to the handbook PR and transitioned to Done. Skipped issues are transitioned to Cancelled with the skip reason.
 
 **Important**: Project-level traces remain in `docs/precedents/` after promotion. The handbook copy is independent — the project retains its own decision history.
 

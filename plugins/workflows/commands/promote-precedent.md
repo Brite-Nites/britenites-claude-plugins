@@ -6,8 +6,6 @@ description: Review and promote flagged decision traces from project precedents 
 
 You are reviewing decision traces that have been flagged for promotion to the org-level handbook. Promotion is the final step of the compound knowledge flywheel — high-value project-level decisions become searchable across ALL projects via `handbook/precedents/`.
 
-`$ARGUMENTS` is unused by this command.
-
 ## Phase 0: Prerequisites
 
 Narrate: `Phase 0/7: Checking prerequisites...`
@@ -146,22 +144,18 @@ Then assess generalizability:
 Use AskUserQuestion with these options:
 - **Promote** — Include this trace in the handbook PR as-is (with path generalization applied automatically)
 - **Edit first** — Review and modify the trace content before promoting (for generalizing project-specific details)
-- **Skip** — This trace is too project-specific or not valuable enough for org-level
+- **Skip (too specific)** — Pattern doesn't generalize across projects
+- **Skip (low confidence)** — Decision may not hold up
+- **Skip (already covered)** — Similar precedent exists with different wording
 - **Skip all remaining** — Stop reviewing further candidates
 
 For **"Edit first"**: Display the trace content as it would appear in the handbook. Let the user describe what changes they want. Apply the changes, then confirm the edited version before staging.
-
-For **"Skip"**: Use AskUserQuestion to ask for a brief reason (used in the Linear issue comment). Options:
-- **Too project-specific** — Pattern doesn't generalize
-- **Low confidence in hindsight** — Decision may not hold up
-- **Already covered** — Similar precedent exists (different wording)
-- (User can also type a custom reason)
 
 Record each decision (promote/skip) with the trace details for the summary report.
 
 Narrate: `Phase 3/7: Reviewing candidates... done ([N] promoted, [N] skipped)`
 
-If no candidates were promoted, skip to Phase 6 (update Linear for skipped candidates) and Phase 7 (summary).
+If no candidates were promoted, clean up the handbook clone (`rm -rf "$CLONE_PATH"`), then skip to Phase 6 (update Linear for skipped candidates) and Phase 7 (summary).
 
 ## Phase 4: Write to Handbook Clone
 
@@ -180,23 +174,18 @@ Write to `$CLONE_PATH/precedents/<ISSUE-ID>.md`:
 
 ### 4b. Update handbook INDEX
 
-Apply the auto-update algorithm from `docs/precedents/README.md`:
+Apply the auto-update algorithm from `docs/precedents/README.md` (Read → Parse → Match → Replace/Append → Sort → Archive → Write) to `$CLONE_PATH/precedents/INDEX.md`. If the file doesn't exist, create it with the standard header template:
 
-1. Read `$CLONE_PATH/precedents/INDEX.md` (create with the standard header template if missing):
-   ```
-   # Precedent Index
+```
+# Precedent Index
 
-   <!-- Auto-updated by promote-precedent. Do not edit manually. -->
+<!-- Auto-updated by promote-precedent. Do not edit manually. -->
 
-   | Issue | Decision | Category | Date | Tags |
-   |-------|----------|----------|------|------|
-   ```
-2. Parse the markdown table — skip header and separator rows
-3. Match each promoted trace against existing rows by composite key: Issue column + Decision text
-4. Replace matched rows (re-promotion updates the entry). Append unmatched rows at the bottom.
-5. Sort order: Chronological by insertion (newest last) — no re-sorting on update
-6. Archive check: If row count exceeds 200, move entries with Date older than 6 months to `$CLONE_PATH/precedents/INDEX-archive.md`
-7. Write the full INDEX.md file. Preserve the HTML comment block above the table header.
+| Issue | Decision | Category | Date | Tags |
+|-------|----------|----------|------|------|
+```
+
+Use `$CLONE_PATH/precedents/INDEX-archive.md` for archive rotation instead of the project-level path.
 
 Narrate: `Phase 4/7: Writing promoted traces... done ([N] trace files, INDEX updated)`
 
@@ -208,19 +197,20 @@ Only runs if at least one trace was promoted in Phase 3.
 
 ### Branch and commit
 
-Derive the project repo name: `basename $(git rev-parse --show-toplevel)`.
+Derive the project repo name from `basename $(git rev-parse --show-toplevel)` (run in the project directory, not the clone). Compute the promotion date once: `PROMO_DATE=$(date +%Y-%m-%d)`.
+
+All git commands must use `git -C "$CLONE_PATH"` since shell working directory does not persist between Bash calls:
 
 ```bash
-cd "$CLONE_PATH"
-git checkout -b "precedent-promotion/$(date +%Y-%m-%d)"
-git add precedents/INDEX.md
-# Add each promoted trace file specifically (not git add -A)
-git add precedents/<ISSUE-ID-1>.md precedents/<ISSUE-ID-2>.md ...
-git commit -m "Promote [N] decision traces from [project-repo]
+git -C "$CLONE_PATH" checkout -b "precedent-promotion/$PROMO_DATE"
+git -C "$CLONE_PATH" add precedents/INDEX.md
+# Stage each promoted trace file by name (do not use git add -A)
+git -C "$CLONE_PATH" add precedents/<ISSUE-ID>.md  # repeat for each promoted trace
+git -C "$CLONE_PATH" commit -m "Promote [N] decision traces from [project-repo]
 
 Traces promoted via /workflows:promote-precedent.
 Source project: [project-repo]"
-git push -u origin "precedent-promotion/$(date +%Y-%m-%d)"
+git -C "$CLONE_PATH" push -u origin "precedent-promotion/$PROMO_DATE"
 ```
 
 ### Create PR
@@ -228,7 +218,7 @@ git push -u origin "precedent-promotion/$(date +%Y-%m-%d)"
 ```bash
 gh pr create --repo Brite-Nites/handbook \
   --base main \
-  --head "precedent-promotion/$(date +%Y-%m-%d)" \
+  --head "precedent-promotion/$PROMO_DATE" \
   --title "Promote [N] decision traces to org precedents" \
   --body "## Precedent Promotion
 
