@@ -79,7 +79,7 @@ You are refining a v1 project plan into agent-ready tasks.
 ```
 
 ### Validation Criteria
-Read `.claude/skills/_shared/validation-pattern.md` and apply it.
+Reference `_shared/validation-pattern.md` and apply it.
 Specific criteria for this skill:
 - [ ] Every task has all required fields filled in (title, context,
       steps, validation, complexity, dependencies)
