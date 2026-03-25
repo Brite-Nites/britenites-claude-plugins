@@ -170,14 +170,6 @@
       "beats": []
     },
     {
-      "name": "visual-explainer",
-      "tier": "design",
-      "user_invocable": true,
-      "keywords": ["diagram", "architecture overview", "visual explanation", "diff review", "plan review", "project recap", "comparison table", "visual report"],
-      "negative_keywords": [],
-      "beats": []
-    },
-    {
       "name": "web-design-guidelines",
       "tier": "design",
       "user_invocable": true,
@@ -283,18 +275,6 @@
       "expected": ["frontend-design"],
       "not_expected": ["ui-ux-pro-max", "web-design-guidelines"],
       "description": "Create/implement triggers frontend-design exclusively"
-    },
-    {
-      "phrase": "Generate a diagram of the system architecture overview",
-      "expected": ["visual-explainer"],
-      "not_expected": [],
-      "description": "Diagram request triggers visual-explainer"
-    },
-    {
-      "phrase": "I need a visual explanation of the data flow",
-      "expected": ["visual-explainer"],
-      "not_expected": [],
-      "description": "Visual explanation triggers visual-explainer"
     },
     {
       "phrase": "Write a new fastapi endpoint for user registration",

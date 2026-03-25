@@ -8,7 +8,6 @@ This file is the single source of truth for:
 - **Trigger conditions** — when each skill activates, with keywords, preconditions, and precedence
 - **Step sequences** — ordered steps for each orchestrator command, with skip/fail semantics
 - **Cross-skill contracts** — what each skill provides and requires from the chain
-- **Visual gating patterns** — standardized message templates for conditional visual output
 - **Error handling contracts** — failure points and recovery actions per skill and command
 
 ### Format Contract
@@ -31,9 +30,7 @@ sed -n "/<!-- spec:${ANCHOR} -->/,/^\`\`\`$/{ /^<!--/d; /^\`\`\`/d; p; }" docs/w
 
 Each block is independently parseable YAML. Adding or removing a skill touches one block.
 
-**Anchor segments**: The middle segment is one of: `trigger`, `steps`, `contract`, `visual-gating`, `errors`. The third segment is the skill or command name.
-
-**`visual-gating` field**: In step-sequence blocks, `visual-gating: true` means the step contains at least one conditional visual output path. It does not guarantee a visual artifact is always produced — the output may be gated by user choice, `--slides` flag, or file availability.
+**Anchor segments**: The middle segment is one of: `trigger`, `steps`, `contract`, `errors`. The third segment is the skill or command name.
 
 **Constraint**: YAML values must not contain a line that is exactly three backticks (`` ``` ``), as this would prematurely terminate the extraction range.
 
@@ -72,9 +69,6 @@ output-artifacts:
   - path: "docs/designs/<issue-id>-<slug>.md"
     type: file
     optional: false
-  - path: "~/.agent/diagrams/<issue-id>-architecture.html"
-    type: file
-    optional: true
 handoff:
   next: writing-plans
   marker: "**Brainstorming complete.**"
@@ -105,12 +99,6 @@ output-artifacts:
   - path: "docs/plans/<issue-id>-plan.md"
     type: file
     optional: false
-  - path: "~/.agent/diagrams/<issue-id>-visual-plan.html"
-    type: file
-    optional: true
-  - path: "~/.agent/diagrams/<issue-id>-plan-review.html"
-    type: file
-    optional: true
 handoff:
   next: git-worktrees
   marker: "**Planning complete.**"
@@ -249,9 +237,6 @@ output-artifacts:
   - path: "CLAUDE.md (auto-fixed)"
     type: file
     optional: false
-  - path: "~/.agent/diagrams/audit-<sanitized-project>.html"
-    type: file
-    optional: true
 handoff:
   next: "/workflows:ship"
   marker: "**Best-practices audit complete.**"
@@ -345,32 +330,6 @@ output-artifacts:
   - path: "design-system/pages/<page-name>.md"
     type: file
     optional: true
-handoff: null
-```
-
-<!-- spec:trigger:visual-explainer -->
-```yaml
-name: visual-explainer
-tier: design
-user-invocable: true
-position: null
-keywords:
-  - "diagram"
-  - "architecture overview"
-  - "diff review"
-  - "plan review"
-  - "project recap"
-  - "comparison table"
-  - "visual explanation"
-  - "complex ASCII table (4+ rows or 3+ columns)"
-negative-keywords: []
-activation-rule: ANY
-objective-criteria: null
-preconditions: []
-output-artifacts:
-  - path: "~/.agent/diagrams/<sanitized-name>.html"
-    type: file
-    optional: false
 handoff: null
 ```
 
@@ -727,7 +686,7 @@ steps:
     skip-target: null
     jump-on-fail: STOP
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Environment Setup"
     required: true
@@ -735,7 +694,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: true
+
   - id: 2
     name: "Company Context"
     required: false
@@ -743,7 +702,7 @@ steps:
     skip-target: 3
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Runs Company Context Interview from commands/_shared/company-context-template.md. Produces: company-context block in CLAUDE.md."
   - id: 3
     name: "Query Linear for Open Issues"
@@ -752,7 +711,7 @@ steps:
     skip-target: 4
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 4
     name: "Read Issue Details"
     required: true
@@ -760,7 +719,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 5
     name: "Brainstorm (Objective Complexity Check)"
     required: true
@@ -768,7 +727,7 @@ steps:
     skip-target: 6
     jump-on-fail: null
     activates-skill: brainstorming
-    visual-gating: false
+
   - id: 6
     name: "Write Plan"
     required: true
@@ -776,7 +735,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: writing-plans
-    visual-gating: true
+
   - id: 7
     name: "Set Up Worktree"
     required: true
@@ -784,7 +743,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: git-worktrees
-    visual-gating: false
+
   - id: 8
     name: "Execute"
     required: true
@@ -792,7 +751,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: executing-plans
-    visual-gating: false
+
 ```
 
 ### 2b. review
@@ -810,7 +769,7 @@ steps:
     skip-target: null
     jump-on-fail: STOP
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Self-Verification"
     required: true
@@ -818,7 +777,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 2
     name: "Diff Triage"
     required: false
@@ -826,7 +785,7 @@ steps:
     skip-target: 3
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Haiku agent classifies diff as trivial/non-trivial. skip-target (3) applies to user skip only. TRIVIAL verdict jumps to Step 8 (abbreviated report, skipping Steps 3-7). Provides: TRIAGE_VERDICT."
   - id: 3
     name: "Simplify Pass"
@@ -835,7 +794,7 @@ steps:
     skip-target: 4
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 4
     name: "Select & Launch Review Agents"
     required: true
@@ -843,7 +802,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Depth mode from $ARGUMENTS: fast (Tier 1 only), thorough (Tier 1+2, default), comprehensive (all tiers). Unrecognized depth defaults to thorough. All review agents run on Opus."
   - id: 5
     name: "Collect & Classify Findings"
@@ -852,7 +811,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Confidence threshold filtering: >= 7 included, low-confidence P2/P3 filtered, borderline P1s marked for human review. Missing confidence defaults to 5."
   - id: 6
     name: "Validate Findings"
@@ -861,7 +820,7 @@ steps:
     skip-target: 7
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Per-finding verification: Opus subagent per P1, Sonnet subagent per P2/P3. Max 20 subagents. P1 verifiers: 10 turns, P2/P3 verifiers: 5 turns. In fast mode, only P1s validated. Provides: VALIDATED_FINDINGS."
   - id: 7
     name: "Fix Loop (P1s Only)"
@@ -870,23 +829,15 @@ steps:
     skip-target: 8
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 8
-    name: "Visual Review Report"
-    required: true
-    skip-condition: null
-    skip-target: null
-    jump-on-fail: null
-    activates-skill: null
-    visual-gating: true
-  - id: 9
     name: "Final Report"
     required: true
     skip-condition: null
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
 ```
 
 ### 2c. ship
@@ -905,7 +856,7 @@ steps:
     skip-target: null
     jump-on-fail: STOP
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Pre-Ship Checks"
     required: true
@@ -913,7 +864,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 2
     name: "Create Pull Request"
     required: true
@@ -921,7 +872,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 3
     name: "Update Linear"
     required: true
@@ -929,7 +880,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 4
     name: "Compound Learnings"
     required: true
@@ -937,7 +888,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: compound-learnings
-    visual-gating: false
+
   - id: 5
     name: "Best Practices Audit"
     required: false
@@ -945,7 +896,7 @@ steps:
     skip-target: 6
     jump-on-fail: null
     activates-skill: best-practices-audit
-    visual-gating: true
+
   - id: 6
     name: "Worktree Cleanup"
     required: false
@@ -953,7 +904,7 @@ steps:
     skip-target: 7
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 7
     name: "Session Close"
     required: true
@@ -961,7 +912,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
 ```
 
 ### 2d. sprint-planning
@@ -980,7 +931,7 @@ steps:
     skip-target: null
     jump-on-fail: STOP
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Resolve Context"
     required: true
@@ -988,7 +939,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 2
     name: "Current State Assessment"
     required: true
@@ -996,7 +947,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 3
     name: "Pull & Display Backlog"
     required: true
@@ -1004,7 +955,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 4
     name: "Interactive Planning"
     required: true
@@ -1012,7 +963,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 5
     name: "Assign to Cycle"
     required: false
@@ -1020,7 +971,7 @@ steps:
     skip-target: 6
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 6
     name: "Summary"
     required: true
@@ -1028,7 +979,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: true
+
 ```
 
 ### 2e. retrospective
@@ -1047,7 +998,7 @@ steps:
     skip-target: null
     jump-on-fail: STOP
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Resolve Context"
     required: true
@@ -1055,7 +1006,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 2
     name: "Delivery Summary"
     required: true
@@ -1063,7 +1014,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 3
     name: "Retrospective Discussion"
     required: true
@@ -1071,39 +1022,31 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 4
-    name: "Visual Retro Deck"
-    required: false
-    skip-condition: "User declines slides and --slides not set"
-    skip-target: 5
-    jump-on-fail: null
-    activates-skill: null
-    visual-gating: true
-  - id: 5
     name: "Post Status Update"
     required: true
     skip-condition: null
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
-  - id: 6
+
+  - id: 5
     name: "Create Follow-up Issues"
     required: false
     skip-condition: "No action items marked 'Create Issue? = Yes'"
-    skip-target: 7
+    skip-target: 6
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
-  - id: 7
+
+  - id: 6
     name: "Summary"
     required: true
     skip-condition: null
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
 ```
 
 ### 2f. scope
@@ -1122,7 +1065,7 @@ steps:
     skip-target: null
     jump-on-fail: STOP
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Interview Phase"
     required: true
@@ -1130,7 +1073,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 2
     name: "Context Gathering"
     required: true
@@ -1138,7 +1081,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 3
     name: "Collaborative Ideation"
     required: true
@@ -1146,7 +1089,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: true
+
   - id: 4
     name: "Issue Creation"
     required: true
@@ -1154,7 +1097,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 5
     name: "Prioritization"
     required: true
@@ -1162,7 +1105,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 6
     name: "Session Summary"
     required: true
@@ -1170,7 +1113,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: true
+
 ```
 
 ### 2g. architecture-decision
@@ -1188,7 +1131,7 @@ steps:
     skip-target: null
     jump-on-fail: STOP
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Identify the Decision"
     required: true
@@ -1196,7 +1139,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 2
     name: "Explore Context"
     required: true
@@ -1204,7 +1147,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 3
     name: "Analyze Options"
     required: true
@@ -1212,7 +1155,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 4
     name: "Confirm the Decision"
     required: true
@@ -1220,7 +1163,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 5
     name: "Document Consequences"
     required: true
@@ -1228,7 +1171,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: true
+
   - id: 6
     name: "Determine Status"
     required: true
@@ -1236,7 +1179,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 7
     name: "Write the ADR"
     required: true
@@ -1244,7 +1187,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 8
     name: "Update CLAUDE.md"
     required: true
@@ -1252,7 +1195,7 @@ steps:
     skip-target: 9
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 9
     name: "Summary"
     required: true
@@ -1260,7 +1203,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
 ```
 
 ### 2h. project-start
@@ -1279,7 +1222,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 1
     name: "Conduct Interview"
     required: true
@@ -1287,7 +1230,7 @@ steps:
     skip-target: 3
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 2
     name: "Classify Project Traits"
     required: true
@@ -1295,7 +1238,7 @@ steps:
     skip-target: 3
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 3
     name: "Git Repository Setup"
     required: true
@@ -1303,7 +1246,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Baseline (git init, minimal .gitignore) is unconditional. Tech-stack .gitignore extensions and GitHub remote prompt gated on produces-code. CI/CD flag gated on produces-code + automation."
   - id: 4
     name: "Scaffold Trait-Conditional Documentation"
@@ -1312,7 +1255,7 @@ steps:
     skip-target: 5
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Sub-step 4b: Trait-to-Infrastructure Dispatch (infrastructure gating defined in Step 3 note). Sub-step 4c: MCP Verification (BC-1949). Verifies global + trait-gated MCP connectivity. All failures non-blocking (WARN)."
   - id: 5
     name: "Generate CLAUDE.md"
@@ -1321,7 +1264,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 6
     name: "Create Linear Project"
     required: false
@@ -1329,7 +1272,7 @@ steps:
     skip-target: 7
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
     note: "Sub-step 6b: Create Trait Labels. For each active trait, creates trait:<name> labels under a Trait label group. Labels are created in parallel. Idempotent — skips existing labels silently."
   - id: 7
     name: "Write Project Plan"
@@ -1338,7 +1281,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
   - id: 8
     name: "Generate ADRs"
     required: false
@@ -1346,7 +1289,7 @@ steps:
     skip-target: null
     jump-on-fail: null
     activates-skill: null
-    visual-gating: false
+
 ```
 
 ---
@@ -1372,7 +1315,6 @@ sequence:
     to: writing-plans
     provides:
       - "Design document at docs/designs/<issue-id>-<slug>.md"
-      - "Architecture diagram at ~/.agent/diagrams/<issue-id>-architecture.html (optional)"
       - "Key decisions summary"
       - "Scope boundaries"
     requires:
@@ -1383,8 +1325,6 @@ sequence:
     to: git-worktrees
     provides:
       - "Plan file at docs/plans/<issue-id>-plan.md"
-      - "Visual plan at ~/.agent/diagrams/<issue-id>-visual-plan.html (optional)"
-      - "Plan review at ~/.agent/diagrams/<issue-id>-plan-review.html (optional)"
       - "Task count and dependency graph"
     requires:
       - "Issue ID"
@@ -1424,7 +1364,6 @@ sequence:
       - "P1 fixes applied (auto-fixable, confidence >= 7)"
       - "Borderline P1s for human review (confidence < 7)"
       - "Filtered finding count (low-confidence P2/P3s)"
-      - "Visual review report"
       - "Verdict (ready/needs-input/blocked/has-borderline-p1s)"
     requires:
       - "Task tool dispatch working"
@@ -1456,7 +1395,6 @@ sequence:
     provides:
       - "CLAUDE.md auto-fixes"
       - "Flagged items for developer"
-      - "Visual audit report (optional)"
     requires:
       - "CLAUDE.md exists"
 ```
@@ -1472,41 +1410,17 @@ artifacts:
     consumers: [writing-plans, git-worktrees, executing-plans, compound-learnings]
     persistence: permanent
 
-  - id: architecture-diagram
-    path: "~/.agent/diagrams/<issue-id>-architecture.html"
-    producer: brainstorming
-    consumers: []
-    persistence: session
-
   - id: plan-file
     path: "docs/plans/<issue-id>-plan.md"
     producer: writing-plans
     consumers: [git-worktrees, executing-plans, compound-learnings]
     persistence: permanent
 
-  - id: visual-plan
-    path: "~/.agent/diagrams/<issue-id>-visual-plan.html"
-    producer: writing-plans
-    consumers: []
-    persistence: session
-
-  - id: plan-review
-    path: "~/.agent/diagrams/<issue-id>-plan-review.html"
-    producer: writing-plans
-    consumers: []
-    persistence: session
-
   - id: worktree
     path: ".claude/worktrees/<issue-id>/"
     producer: git-worktrees
     consumers: [executing-plans, "ship (command)"]
     persistence: temporary
-
-  - id: review-report
-    path: "~/.agent/diagrams/review-<sanitized-branch>.html"
-    producer: "review (command)"
-    consumers: []
-    persistence: session
 
   - id: claude-md
     path: "CLAUDE.md"
@@ -1519,44 +1433,6 @@ artifacts:
     producer: compound-learnings
     consumers: [session-start, scope]
     persistence: permanent
-
-  - id: audit-report
-    path: "~/.agent/diagrams/audit-<sanitized-project>.html"
-    producer: best-practices-audit
-    consumers: []
-    persistence: session
-
-  - id: sprint-slides
-    path: "~/.agent/diagrams/sprint-cycle-<N>-overview.html"
-    producer: "sprint-planning (command)"
-    consumers: []
-    persistence: session
-
-  - id: retro-slides
-    path: "~/.agent/diagrams/retro-cycle-<N>.html"
-    path-alt: "~/.agent/diagrams/retro-cycle-<N>-midcheck.html"
-    note: "alt path used in mid-sprint mode"
-    producer: "retrospective (command)"
-    consumers: []
-    persistence: session
-
-  - id: scope-mindmap
-    path: "~/.agent/diagrams/scope-<sanitized-project>-mindmap.html"
-    producer: "scope (command)"
-    consumers: []
-    persistence: session
-
-  - id: scope-slides
-    path: "~/.agent/diagrams/scope-<sanitized-project>-slides.html"
-    producer: "scope (command)"
-    consumers: []
-    persistence: session
-
-  - id: adr-diagrams
-    path: "~/.agent/diagrams/adr-<slug>-diagrams.html"
-    producer: "architecture-decision (command)"
-    consumers: []
-    persistence: session
 
   - id: adr-file
     path: "docs/decisions/NNN-<slug>.md"
@@ -1597,15 +1473,6 @@ artifacts:
           type: "string[]"
           source: "developer input (AskUserQuestion)"
           sanitization: "[a-zA-Z0-9 _-], max 40 chars each"
-
-  - id: project-recap
-    path: "~/.agent/diagrams/<repo-name>-project-recap.html"
-    producer: "session-start (command)"
-    alternate-producer: "project-recap (command)"
-    optional: true
-    condition: "user accepts visual recap offer in session-start Step 1"
-    consumers: []
-    persistence: session
 
   - id: refined-plan
     path: "docs/project-plan-refined.md"
@@ -1894,97 +1761,9 @@ index:
 
 ---
 
-## 4. Visual Gating Patterns
+## 4. Error Handling Contracts
 
-### 4a. Pattern Definitions
-
-<!-- spec:visual-gating:patterns -->
-```yaml
-patterns:
-  - id: skip
-    template: "Visual-explainer files not found. Skipping [artifact name]."
-    trigger: "Any required visual-explainer file (SKILL.md, template, reference) cannot be read"
-    action: "Skip visual output entirely, continue workflow"
-
-  - id: degrade
-    template: "Visual-explainer files not found. Generating plain HTML [artifact name]."
-    trigger: "Visual-explainer files unavailable but plain HTML fallback exists"
-    scope: "review.md Step 8 only"
-    action: "Generate plain semantic HTML with same structure, no external CSS/templates/animations"
-
-  - id: non-file-skip
-    template: "--slides requested, but [reason]. Skipping [artifact name]."
-    trigger: "Slides requested via --slides flag but a non-file condition prevents generation"
-    constraint: "[reason] must be a hardcoded literal string, never derived from external data"
-    action: "Skip visual output, continue workflow"
-
-rules:
-  - "Never clear slides_requested on file failure — flag represents user intent"
-  - "Each visual step independently checks file availability"
-  - "Prefix 'Visual-explainer files not found.' must be identical across skip and degrade patterns. non-file-skip uses a different prefix ('--slides requested, but...') — it applies when visual-explainer files ARE available but a non-file condition prevents generation."
-```
-
-### 4b. Per-File Matrix
-
-<!-- spec:visual-gating:matrix -->
-```yaml
-visual-gating-files:
-  - file: "commands/session-start.md"
-    step: "Step 1 (project recap)"
-    patterns: [skip]
-    artifact: "project recap HTML"
-
-  - file: "commands/review.md"
-    step: "Step 6 (visual review report)"
-    patterns: [degrade]
-    artifact: "review report HTML"
-
-  - file: "commands/sprint-planning.md"
-    step: "Optional slides subsection after Step 6 (sprint overview slides)"
-    patterns: [skip, non-file-skip]
-    artifact: "sprint overview deck"
-
-  - file: "commands/retrospective.md"
-    step: "Step 4 (visual retro deck)"
-    patterns: [skip, non-file-skip]
-    artifact: "retro deck"
-
-  - file: "commands/scope.md"
-    step: "Step 3 item 6 (mind map)"
-    patterns: [skip]
-    artifact: "scope mind map"
-
-  - file: "commands/scope.md"
-    step: "Optional slides subsection after Step 6 (summary slides)"
-    patterns: [skip]
-    artifact: "scope summary slides"
-
-  - file: "commands/architecture-decision.md"
-    step: "Step 5b (architecture diagrams)"
-    patterns: [skip]
-    artifact: "before/after diagrams"
-
-  - file: "skills/brainstorming/SKILL.md"
-    step: "Phase 4 (architecture diagram)"
-    patterns: [skip]
-    artifact: "architecture diagram"
-
-  - file: "skills/writing-plans/SKILL.md"
-    step: "Visual Plan Approval prerequisite read"
-    patterns: [skip]
-    artifact: "visual plan and plan review"
-
-  - file: "skills/best-practices-audit/SKILL.md"
-    step: "Visual Audit Report availability check"
-    patterns: [skip]
-    artifact: "audit report HTML"
-```
-
----
-
-## 5. Error Handling Contracts
-
-### 5a. Inner Loop Skills
+### 4a. Inner Loop Skills
 
 <!-- spec:errors:brainstorming -->
 ```yaml
@@ -2002,9 +1781,6 @@ error-handling:
   - failure-point: "Design doc file write verification fails"
     action: retry
     detail: "Retry once. If still fails, report error and do not print completion marker"
-  - failure-point: "Visual-explainer files not found"
-    action: skip
-    detail: "Skip diagram generation entirely"
 ```
 
 <!-- spec:errors:writing-plans -->
@@ -2020,9 +1796,6 @@ error-handling:
   - failure-point: "CDR INDEX unavailable (no Company Context, Context7 down, or no results)"
     action: skip
     detail: "Log reason in Decision Log format, proceed with planning without CDR awareness"
-  - failure-point: "Visual-explainer files not found"
-    action: skip
-    detail: "Skip Steps 2 and 3 of Visual Plan Approval, proceed to Step 4 (Approval)"
   - failure-point: "Plan file cannot be read for task count"
     action: degrade
     detail: "Fall back to counting tasks from plan text in context window, note discrepancy"
@@ -2122,9 +1895,6 @@ error-handling:
   - failure-point: "Best-practices reference not accessible"
     action: degrade
     detail: "Use built-in audit checklist as authoritative guide"
-  - failure-point: "Visual-explainer files missing"
-    action: skip
-    detail: "Skip visual output: Visual-explainer files not found. Skipping audit report."
 ```
 
 <!-- spec:errors:systematic-debugging -->
@@ -2136,7 +1906,7 @@ error-handling:
     detail: "AskUserQuestion: Add more logging and retry / Get more info from reporter / Proceed with best guess (risky)"
 ```
 
-### 5b. Commands
+### 4b. Commands
 
 <!-- spec:errors:session-start -->
 ```yaml
@@ -2166,9 +1936,6 @@ error-handling:
   - failure-point: "No open issues found"
     action: escalate
     detail: "AskUserQuestion: Create a new issue?"
-  - failure-point: "Visual-explainer files not found (Step 1 recap)"
-    action: skip
-    detail: "Skip visual recap, proceed to Step 2"
   - failure-point: "No @imported files have freshness frontmatter (Step 1)"
     action: skip
     detail: "Silent pass — no warnings, proceed normally"
@@ -2218,9 +1985,6 @@ error-handling:
   - failure-point: "P1 persists after 3 fix attempts (Step 7)"
     action: escalate
     detail: "Flag for human review with full context on what was tried"
-  - failure-point: "Visual-explainer files not found (Step 8)"
-    action: degrade
-    detail: "Generate plain HTML review report"
 ```
 
 <!-- spec:errors:ship -->
@@ -2266,12 +2030,6 @@ error-handling:
   - failure-point: "Individual issue assignment fails (Step 5)"
     action: degrade
     detail: "Continue with remaining assignments, report failures"
-  - failure-point: "Visual-explainer files not found (Step 6 slides)"
-    action: skip
-    detail: "Visual-explainer files not found. Skipping sprint overview deck."
-  - failure-point: "--slides in prioritization-only mode"
-    action: skip
-    detail: "--slides requested, but no cycle exists to visualize. Skipping sprint overview deck."
 ```
 
 <!-- spec:errors:retrospective -->
@@ -2287,13 +2045,7 @@ error-handling:
   - failure-point: "No cycles exist (Step 1)"
     action: STOP
     detail: "No cycles found. Create a cycle in Linear first."
-  - failure-point: "Visual-explainer files not found (Step 4)"
-    action: skip
-    detail: "Visual-explainer files not found. Skipping retro deck."
-  - failure-point: "Cycle number validation fails (Step 4)"
-    action: skip
-    detail: "Cycle number failed format validation. Skipping slide deck."
-  - failure-point: "Individual issue creation fails (Step 6)"
+  - failure-point: "Individual issue creation fails (Step 5)"
     action: degrade
     detail: "Continue with remaining issues, report failures"
 ```
@@ -2308,12 +2060,6 @@ error-handling:
   - failure-point: "Sequential-thinking MCP unavailable (Step 0)"
     action: STOP
     detail: "Cannot reach sequential-thinking. Run /workflows:smoke-test to diagnose."
-  - failure-point: "Visual-explainer files not found (Step 3 mind map)"
-    action: skip
-    detail: "Visual-explainer files not found. Skipping mind map."
-  - failure-point: "Visual-explainer files not found (Step 6 slides)"
-    action: skip
-    detail: "Visual-explainer files not found. Skipping summary deck."
 ```
 
 <!-- spec:errors:architecture-decision -->
@@ -2326,9 +2072,6 @@ error-handling:
   - failure-point: "$ARGUMENTS validation fails (Step 1)"
     action: degrade
     detail: "Treat as empty, ask user for topic manually"
-  - failure-point: "Visual-explainer files not found (Step 5b)"
-    action: skip
-    detail: "Visual-explainer files not found. Skipping architecture diagrams."
   - failure-point: "Context fact-check finds inaccuracies (Step 7d)"
     action: escalate
     detail: "Present corrections to developer, incorporate accepted changes"
@@ -2385,11 +2128,11 @@ error-handling:
     detail: "Skip README import. Note: 'README could not be parsed. Proceeding without README context.'"
 ```
 
-## 6. Context Loading Cascade
+## 5. Context Loading Cascade
 
 Authoritative specification for when context loads during the inner loop. Governs what each stage should load and at what tier. See `docs/designs/BRI-2006-context-loading-cascade.md` for rationale and design decisions.
 
-### 6a. Loading Table
+### 5a. Loading Table
 
 <!-- spec:cascade:loading-table -->
 ```yaml
@@ -2457,7 +2200,7 @@ stages:
     status: implemented
 ```
 
-### 6b. Context Layers
+### 5b. Context Layers
 
 <!-- spec:cascade:context-layers -->
 ```yaml
@@ -2508,7 +2251,7 @@ layers:
     status: implemented
 ```
 
-### 6c. Tier Definitions
+### 5c. Tier Definitions
 
 <!-- spec:cascade:tiers -->
 ```yaml
@@ -2538,7 +2281,7 @@ tiers:
     budget: variable
 ```
 
-### 6d. Budget Guards
+### 5d. Budget Guards
 
 <!-- spec:cascade:budget-guards -->
 ```yaml

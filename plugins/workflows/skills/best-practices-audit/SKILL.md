@@ -26,7 +26,7 @@ After preconditions pass, print the activation banner (see `_shared/observabilit
 ---
 **Best Practices Audit** activated
 Trigger: Ship phase — ensuring CLAUDE.md health
-Produces: audit report, optional visual report, auto-fixes
+Produces: audit report, auto-fixes
 ---
 ```
 
@@ -192,45 +192,7 @@ Log each auto-fix decision:
 **Hook candidates**:
 - [rules that should become hooks]
 
-**Visual report**: [path to HTML file, or "Visual-explainer files not found. Skipping audit report."]
 ```
-
-## Visual Audit Report (Optional)
-
-Generate a visual HTML report if the visual-explainer skill is available.
-
-### Availability check
-
-Read these files — if **any** is missing, skip visual output entirely and note "Visual-explainer files not found. Skipping audit report." in the report:
-1. `plugins/workflows/skills/visual-explainer/SKILL.md`
-2. `plugins/workflows/skills/visual-explainer/templates/data-table.html`
-3. `plugins/workflows/skills/visual-explainer/references/css-patterns.md`
-
-If all files are present, read `plugins/workflows/skills/visual-explainer/SKILL.md` for anti-slop design guidelines before generating. Apply strictly.
-
-If visual-explainer files are missing, narrate the skip reason: "Visual-explainer files not found. Skipping audit report."
-
-### HTML structure (4 sections)
-
-Follow visual-explainer SKILL.md rules strictly (no generic AI styling, no slop). Use the data-table.html template as a structural reference.
-
-1. **Health Summary** — Hero section with KPI cards: CLAUDE.md line count, accuracy percentage (confirmed ÷ (confirmed + stale) — excludes unverifiable claims from the denominator; if no confirmed or stale claims exist, show `—` with label "No verifiable claims"), dimensions passed vs flagged.
-
-2. **Dimension Results** — Table with one row per dimension (1-8). Columns: Dimension name, Status (pass/flag/skip), Finding count, Summary. Use status badges (green = pass, amber = flag, grey = skip).
-
-3. **Accuracy Findings** — Detailed table of Dimension 8 results. Columns: Claim, Type (path/command/name/config), Status (confirmed/stale/unverifiable), Evidence. Stale rows highlighted. Wrap in `<details>` collapsed by default if more than 10 findings.
-
-4. **Recommendations** — Styled cards for each recommendation and hook candidate. Priority-ordered.
-
-### Write and open
-
-1. **Read raw project name** from CLAUDE.md title or `package.json` `name`.
-2. **Pre-sanitization safety check**: If the raw value contains shell metacharacters (`;`, `|`, `` ` ``, `$`, `(`, `)`, `\`, `"`, `'`), whitespace (space, tab, newline), `..`, or path separators (`/`), use `unnamed-project` immediately.
-3. **Sanitize**: Lowercase, replace any character outside `[a-z0-9]` with a hyphen, collapse consecutive hyphens, strip leading/trailing hyphens. The result must match `^[a-z0-9]([a-z0-9-]*[a-z0-9])?$`. If empty, use `unnamed-project`.
-4. Write to `~/.agent/diagrams/audit-<sanitized-project>.html`. Create the directory if needed.
-5. Verify the file was written successfully.
-6. Open in the default browser: `open -- <path>` on macOS, `xdg-open -- <path>` on Linux. The `--` end-of-options marker prevents a sanitized name starting with `-` from being misread as a flag (stricter than the visual-explainer base pattern, which omits `--`).
-7. Tell the user the file path.
 
 ## Handoff
 
@@ -240,7 +202,6 @@ After the Report section, print this completion marker exactly:
 **Best-practices audit complete.**
 Artifacts:
 - CLAUDE.md: [N] auto-fixes applied
-- Visual report: [path to HTML file, or "skipped"]
 - Flagged items: [N] items need developer input
 Returning to → /workflows:ship
 ```

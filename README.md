@@ -98,17 +98,11 @@ Verify installation by typing `/workflows:` in Claude Code — you should see th
 | `/workflows:create-plugin` | Scaffold a new domain plugin from template |
 | `/workflows:smoke-test` | Diagnostic checks on plugin environment |
 
-**Visual (diagrams, slides, reviews):**
+**Quality:**
 
 | Command | Description |
 |---------|-------------|
-| `/workflows:generate-web-diagram` | Generate a standalone HTML diagram and open in browser |
-| `/workflows:generate-slides` | Generate a magazine-quality slide deck as HTML |
-| `/workflows:generate-visual-plan` | Generate a visual implementation plan with state machines and code |
 | `/workflows:fact-check` | Verify factual accuracy of a document against the codebase |
-| `/workflows:diff-review` | Generate a visual before/after diff review as HTML |
-| `/workflows:plan-review` | Generate a visual plan review — codebase vs. proposed plan |
-| `/workflows:project-recap` | Generate a visual project recap with architecture and decisions |
 
 ## Skill Coverage Matrix
 
@@ -138,7 +132,6 @@ Skills activate automatically when Claude detects relevant context.
 | `web-design-guidelines` | Design | Reviewing UI code for best practices and accessibility |
 | `code-quality` | Quality | ESLint, Prettier, Ruff, TypeScript strict enforcement |
 | `testing-strategy` | Quality | Testing patterns for Vitest, RTL, MSW, and Playwright |
-| `visual-explainer` | Visual | Diagrams, slides, data tables, and visual reviews as HTML |
 | `agent-browser` | Automation | Navigating websites, filling forms, taking screenshots |
 | `find-skills` | Discovery | Looking for new skills or capabilities to install |
 

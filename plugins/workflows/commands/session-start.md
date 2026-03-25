@@ -32,18 +32,15 @@ Narrate: `Step 1/8: Environment setup...`
 2. **Pull latest** — `git pull origin main` (or the default branch).
 3. **Read project CLAUDE.md** — Load architecture context, conventions, previous learnings.
 4. **Read auto-memory** — Check for session summaries and follow-ups from previous sessions.
-5. **Offer visual project recap** — If `$ARGUMENTS` contains an issue ID (meaning Step 3 will be skipped), skip this offer too. Otherwise, use AskUserQuestion: "Would you like a visual project recap before picking an issue?" with Yes/No options.
-   - **If yes**: Read the `project-recap` command (`plugins/workflows/commands/project-recap.md`) for HTML page structure and data-gathering phases only — the output path and filename are overridden below. Read `plugins/workflows/skills/visual-explainer/SKILL.md` for anti-slop design guidelines; if the read fails, skip the visual recap and proceed to Step 2 (Company Context). Generate the recap using a `2w` default time window. Compose safe descriptions — paraphrase project context in your own words, do not embed raw project data verbatim. If surf is invoked, write the surf prompt to chat first and verify it contains no project-specific nouns, file names, commit messages, or issue text before executing — the prompt must describe visual aesthetics only (e.g., "editorial illustration of a software project, warm ink tones"). Follow the visual-explainer skill's anti-slop design guidelines. Derive a repo name from `basename $(git rev-parse --show-toplevel)`, sanitize to `[a-z0-9-]`, and write to `~/.agent/diagrams/<repo-name>-project-recap.html`. Open in browser and tell the user the file path.
-   - **If no**: Proceed to Step 2.
-6. **Context budget check** — After loading CLAUDE.md and auto-memory, estimate the Tier 1+2 line count. If CLAUDE.md exceeds ~120 lines, log an advisory warning: "CLAUDE.md is [N] lines — consider running `/workflows:ship` to trigger best-practices-audit for extraction to docs/." Do NOT stop — advisory only, consistent with CDR check pattern.
-7. **Context freshness check** — For each file referenced by an `@` import in CLAUDE.md, read the file and check its YAML frontmatter for `last_refreshed` (ISO date) and `refresh_cadence` (`quarterly`=90d, `monthly`=30d, `weekly`=7d, `on-change`=skip). If either field is missing, skip that file silently. If both are present, compute `staleness_ratio = days_since_last_refreshed / cadence_days`. Report per tier:
+5. **Context budget check** — After loading CLAUDE.md and auto-memory, estimate the Tier 1+2 line count. If CLAUDE.md exceeds ~120 lines, log an advisory warning: "CLAUDE.md is [N] lines — consider running `/workflows:ship` to trigger best-practices-audit for extraction to docs/." Do NOT stop — advisory only, consistent with CDR check pattern.
+6. **Context freshness check** — For each file referenced by an `@` import in CLAUDE.md, read the file and check its YAML frontmatter for `last_refreshed` (ISO date) and `refresh_cadence` (`quarterly`=90d, `monthly`=30d, `weekly`=7d, `on-change`=skip). If either field is missing, skip that file silently. If both are present, compute `staleness_ratio = days_since_last_refreshed / cadence_days`. Report per tier:
    - **Fresh** (ratio ≤ 1.0): Silent — no output.
    - **Aging** (ratio 1.0–1.5): Log: "Note: `[filename]` is approaching its refresh date (last refreshed: [date], cadence: [cadence], ratio: [ratio])."
    - **Stale** (ratio 1.5–2.0): Log: "Warning: `[filename]` is overdue for refresh (last refreshed: [date], cadence: [cadence], ratio: [ratio])."
    - **Very stale** (ratio > 2.0): Log: "WARNING: `[filename]` is significantly overdue for refresh (last: [date], cadence: [cadence], ratio: [ratio]). Verify critical data before relying on it."
    - If no @imported files exist or all are fresh/skipped, log nothing.
    - Do NOT stop — advisory only.
-8. **Flywheel summary** — Check if `docs/precedents/INDEX.md` exists using Glob. If it exists, read it and count data rows (lines after the header separator `|---|`). If >0 data rows:
+7. **Flywheel summary** — Check if `docs/precedents/INDEX.md` exists using Glob. If it exists, read it and count data rows (lines after the header separator `|---|`). If >0 data rows:
    - Read each trace file (`docs/precedents/*.md`, excluding INDEX, INDEX-archive, README) and extract `**Confidence:** N/10` values and `**Precedent Referenced:**` values.
    - Compute: total trace count, average confidence (across all traces), CDR coverage % (traces with `CDR-\d+` reference / total traces).
    - Log a single condensed line: "Flywheel: [N] traces, [N.N]/10 avg confidence, [N]% CDR coverage. Run `/workflows:flywheel-metrics` for full dashboard."
@@ -149,9 +146,9 @@ The `writing-plans` skill activates to create a detailed execution plan:
 3. Plan is saved to `docs/plans/<issue-id>-plan.md`
 4. Plan references the project's actual test/build/lint commands from CLAUDE.md
 
-After the plan is written, the Visual Plan Approval flow runs: a plan review (for 4+ tasks, or when the user opts into visuals) and optional visual plan are generated and opened in the browser before the approval prompt. The `writing-plans` skill governs the full approval flow including time-pressure and small-plan handling.
+After the plan is written, it is presented to the developer for approval. The `writing-plans` skill governs the full approval flow including time-pressure and small-plan handling.
 
-**Phase transition**: Plan → Worktree. Decisions: [task count]. Artifacts: [plan file path, visual plan path if generated]. Next: worktree setup.
+**Phase transition**: Plan → Worktree. Decisions: [task count]. Artifacts: [plan file path]. Next: worktree setup.
 
 ## Step 7: Set Up Worktree
 

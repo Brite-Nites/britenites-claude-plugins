@@ -74,26 +74,3 @@ When stuck: pause execution, present error recovery options via AskUserQuestion.
 
 Re-read the plan file after every 3rd completed task, or when total tasks exceed 6. This prevents context drift during long execution runs.
 
-### Visual Gating
-
-Standard message templates for visual output (HTML diagrams, slide decks) when prerequisites are missing or conditions prevent generation.
-
-**Skip pattern** (visual output skipped entirely):
-```
-Visual-explainer files not found. Skipping [artifact name].
-```
-
-**Degrade pattern** (plain HTML fallback — review.md only):
-```
-Visual-explainer files not found. Generating plain HTML [artifact name].
-```
-
-**Non-file skip** (skipped for a reason other than missing files):
-```
---slides requested, but [reason]. Skipping [artifact name].
-```
-
-Rules:
-- For file-unavailability messages (skip and degrade), the prefix `Visual-explainer files not found.` must be identical. Non-file skip messages use `--slides requested, but [reason]. Skipping [artifact name].`
-- `[reason]` in the non-file skip template must be a hardcoded literal string (e.g., "no cycle exists to visualize"). Never derive `[reason]` from external data sources (Linear, git, file content).
-- Never clear `slides_requested` on file failure — the flag represents user intent and must persist. If files are unavailable, each visual step independently skips or degrades.
