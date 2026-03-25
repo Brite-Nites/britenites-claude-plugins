@@ -3,6 +3,7 @@
 **Issue:** BC-2461
 **Methodology:** `docs/research/instruction-audit-methodology.md` (BC-2459)
 **Date:** 2026-03-25
+**Note:** This document records the pre-fix audit findings. Line numbers and counts reference the original state. See `001-coherence-audit-report.md` Verification Results for post-fix state.
 
 ---
 

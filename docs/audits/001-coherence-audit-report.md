@@ -3,6 +3,7 @@
 **Issue:** BC-2461
 **Methodology:** `docs/research/instruction-audit-methodology.md` (BC-2459)
 **Date:** 2026-03-25
+**Status:** Applied — all findings below have been resolved. Line numbers reference the pre-fix CLAUDE.md (236 lines). See Verification Results at bottom for post-fix state.
 
 ---
 
@@ -166,10 +167,11 @@ ship.md Steps 4-6 re-describe compound-learnings, best-practices-audit, and hand
 
 | Metric | Before | After | Change |
 |--------|-------:|------:|--------|
-| CLAUDE.md lines | 236 | 127 | **-46%** |
-| CONTRIBUTING.md lines | 192 | 228 | +36 (absorbed extracted content) |
+| CLAUDE.md lines | 236 | 128 | **-46%** |
+| CONTRIBUTING.md lines | 191 | 232 | +41 (absorbed extracted content) |
 | Total instruction lines | 10,161 | ~10,161 | ~0% (redistribution) |
-| Per-session CLAUDE.md tokens | ~9,400 | ~5,080 | **-46%** (estimated at ~40 tokens/line) |
+| Per-session CLAUDE.md tokens | ~9,400 | ~5,120 | **-46%** (estimated at ~40 tokens/line) |
+| ADR @import tokens saved | ~8,800 | 0 | **-100%** (converted to on-demand comments) |
 
 The total instruction surface doesn't shrink — content moves from always-loaded CLAUDE.md to CONTRIBUTING.md. The per-session cost drops significantly because CLAUDE.md is loaded every session but CONTRIBUTING.md is not.
 

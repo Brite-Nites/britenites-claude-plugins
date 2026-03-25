@@ -2,6 +2,7 @@
 
 **Issue:** BC-2461
 **Date:** 2026-03-25
+**Note:** Line numbers reference the pre-fix CLAUDE.md (236 lines). All findings below have been resolved. See `001-coherence-audit-report.md` Verification Results for post-fix state.
 
 ---
 

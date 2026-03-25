@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
 7. After you run `/workflows:review`, a Haiku-powered diff triage gates trivial diffs, then a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then Opus-powered review agents are dynamically selected based on depth mode and your stack (3-10 agents) and run in parallel, findings are validated by per-finding subagents, and P1s are auto-fixed (up to 3 attempts)
-8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, **best-practices-audit** keeps CLAUDE.md healthy, and **handbook-drift-check** detects if shipped changes require handbook updates
+8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings**, **best-practices-audit**, and **handbook-drift-check** run in sequence (see ship table below for details)
 
 ### Artifacts produced
 
