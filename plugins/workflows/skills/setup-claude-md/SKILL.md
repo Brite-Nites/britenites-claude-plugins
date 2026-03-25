@@ -61,7 +61,7 @@ Claude Code best practices.
   (preserve any custom content, update/add missing sections)
 
 ### Validation Criteria
-Read `.claude/skills/_shared/validation-pattern.md` and apply it.
+Reference `_shared/validation-pattern.md` and apply it.
 Specific criteria for this skill:
 - [ ] All required sections are present
 - [ ] Bash commands are correct (test at least the build and lint

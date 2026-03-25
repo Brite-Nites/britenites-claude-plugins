@@ -86,7 +86,7 @@ Before creating any issues, you must determine the target team and project.
   - Any issues that needed special handling
 
 ### Validation Criteria
-Read `.claude/skills/_shared/validation-pattern.md` and apply it.
+Reference `_shared/validation-pattern.md` and apply it.
 Specific criteria for this skill:
 - [ ] Every task in the refined plan has a corresponding Linear issue
 - [ ] Each issue's description contains Context, Implementation Steps,

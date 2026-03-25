@@ -42,9 +42,34 @@ If you're unsure whether something belongs here, ask: "Is this about *how* we wo
 4. Set a `matcher` regex for which tools trigger the hook
 5. Run `python3 -m json.tool hooks/hooks.json` to validate JSON
 
-## SKILL.md Frontmatter Standard
+## plugin.json Schema (STRICT — read before editing)
 
-Source of truth: [CLAUDE.md](CLAUDE.md) — reproduced here for convenience.
+**Claude Code validates plugin.json against a strict Zod schema. Any unrecognized field causes a silent hard failure — the entire plugin won't load (no commands, no skills, nothing). There is no error message shown to the user.**
+
+Only these fields are recognized:
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `name` | string | yes | |
+| `description` | string | yes | |
+| `author` | `{ name, email? }` | yes | |
+| `version` | string | no | Must bump for cache invalidation |
+| `homepage` | string | no | |
+| `repository` | string | no | |
+| `license` | string | no | |
+| `keywords` | string[] | no | |
+| `commands` | string | no | Path to commands dir (e.g., `"./commands/"`) |
+| `skills` | string | no | Path to skills dir (e.g., `"./skills/"`) |
+| `mcpServers` | object | no | **Inline object only**, not a file path |
+
+**NEVER add these to plugin.json** (they are auto-discovered from the plugin root):
+- `agents` — the `agents/` directory is scanned automatically
+- `hooks` — `hooks/hooks.json` is loaded automatically
+- `mcpServers` as a string path (e.g., `"./.mcp.json"`) — `.mcp.json` is loaded automatically. If you must declare MCP servers in plugin.json, use the inline object format.
+
+The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowlist.
+
+## SKILL.md Frontmatter Standard
 
 ```yaml
 ---
@@ -69,6 +94,22 @@ metadata:                      # Optional. Only for skills from external sources
 **Agent-linked skills** also use:
 - `agent: agent-name` — references an agent in `agents/`
 - `context: fork` — intended for isolated execution (currently has upstream bugs, runs inline)
+
+## Hooks
+
+The plugin includes hooks in `plugins/workflows/hooks/hooks.json` (auto-loaded by Claude Code — do NOT add a `hooks` field to `plugin.json`):
+
+- **PreToolUse (Bash)**: Two-layer security — regex command hook (deterministic, blocks `rm -rf`, `--force`, `DROP`, `chmod 777`, piped downloads) runs first, then Haiku prompt hook as fallback
+- **PreToolUse (Bash)**: Pre-commit quality — intercepts `git commit` commands, detects project type (`package.json` → JS/TS, `pyproject.toml`/`setup.py` → Python), runs linters on staged files only (ESLint, `tsc --noEmit`, Ruff). Degrades gracefully if no linters installed. Note: inactive from plugins until upstream [#6305](https://github.com/anthropics/claude-code/issues/6305) is fixed.
+- **PreToolUse (Write/Edit)**: Two-layer security — regex command hook (deterministic, blocks `sk-proj-`, `AKIA`, `ghp_`, `sk_live/test` patterns) runs first, then Haiku prompt hook as fallback
+- **PostToolUse (Write/Edit)**: Auto-linter — runs ESLint (JS/TS) or Ruff (Python) if available
+- **SessionStart**: Team context — runs environment health checks (git, node, gh, npx) and shows key commands
+
+A standalone version of the pre-commit hook is available at `scripts/pre-commit.sh` for direct installation as a git hook (`cp scripts/pre-commit.sh .git/hooks/pre-commit`). This works today regardless of the upstream plugin hook bug.
+
+## ADR Convention
+
+Architecture Decision Records live in `docs/decisions/NNN-kebab-title.md`. They are imported into CLAUDE.md via individual `@` imports (directory imports are not supported). The `/workflows:architecture-decision` command generates ADRs and auto-appends the import. `/workflows:project-start` generates ADRs for all major tech decisions made during the interview.
 
 ## Branch Conventions
 

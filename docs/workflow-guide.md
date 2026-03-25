@@ -45,7 +45,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
 7. After you run `/workflows:review`, a Haiku-powered diff triage gates trivial diffs, then a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then Opus-powered review agents are dynamically selected based on depth mode and your stack (3-10 agents) and run in parallel, findings are validated by per-finding subagents, and P1s are auto-fixed (up to 3 attempts)
-8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
+8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, **best-practices-audit** keeps CLAUDE.md healthy, and **handbook-drift-check** detects if shipped changes require handbook updates
 
 ### Artifacts produced
 
@@ -61,19 +61,21 @@ Between those 3 commands, skills activate in sequence based on the work:
 
 ## 2. Skill Reference
 
-### Inner Loop Skills (8)
+### Inner Loop Skills (10)
 
 These activate automatically in sequence. None need to be invoked manually.
 
 | Skill | Activates When | Purpose | Produces |
 |-------|---------------|---------|----------|
 | `brainstorming` | 2+ modules, 4+ tasks, 2+ approaches, or new patterns | Socratic discovery | `docs/designs/<issue-id>-<slug>.md` |
+| `precedent-search` | During brainstorming or planning | Search past decision traces from project and org INDEX | Relevant precedent context |
 | `writing-plans` | Multi-step task, after brainstorm or complexity skip | CDR conflict check, then break into 2-5min tasks with TDD | `docs/plans/<issue-id>-plan.md` |
 | `git-worktrees` | Plan approved, before coding | Isolated workspace + clean baseline | `.claude/worktrees/` branch |
 | `executing-plans` | Plan file exists | Subagent-per-task + TDD + checkpoints | Implemented code + tests |
 | `verification-before-completion` | Task checkpoints during execution | 4-level verification (build, tests, acceptance, integration) | Verification report |
 | `compound-learnings` | Via `/workflows:ship` after PR | Knowledge capture | CLAUDE.md + memory updates |
 | `best-practices-audit` | Via `/workflows:ship` after compound | CLAUDE.md audit + auto-fix | CLAUDE.md fixes |
+| `handbook-drift-check` | Via `/workflows:ship` after best-practices audit | Detect handbook drift, open handbook PR | Handbook PR (if drift found) |
 | `systematic-debugging` | Bug investigation (anytime) | 4-phase root cause analysis (reproduce, isolate, analyze, fix) | Fix + regression test |
 
 `systematic-debugging` is the only inner loop skill that can also be triggered manually — all others activate automatically in the chain.
@@ -228,7 +230,7 @@ This ensures expensive Opus inference only runs when the diff warrants it, and e
 
 #### `/workflows:ship`
 
-Create PR, update Linear, capture learnings, audit CLAUDE.md, suggest next issue.
+Create PR, update Linear, capture learnings, audit CLAUDE.md, check handbook drift, suggest next issue.
 
 | Step | Name | What happens |
 |------|------|-------------|
@@ -238,8 +240,9 @@ Create PR, update Linear, capture learnings, audit CLAUDE.md, suggest next issue
 | 3 | Update Linear | Move issue to "In Review", add comment with PR link |
 | 4 | Compound Learnings | Accuracy pass on CLAUDE.md, capture durable knowledge (sanitization enforced in `compound-learnings` skill), write session summary |
 | 5 | Best Practices Audit | 8-dimension audit of CLAUDE.md, auto-fix structural issues |
-| 6 | Worktree Cleanup | Remove worktree and local branch if applicable |
-| 7 | Session Close | Summary of what shipped, learnings captured, suggested next issue |
+| 6 | Handbook Drift Check | Compare shipped changes against handbook files, detect stale content, optionally open handbook PR |
+| 7 | Worktree Cleanup | Remove worktree and local branch if applicable |
+| 8 | Session Close | Summary of what shipped, learnings captured, suggested next issue |
 
 ### Direction-Setting Commands
 

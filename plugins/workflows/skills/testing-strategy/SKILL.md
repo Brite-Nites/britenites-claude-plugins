@@ -73,7 +73,7 @@ Reference these guidelines when:
 - `vitest-vi-mock` — Use vi.mock for module mocking, vi.spyOn for method spying
 - `vitest-test-each` — Use test.each for parameterized tests instead of loops
 - `vitest-setup-teardown` — Use beforeEach/afterEach for per-test setup, beforeAll/afterAll for expensive shared setup
-- `vitest-in-source` — Use in-source testing for pure utility functions when appropriate
+- `vitest-in-source` — Use in-source testing for pure utility functions with no side effects and no more than 3 dependencies
 - `vitest-fake-timers` — Use vi.useFakeTimers for time-dependent code, always restore after
 
 ### 4. React Testing Library (HIGH)
