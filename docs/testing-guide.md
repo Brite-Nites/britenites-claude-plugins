@@ -34,7 +34,7 @@ Run these outside Claude, from a regular terminal or CI.
 | T0.1 Structural validation | `bash scripts/validate.sh` | 0 errors, 0 warnings |
 | T0.2 Hook regex tests | `bash scripts/test-hooks.sh` | 37/37 pass |
 | T0.3 Prerequisites check | `bash scripts/check-prereqs.sh` | All PASS (or explained SKIPs) |
-| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 24 commands found |
+| T0.4 Command registration | `bash scripts/test-plugin-load.sh` | All 21 commands found |
 | T0.5 CI workflow | Push to branch, check GitHub Actions | All steps green |
 | T0.6 Scenario validation | `bash scripts/test-scenarios.sh` | 225/225 pass (60 scenarios + 12 FP regressions + 6 express mode, 7 categories) |
 
@@ -44,7 +44,7 @@ Run these outside Claude, from a regular terminal or CI.
 
 | Test | Steps | Expected |
 |------|-------|----------|
-| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/workflows`, type `/workflows:` | 24 commands in autocomplete: `architecture-decision`, `bug-report`, `code-review`, `create-plugin`, `deployment-checklist`, `diff-review`, `fact-check`, `generate-slides`, `generate-visual-plan`, `generate-web-diagram`, `onboarding-checklist`, `plan-review`, `project-recap`, `project-start`, `retrospective`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `sprint-planning`, `tech-stack` |
+| T1.1 Plugin loads | Start `claude --plugin-dir ./plugins/workflows`, type `/workflows:` | 21 commands in autocomplete: `architecture-decision`, `audit-trail`, `bug-report`, `code-review`, `create-plugin`, `deployment-checklist`, `fact-check`, `flywheel-metrics`, `onboarding-checklist`, `project-start`, `promote-precedent`, `retrospective`, `review`, `scope`, `security-audit`, `session-start`, `setup-claude-md`, `ship`, `smoke-test`, `sprint-planning`, `tech-stack` |
 | T1.2 SessionStart hook | Observe session start output | Environment banner with git/node/gh/npx status + key commands listed |
 | T1.3 Smoke test | Run `/workflows:smoke-test` | Summary table with PASS/FAIL/SKIP/KNOWN ISSUE for 8 checks (env, MCP, hooks, agents) |
 
@@ -74,7 +74,6 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T2.7 | "Build a login form with email and password" | `frontend-design` |
 | T2.8 | "Choose a color palette for a SaaS dashboard" | `ui-ux-pro-max` |
 | T2.9 | "Review my UI for accessibility issues" | `web-design-guidelines` |
-| T2.13 | "Create a diagram of our auth flow" | `visual-explainer` |
 
 ### Quality / Reference Skills
 
@@ -142,17 +141,11 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | T3.14k | `/workflows:project-start` (brownfield declined) | `mkdir /tmp/test-bf3 && cd /tmp/test-bf3 && printf '# Project\n%.0s\n' {1..60} > README.md` | Run, accept or skip express, decline brownfield ("No, start fresh") | Verify: proceeds to interview (or Git Setup) with no brownfield context, no pre-filling of docs. **Cleanup:** `rm -rf /tmp/test-bf3` |
 | T3.15 | `/workflows:setup-claude-md` | Any project | Run | CLAUDE.md generated/updated with required sections. Agent dispatched |
 
-### Visual Commands (generates HTML files)
+### Standalone Commands
 
 | Test | Command | Steps | Expected |
 |------|---------|-------|----------|
-| T3.18 | `/workflows:generate-web-diagram` | Run with "microservices architecture" | HTML file written to `~/.agent/diagrams/`, opened in browser, uses Mermaid or CSS cards, distinctive aesthetic |
-| T3.19 | `/workflows:generate-slides` | Run with "project overview" | Slide deck HTML in `~/.agent/diagrams/`, opens in browser, keyboard nav works, slide types vary |
-| T3.20 | `/workflows:generate-visual-plan` | Run with a feature description in a project with code | Implementation plan HTML with state machine, code snippets, edge cases table |
-| T3.21 | `/workflows:fact-check` | Point at a recent generated HTML in `~/.agent/diagrams/` | Claims extracted, verified against code/git, corrections applied in-place, verification summary added |
-| T3.22 | `/workflows:diff-review` | On a branch with changes vs main | Visual diff review HTML with KPI dashboard, architecture diagram, Good/Bad/Ugly analysis |
-| T3.23 | `/workflows:plan-review` | Run with path to a plan markdown file | Plan review HTML with current vs planned architecture diagrams, risk assessment, understanding gaps |
-| T3.24 | `/workflows:project-recap` | Run with `2w` | Project recap HTML with architecture snapshot, activity narrative, cognitive debt hotspots |
+| T3.21 | `/workflows:fact-check` | Point at a generated file in the project directory | Claims extracted, verified against code/git, corrections applied in-place, verification summary added |
 
 ### Freshness Tracking (session-start Step 1)
 
@@ -281,7 +274,7 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 
 | Component | Count | Covered by |
 |-----------|-------|------------|
-| Commands | 24 | T1.1, T3.1–T3.25g |
+| Commands | 21 | T1.1, T3.1–T3.25g |
 | Skills (Inner Loop) | 8 | T2.1–T2.6, T4.1 |
 | Skills (Design) | 3 | T2.7–T2.9 |
 | Skills (Quality/Ref) | 3 | T2.10–T2.12 |
@@ -304,12 +297,12 @@ Environment: macOS / Linux / WSL
 
 Layer 0 (Automated):  __/6
 Layer 1 (Loading):    __/3
-Layer 2 (Skills):     __/13
-Layer 3 (Commands):   __/47
+Layer 2 (Skills):     __/12
+Layer 3 (Commands):   __/41
 Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/26
 
-Total:  __/102
+Total:  __/96
 Notes:  ____
 ```

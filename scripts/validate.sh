@@ -614,30 +614,8 @@ for e in errors:
     warn "hooks.json not found (optional)"
   fi
 
-  # ── Visual Gating Message Consistency ────────────────────────────
-  section "12. Visual Gating ($plugin_name)"
-  # Every "Visual-explainer" file-unavailability message must use the
-  # standard prefix "Visual-explainer files not found." — not variants
-  # like "skill files not found" or "Cannot read visual-explainer".
-  local ve_bad=0
-  for file in "$PLUGIN_ROOT"/commands/*.md "$PLUGIN_ROOT"/skills/*/SKILL.md; do
-    [ -f "$file" ] || continue
-    # Match "Visual-explainer" or "visual-explainer" followed by skip/degrade
-    # text that does NOT use the standard prefix
-    if grep -qiE 'visual-explainer' "$file" 2>/dev/null; then
-      # Check for non-standard variants
-      if grep -qE '(Cannot read visual-explainer|skill files not found|skill files not available|Visual report skipped|visual-explainer not available)' "$file" 2>/dev/null; then
-        fail "$(basename "$file"): non-standard visual-explainer skip message (see _shared/observability.md Visual Gating)"
-        ve_bad=$((ve_bad + 1))
-      fi
-    fi
-  done
-  if [ "$ve_bad" -eq 0 ]; then
-    pass "Visual gating messages use standard prefix"
-  fi
-
   # ── Step Sequence Validation ──────────────────────────────────────
-  section "13. Step Sequence Validation ($plugin_name)"
+  section "12. Step Sequence Validation ($plugin_name)"
 
   local step_seq_errors=0
   local step_seq_checked=0
@@ -856,7 +834,7 @@ PYEOF
   fi
 
   # ── Trigger Registry Validation ──────────────────────────────────
-  section "14. Trigger Registry ($plugin_name)"
+  section "13. Trigger Registry ($plugin_name)"
 
   local trigger_registry="$PLUGIN_ROOT/skills/_shared/trigger-registry.json"
   if [ ! -f "$trigger_registry" ]; then

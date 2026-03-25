@@ -138,7 +138,6 @@ A standalone version of the pre-commit hook is available at `scripts/pre-commit.
 |-------|-------------|---------|
 | `frontend-design` | "build", "create", "implement" UI | Write production code |
 | `ui-ux-pro-max` | "choose palette", "design system", "plan visual direction" | Design planning |
-| `visual-explainer` | "diagram", "architecture overview", "visual explanation", complex tables | Generate styled HTML pages. Commands: `/workflows:generate-web-diagram`, `/workflows:generate-slides`, `/workflows:generate-visual-plan`, `/workflows:diff-review`, `/workflows:plan-review`, `/workflows:project-recap`, `/workflows:fact-check` |
 | `web-design-guidelines` | "review", "audit", "check" existing UI | Compliance review |
 
 ### Quality Skills
@@ -204,14 +203,14 @@ The `scripts/validate.sh` pre-push hook and CI workflow both enforce this allowl
 
 ## Testing & Validation
 
-- `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs, step sequences, visual gating, trigger registry). Run pre-push and in CI.
+- `scripts/validate.sh` — structural validation (JSON, frontmatter, schema, cross-refs, step sequences, trigger registry). Run pre-push and in CI.
 - `scripts/test-hooks.sh` — tests security and quality hook regex patterns against 37 known inputs. Run in CI.
-- `scripts/test-skill-triggers.sh` — tests skill trigger keyword matching, negative keywords, and precedence resolution against 42 test cases. Run in CI.
+- `scripts/test-skill-triggers.sh` — tests skill trigger keyword matching, negative keywords, and precedence resolution against 40 test cases. Run in CI.
 - `scripts/check-prereqs.sh` — verifies CLI tools, MCP servers, plugin JSON validity.
 - `scripts/test-plugin-load.sh` — verifies all commands register (runs outside Claude, for CI).
 - `/workflows:smoke-test` — in-session diagnostic (env, MCP, hooks, agent dispatch).
 - `scripts/test-scenarios.sh` — E2E scenario validation (225 sub-tests: 60 PRD scenarios + 12 false positive regressions + 6 express mode cases).
-- `docs/testing-guide.md` — comprehensive testing guide (102 tests across 7 layers, plus 225 scenario sub-tests in T0.6).
+- `docs/testing-guide.md` — comprehensive testing guide (96 tests across 7 layers, plus 225 scenario sub-tests in T0.6).
 
 ## ADR Convention
 
@@ -233,6 +232,5 @@ A GitHub Actions workflow (`.github/workflows/validate-plugin.yml`) runs on push
 - Frontmatter in all commands and SKILL.md files
 - Skill name-to-directory matching
 - Step-sequence ordering (no gaps, duplicates, or bad skip references)
-- Visual gating message conformance
 - Trigger registry completeness and field validation
 - Trigger matching (keyword, negative keyword, precedence)

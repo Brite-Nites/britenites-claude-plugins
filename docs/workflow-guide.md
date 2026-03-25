@@ -1,15 +1,14 @@
 # Workflow Guide
 
-A complete reference for using the Brite Workflows plugin. Covers the inner loop (daily development), visual features, orchestrator commands, and troubleshooting.
+A complete reference for using the Brite Workflows plugin. Covers the inner loop (daily development), orchestrator commands, and troubleshooting.
 
 ## Table of Contents
 
 1. [The Inner Loop](#1-the-inner-loop)
 2. [Skill Reference](#2-skill-reference)
-3. [Visual Features](#3-visual-features)
-4. [Orchestrator Commands](#4-orchestrator-commands)
-5. [Troubleshooting](#5-troubleshooting)
-6. [Configuration](#6-configuration)
+3. [Orchestrator Commands](#3-orchestrator-commands)
+4. [Troubleshooting](#4-troubleshooting)
+5. [Configuration](#5-configuration)
 
 ---
 
@@ -45,7 +44,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 4. **git-worktrees** creates an isolated branch and workspace, installs dependencies, verifies clean baseline
 5. **executing-plans** runs each task via a fresh subagent with TDD enforcement (red-green-refactor) and checkpoints
 6. **verification-before-completion** runs 4-level verification at each checkpoint during execution
-7. After you run `/workflows:review`, a Haiku-powered diff triage gates trivial diffs, then a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then Opus-powered review agents are dynamically selected based on depth mode and your stack (3-10 agents) and run in parallel, findings are validated by per-finding subagents, P1s are auto-fixed (up to 3 attempts), and a visual HTML report is generated
+7. After you run `/workflows:review`, a Haiku-powered diff triage gates trivial diffs, then a simplify pass runs 3 agents (code reuse, quality, efficiency) to auto-fix behavior-preserving improvements, then Opus-powered review agents are dynamically selected based on depth mode and your stack (3-10 agents) and run in parallel, findings are validated by per-finding subagents, and P1s are auto-fixed (up to 3 attempts)
 8. After you run `/workflows:ship`, a PR is created, Linear is updated, then **compound-learnings** captures durable knowledge to CLAUDE.md and auto-memory, and **best-practices-audit** keeps CLAUDE.md healthy
 
 ### Artifacts produced
@@ -54,10 +53,7 @@ Between those 3 commands, skills activate in sequence based on the work:
 |-------|----------|------|
 | Brainstorming | Design document | `docs/designs/<issue-id>-<slug>.md` |
 | Planning | Execution plan | `docs/plans/<issue-id>-plan.md` |
-| Planning | Visual plan (4+ tasks) | `~/.agent/diagrams/<issue-id>-visual-plan.html` |
-| Planning | Plan review | `~/.agent/diagrams/<issue-id>-plan-review.html` |
 | Worktree | Isolated branch | `.claude/worktrees/<issue-id>/` |
-| Review | Visual report | `~/.agent/diagrams/review-<sanitized-branch>.html` |
 | Ship | Pull request | GitHub |
 | Ship | CLAUDE.md + memory updates | Project root + auto-memory |
 
@@ -77,7 +73,7 @@ These activate automatically in sequence. None need to be invoked manually.
 | `executing-plans` | Plan file exists | Subagent-per-task + TDD + checkpoints | Implemented code + tests |
 | `verification-before-completion` | Task checkpoints during execution | 4-level verification (build, tests, acceptance, integration) | Verification report |
 | `compound-learnings` | Via `/workflows:ship` after PR | Knowledge capture | CLAUDE.md + memory updates |
-| `best-practices-audit` | Via `/workflows:ship` after compound | CLAUDE.md audit + auto-fix | Audit report |
+| `best-practices-audit` | Via `/workflows:ship` after compound | CLAUDE.md audit + auto-fix | CLAUDE.md fixes |
 | `systematic-debugging` | Bug investigation (anytime) | 4-phase root cause analysis (reproduce, isolate, analyze, fix) | Fix + regression test |
 
 `systematic-debugging` is the only inner loop skill that can also be triggered manually — all others activate automatically in the chain.
@@ -89,8 +85,6 @@ These activate automatically in sequence. None need to be invoked manually.
 | `frontend-design` | "build", "create", "implement" UI components | Write production code (HTML/CSS/JS/React) |
 | `ui-ux-pro-max` | "choose palette", "design system", "plan visual direction" | Design planning (50+ styles, 97 palettes, 57 font pairings) |
 | `web-design-guidelines` | "review", "audit", "check" existing UI | Compliance review against Web Interface Guidelines |
-| `visual-explainer` | "diagram", "architecture overview", complex tables | Generate styled HTML pages |
-
 ### Backend & Quality Skills
 
 | Skill | Triggers On | Purpose |
@@ -118,52 +112,7 @@ These activate automatically in sequence. None need to be invoked manually.
 
 ---
 
-## 3. Visual Features
-
-### 3a. Inner Loop Visuals (auto-triggered)
-
-These visuals are generated automatically during the inner loop workflow.
-
-| Phase | Visual | Trigger | Output Path |
-|-------|--------|---------|-------------|
-| Brainstorming | Architecture diagram | Design involves topology or new patterns | `~/.agent/diagrams/<issue-id>-architecture.html` |
-| Writing Plans | Visual plan | 4+ tasks | `~/.agent/diagrams/<issue-id>-visual-plan.html` |
-| Writing Plans | Plan review | All plans | `~/.agent/diagrams/<issue-id>-plan-review.html` |
-| Review | Review report | Always (Step 8) | `~/.agent/diagrams/review-<sanitized-branch>.html` |
-| Ship | Audit report | Optional | `~/.agent/diagrams/audit-<project>.html` |
-
-### 3b. Outer Loop Visuals (`--slides` flag)
-
-These visuals are available from outer loop commands, typically via the `--slides` flag.
-
-| Command | Visual | Trigger | Output Path |
-|---------|--------|---------|-------------|
-| `/workflows:session-start` | Project recap | User opt-in (Step 1) | `~/.agent/diagrams/<repo>-project-recap.html` |
-| `/workflows:sprint-planning` | Sprint slides | `--slides` flag | `~/.agent/diagrams/sprint-cycle-<N>-overview.html` |
-| `/workflows:retrospective` | Retro deck | `--slides` flag | `~/.agent/diagrams/retro-cycle-<N>.html` |
-| `/workflows:scope` | Mind map | Auto (during scoping) | `~/.agent/diagrams/scope-<project>-mindmap.html` |
-| `/workflows:scope` | Summary slides | `--slides` flag | `~/.agent/diagrams/scope-<project>-slides.html` |
-| `/workflows:architecture-decision` | Before/after diagrams | Auto (optional) | `~/.agent/diagrams/adr-<slug>-diagrams.html` |
-
-### 3c. Standalone Visual Commands
-
-These commands can be run anytime to generate visual HTML pages.
-
-| Command | Description |
-|---------|-------------|
-| `/workflows:generate-web-diagram` | Generate a standalone HTML diagram from a topic |
-| `/workflows:generate-slides` | Generate a magazine-quality slide deck as HTML |
-| `/workflows:generate-visual-plan` | Generate a visual implementation plan with state machines and code snippets |
-| `/workflows:fact-check` | Verify a document's claims against the actual codebase |
-| `/workflows:diff-review` | Generate a before/after architecture comparison from a git diff |
-| `/workflows:plan-review` | Generate a visual comparison of codebase state vs. implementation plan |
-| `/workflows:project-recap` | Rebuild mental model of a project's current state and recent decisions |
-
-All visual outputs are self-contained HTML files written to `~/.agent/diagrams/` and opened in the default browser.
-
----
-
-## 4. Orchestrator Commands
+## 3. Orchestrator Commands
 
 ### Inner Loop Commands
 
@@ -174,18 +123,18 @@ Start a work session. Guides you from issue selection through execution.
 | Step | Name | What happens |
 |------|------|-------------|
 | 0 | Verify Prerequisites | Confirm Linear MCP, sequential-thinking MCP, Context7 MCP (non-blocking) |
-| 1 | Environment Setup | Git pull, read CLAUDE.md + auto-memory, optional visual project recap |
+| 1 | Environment Setup | Git pull, read CLAUDE.md + auto-memory |
 | 2 | Company Context | Check for `## Company Context` in CLAUDE.md — run interview if missing, skip if present or opted out |
 | 3 | Query Linear | Find in-progress issues first, then backlog; scoped to project in CLAUDE.md |
 | 4 | Read Issue Details | Fetch full issue, linked docs, identify relevant code |
 | 5 | Brainstorm | Objective complexity check — brainstorm if criteria met, skip if not |
-| 6 | Write Plan | Break work into tasks, visual plan approval for 4+ tasks |
+| 6 | Write Plan | Break work into tasks, plan approval |
 | 7 | Set Up Worktree | Isolated branch + dependency install + clean baseline |
 | 8 | Execute | Subagent-per-task with TDD and checkpoints |
 
 #### `/workflows:review`
 
-Self-verify work, simplify code, run review agents in parallel, fix P1s, produce a visual report.
+Self-verify work, simplify code, run review agents in parallel, fix P1s.
 
 **Depth Modes**
 
@@ -216,8 +165,7 @@ Depth can be combined with other flags: `/workflows:review fast skip triage skip
 | 5 | Collect & Classify | Merge, deduplicate, and confidence-filter findings (>= 7 included, low-confidence P2/P3 filtered, borderline P1s to human review) |
 | 6 | Validate Findings | Per-finding verification: Opus subagent per P1, Sonnet subagent per P2/P3 (max 20 subagents). In `fast` mode, only P1s are validated; P2/P3 validation is skipped. Skippable via "skip validation" flag. |
 | 7 | Fix Loop | Auto-fix high-confidence P1s (>= 7, max 3 attempts), present borderline P1s for human review |
-| 8 | Visual Review Report | Generate 6-section HTML report (summary, KPIs with avg confidence, architecture, findings with confidence pills, file map, tests) |
-| 9 | Final Report | Present verdict: ready to ship, needs input on P2s, blocked, or has borderline P1s for review |
+| 8 | Final Report | Present verdict: ready to ship, needs input on P2s, blocked, or has borderline P1s for review |
 
 **Review Agent Roster**
 
@@ -332,7 +280,7 @@ After project-start, run `/workflows:post-plan-setup` to refine the plan, create
 
 | Command | Description |
 |---------|-------------|
-| `/workflows:sprint-planning` | Pull backlog, review velocity, assign issues to cycles. Supports `current` mode and `--slides` flag. |
+| `/workflows:sprint-planning` | Pull backlog, review velocity, assign issues to cycles. Supports `current` mode. |
 | `/workflows:retrospective` | Review completed cycle, facilitate retro discussion, post status update to Linear. |
 | `/workflows:scope` | Collaborative scoping session — discover what to build, create Linear issues, prioritize. |
 | `/workflows:architecture-decision` | Generate Architecture Decision Records (ADRs) with structured analysis of alternatives. |
@@ -347,15 +295,14 @@ After project-start, run `/workflows:post-plan-setup` to refine the plan, create
 
 ---
 
-## 5. Troubleshooting
+## 4. Troubleshooting
 
-### Top 5 Quick Fixes
+### Top 4 Quick Fixes
 
 | Problem | Quick Fix |
 |---------|-----------|
 | Skills don't trigger | Check plugin is loaded (`/workflows:` in autocomplete). Verify your prompt matches the skill's `description` field. |
 | Linear queries return wrong issues | Add a `## Linear Project` section to CLAUDE.md with `Project: <name>`. |
-| Visual outputs not generating | Verify visual-explainer skill files exist. Use `--slides` flag for outer loop commands. |
 | Hooks not firing | Known upstream bug [#6305](https://github.com/anthropics/claude-code/issues/6305) — PreToolUse/PostToolUse hooks (security blocking, pre-commit quality) don't fire from plugins. SessionStart hooks (environment banner) work. Use `scripts/pre-commit.sh` as a direct git hook in the meantime. |
 | Stale behavior after plugin update | Bump `version` in both `plugin.json` and `marketplace.json` to invalidate cache. |
 
@@ -363,7 +310,7 @@ For detailed troubleshooting, see [troubleshooting.md](troubleshooting.md).
 
 ---
 
-## 6. Configuration
+## 5. Configuration
 
 ### Required: `## Linear Project` in CLAUDE.md
 
@@ -385,10 +332,6 @@ Context7 provides two capabilities:
 
 Setup: `npx ctx7 setup --claude --api-key <key>`. Without Context7, sessions degrade gracefully — library docs fall back to training data, and company context is gathered manually during the interview.
 
-### Output directory
-
-All visual HTML outputs are written to `~/.agent/diagrams/`. This directory is created automatically on first use. Files are opened in the default browser after generation.
-
 ### Diagnostics
 
 Run `/workflows:smoke-test` to check the plugin environment:
@@ -397,4 +340,4 @@ Run `/workflows:smoke-test` to check the plugin environment:
 - Hook registration
 - Agent dispatch capability
 
-See [testing-guide.md](testing-guide.md) for the full 102-test validation suite.
+See [testing-guide.md](testing-guide.md) for the full 96-test validation suite.

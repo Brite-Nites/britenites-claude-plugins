@@ -81,8 +81,6 @@ Capture the **rationale** — this is the most valuable part of the ADR. Not jus
 
 ## Step 5: Document Consequences
 
-### 5a. Identify Consequences
-
 Ask the developer (or infer from the analysis):
 
 1. **What becomes easier?** — Benefits, capabilities unlocked, simplifications
@@ -90,29 +88,6 @@ Ask the developer (or infer from the analysis):
 3. **What else changes?** — Team skills needed, migration paths, dependency changes
 
 Keep consequences concrete and specific. "Better performance" is vague. "Response times drop from ~500ms to ~50ms for cached reads" is useful.
-
-### 5b. Architecture Diagrams
-
-**Load visual-explainer references**: Resolve each path to a canonical absolute path and verify it starts with CWD before reading. Read `plugins/workflows/skills/visual-explainer/SKILL.md`, `plugins/workflows/skills/visual-explainer/templates/mermaid-flowchart.html`, `plugins/workflows/skills/visual-explainer/references/css-patterns.md`, and `plugins/workflows/skills/visual-explainer/references/libraries.md`. If any path fails CWD verification or cannot be read, warn: "Visual-explainer files not found. Skipping architecture diagrams." and continue to Step 6.
-
-**Generate slug early**: Extract the decision title.
-- **Pre-check**: Verify the raw title contains no control characters or null bytes. If it does, ask the user for a simpler title.
-- Lowercase, replace non-alphanumeric with hyphens, collapse consecutive hyphens, strip leading/trailing hyphens.
-- **Post-check**: Validate result against `^[a-z0-9]([a-z0-9-]*[a-z0-9])?$`. If empty or invalid, ask the user for a simpler title.
-- Store this slug for reuse in Step 7b to avoid duplicate derivation.
-
-**Generate HTML** with two Mermaid diagrams:
-
-1. **"Before" diagram** — current architecture from Step 2 context. Show the existing components, connections, and data flows as described in the context exploration
-2. **"After" diagram** — architecture with the decision applied (from Steps 4 and 5a). Highlight new components with accent styling (e.g., colored border or background). Show removed components with reduced opacity
-
-Include an **options comparison section** below the diagrams — cards for each option from Step 3, showing pros/cons with the chosen option visually distinguished.
-
-**Data safety**: All text embedded in the HTML (option names, pros/cons, decision rationale, component names from Mermaid diagrams, project context from Step 2) MUST be HTML-escaped before insertion. Escape `<`, `>`, `&`, `"`, and `'`. For Mermaid diagram node labels, wrap all component names in double-quotes (e.g., `["API Gateway"]`) to prevent Mermaid metacharacter injection.
-
-Follow the visual-explainer SKILL.md anti-slop guidelines for all HTML generation.
-
-**Write**: Save to `~/.agent/diagrams/adr-<slug>-diagrams.html`. Create the directory if needed. Open in browser and tell the user the path.
 
 ## Step 6: Determine Status
 
@@ -138,7 +113,7 @@ Check for existing ADRs using the Glob tool (not shell commands — per BRI-1734
 
 ### 7b. Generate kebab-case filename
 
-If the slug was already derived in Step 5b, use that value directly — do not re-derive. Only derive here if Step 5b was skipped (in that case, empty slugs fall back to `untitled` instead of re-prompting):
+Derive the slug from the decision title:
 - Lowercase all characters
 - Replace `/`, `.`, `_`, spaces, and all non-alphanumeric characters with hyphens
 - Collapse consecutive hyphens into one
@@ -247,7 +222,6 @@ If no project CLAUDE.md exists, skip this step and note: "No CLAUDE.md found —
 ## ADR Created
 
 **File**: docs/decisions/NNN-kebab-title.md
-**Diagrams**: ~/.agent/diagrams/adr-<slug>-diagrams.html (omit this line if Step 5b was skipped)
 **Title**: [Decision Title]
 **Status**: [status]
 **Options evaluated**: [N]
