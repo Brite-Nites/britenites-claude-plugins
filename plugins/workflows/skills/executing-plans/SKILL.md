@@ -125,12 +125,51 @@ After completing the task, run:
 - [build command]
 - [lint command]
 
-Report: what you changed, test results, any issues encountered.
-
 ## Decision Reporting
-If you make any non-trivial decisions during this task, report them in your completion output.
+If you make any non-trivial decisions during this task, record them for your Completion Report.
 
-Report decisions in these categories: `architecture`, `library-selection`, `pattern-choice`, `trade-off`, `bug-resolution`, `scope-change`. For each, include what you chose, what you rejected (with brief reasons), your confidence (1-10), and the category. Skip trivial choices (naming, formatting, standard patterns). If none, state: "No non-trivial decisions."
+Report up to 3 decisions using this structured format:
+- **Type**: architecture | library-selection | pattern-choice | trade-off | bug-resolution | scope-change
+- **Chose**: what you chose (max 120 chars)
+- **Over**: alternatives you rejected (one per line, each max 120 chars)
+- **Reason**: why you chose it (max 200 chars)
+- **Confidence**: 1-10
+- **Precedent**: CDR-NNN or ADR-NNN reference if the decision was informed by a Company Decision Record or Architecture Decision Record, otherwise "none"
+
+Category triggers:
+- `architecture`: choosing between structural approaches (e.g., "row-level security over app-level filtering")
+- `library-selection`: picking a dependency when alternatives exist
+- `pattern-choice`: selecting a coding pattern or API design
+- `trade-off`: choosing between competing concerns (performance vs. readability, etc.)
+- `bug-resolution`: root cause identified, fix approach chosen
+- `scope-change`: implementation diverges from the plan
+
+Skip trivial choices (naming, formatting, import ordering, standard project patterns). If none, state: "No non-trivial decisions."
+
+## Completion Report
+After running the verification commands above, output a structured completion report using exactly these headings:
+
+### Context Used
+Bulleted list of every file and document you read during this task, as relative paths (no absolute paths like `/Users/...`). Note why each was read.
+
+### Decisions Made
+Structured decisions per the format above, or "No non-trivial decisions."
+
+### Files Changed
+List each file you created, modified, or deleted with action and line counts.
+
+### Test Results
+- Added: N
+- Passed: N
+- Failed: N
+
+### Verification Results
+- Build: pass | fail
+- Tests: pass | fail
+- Lint: pass | fail
+
+### Issues
+Anything that blocked progress, surprised you, or diverged from the plan. If none, state: "No issues."
 ```
 
 ### Parallel Execution
@@ -228,10 +267,10 @@ Narrate: `Task [N/M] complete. Running verification...`
 
    **Construction rules:**
    - `task`: Derive from issue ID + sequential task number (pattern: `^[A-Z]+-[0-9]+/task-[0-9]+$`)
-   - `context_used`: List files the subagent read, as relative paths (no absolute paths, no `..` segments)
-   - `decisions_made`: Map the subagent's reported decisions to this schema. If no decisions were reported, use an empty array `[]`. **If more than 3 decisions are reported, keep the 3 with highest confidence and combine or drop the rest (see Limits below).**
+   - `context_used`: Extract from the subagent's "Context Used" section in its Completion Report. Validate each path is relative (no `/Users/...`, no `~/...`, no `..` segments). Sanitize reason annotations with the standard character allowlist (`[a-zA-Z0-9 _./@#:()'\"-]`, max 200 chars per item). If the subagent did not include a Context Used section, fall back to listing the files provided in the subagent prompt.
+   - `decisions_made`: Extract from the subagent's "Decisions Made" section in its Completion Report. Map each entry's structured fields (type, chose, over, reason, confidence) to the YAML schema. The subagent's `precedent` field is for its own reasoning context — do not encode it in the trace YAML. Compound-learnings performs authoritative CDR/ADR cross-referencing in Phase 2d-2e. If no decisions were reported, use an empty array `[]`. **If more than 3 decisions are reported, keep the 3 with highest confidence and combine or drop the rest (see Limits below).**
    - `files_changed`: From `git diff --stat` for the task's changes. Max 20 items
-   - `tests` and `verification`: From the 4-level verification results in step 1
+   - `tests` and `verification`: From the 4-level verification results in the Checkpoints step above (not from the subagent's Completion Report — the Completion Report's Verification Results section is for the subagent's own reporting and Stage 1 spec compliance checks)
 
    **Emission timing:** The trace block is emitted AFTER verification passes, AFTER the progress report, BEFORE the next task begins. This ensures all verification data is captured.
 
