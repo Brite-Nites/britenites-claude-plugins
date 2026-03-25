@@ -337,6 +337,12 @@ After project-start, run `/workflows:post-plan-setup` to refine the plan, create
 | `/workflows:scope` | Collaborative scoping session — discover what to build, create Linear issues, prioritize. |
 | `/workflows:architecture-decision` | Generate Architecture Decision Records (ADRs) with structured analysis of alternatives. |
 
+### Knowledge Management Commands
+
+| Command | Description |
+|---------|-------------|
+| `/workflows:promote-precedent` | Review flagged decision traces and promote them to the org-level handbook. Candidates are flagged during `/workflows:ship` when traces meet promotion criteria (confidence >= 8, category in {architecture, library-selection, trade-off}, generalizable). Creates a PR against `Brite-Nites/handbook`. |
+
 ---
 
 ## 5. Troubleshooting

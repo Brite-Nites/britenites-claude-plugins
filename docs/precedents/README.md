@@ -94,6 +94,18 @@ The handbook repo (`handbook/precedents/INDEX.md`) uses the same format. Traces 
 
 compound-learnings creates a Linear issue with label `precedent-promotion` for eligible traces. Promotion is never automatic.
 
+## Promotion Workflow
+
+The `/workflows:promote-precedent` command handles the human-reviewed promotion of flagged traces to the handbook. The full flow:
+
+1. **Flag** — During `/workflows:ship`, compound-learnings (Phase 2g) identifies traces meeting all 3 promotion criteria and creates a Linear issue with label `precedent-promotion`
+2. **Review** — Developer runs `/workflows:promote-precedent` to review flagged candidates one at a time. Each candidate is presented with full trace context and a generalizability assessment
+3. **Promote** — Approved traces are copied to a shallow clone of `Brite-Nites/handbook`, with project-specific paths generalized (e.g., `src/foo.ts` → `<project>/src/foo.ts`)
+4. **PR** — A PR is opened against the handbook repo with all promoted traces. The handbook INDEX is updated using the same auto-update algorithm as the project-level INDEX
+5. **Close** — Linear issues are updated with the PR link and transitioned to Done (promoted) or Cancelled (skipped)
+
+**Important**: Project-level traces remain in `docs/precedents/` after promotion. The handbook copy is independent — the project retains its own decision history.
+
 ## Consumers
 
 | Consumer | How it uses INDEX.md |
