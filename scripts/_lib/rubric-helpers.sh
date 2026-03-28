@@ -25,6 +25,12 @@ RUBRIC_DIR="${RUBRIC_DIR:-$(cd "$_LIB_DIR/../.." && pwd)/tests/rubrics}"
 # Returns 0 if rubric found, 1 if not.
 load_rubric() {
   local skill="$1"
+
+  # Reject path traversal and invalid characters
+  if [[ "$skill" == */* ]] || [[ "$skill" == *..* ]] || [[ ! "$skill" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]]; then
+    return 1
+  fi
+
   local rubric_file="${RUBRIC_DIR}/${skill}.md"
 
   RUBRIC_FOUND="false"

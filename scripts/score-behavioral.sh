@@ -138,6 +138,7 @@ for i in $(seq 0 $((result_count - 1))); do
 
     # Dynamic dimension checking
     all_pass=true
+    total_score=0
     score_entry=$(jq -n --arg id "$id" --arg reasoning "$reasoning" '{id: $id, reasoning: $reasoning}')
 
     for dim in $RUBRIC_DIM_NAMES; do
@@ -150,8 +151,21 @@ for i in $(seq 0 $((result_count - 1))); do
         all_pass=false
       fi
 
+      total_score=$((total_score + score_val))
       score_entry=$(printf '%s' "$score_entry" | jq --arg d "$dim" --argjson v "$score_val" '. + {($d): $v}')
     done
+
+    printf "  Reasoning:     %s\n" "$reasoning"
+
+    # Check overall average against pass threshold
+    if [[ "$RUBRIC_DIM_COUNT" -gt 0 ]]; then
+      avg=$(awk "BEGIN { printf \"%.1f\", $total_score / $RUBRIC_DIM_COUNT }")
+      printf "  Average:       %s/5 (pass: >= %s)\n" "$avg" "$RUBRIC_PASS_THRESH"
+      if ! awk "BEGIN { exit ($avg >= $RUBRIC_PASS_THRESH) ? 0 : 1 }"; then
+        fail "$id: Average $avg < pass_threshold $RUBRIC_PASS_THRESH"
+        all_pass=false
+      fi
+    fi
 
     if [[ "$all_pass" == true ]]; then
       pass "$id: All dimensions meet thresholds"

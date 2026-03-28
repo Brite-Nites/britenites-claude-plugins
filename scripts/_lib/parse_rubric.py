@@ -15,20 +15,24 @@ import re
 
 def try_parse_value(val):
     """Try to parse a YAML scalar as a Python type."""
-    val = val.strip().strip('"').strip("'")
-    if val.lower() in ('true', 'yes'):
+    stripped = val.strip()
+    # Quoted values are explicitly strings — no type coercion
+    if (stripped.startswith('"') and stripped.endswith('"')) or \
+       (stripped.startswith("'") and stripped.endswith("'")):
+        return stripped[1:-1]
+    if stripped.lower() in ('true', 'yes'):
         return True
-    if val.lower() in ('false', 'no'):
+    if stripped.lower() in ('false', 'no'):
         return False
     try:
-        return int(val)
+        return int(stripped)
     except ValueError:
         pass
     try:
-        return float(val)
+        return float(stripped)
     except ValueError:
         pass
-    return val
+    return stripped
 
 
 def parse_rubric(filepath):
