@@ -983,20 +983,27 @@ PYEOF
 
   if [ "${#tmpl_files[@]}" -gt 0 ]; then
     section "14. Template Freshness ($plugin_name)"
-    local tmpl_stale=0
-    for tmpl_file in "${tmpl_files[@]}"; do
-      local skill_dir
-      skill_dir="$(dirname "$tmpl_file")"
-      local skill_name
-      skill_name="$(basename "$skill_dir")"
-      if python3 "$REPO_ROOT/scripts/gen-skill-docs.py" --check --skill "$skill_name" > /dev/null 2>&1; then
-        pass "$skill_name/SKILL.md is fresh"
-      else
-        fail "$skill_name/SKILL.md is stale (regenerate with: bash scripts/gen-skill-docs.sh)"
-        tmpl_stale=$((tmpl_stale + 1))
-      fi
-    done
-    pass "${#tmpl_files[@]} template(s) checked, $tmpl_stale stale"
+    # Fast path: single invocation checks all templates at once
+    if python3 "$REPO_ROOT/scripts/gen-skill-docs.py" --check > /dev/null 2>&1; then
+      pass "All ${#tmpl_files[@]} template(s) fresh"
+    else
+      # Slow path: per-skill detail to identify which failed and why
+      local tmpl_stale=0
+      for tmpl_file in "${tmpl_files[@]}"; do
+        local skill_dir skill_name tmpl_output
+        skill_dir="$(dirname "$tmpl_file")"
+        skill_name="$(basename "$skill_dir")"
+        if tmpl_output=$(python3 "$REPO_ROOT/scripts/gen-skill-docs.py" --check --skill "$skill_name" 2>&1); then
+          pass "$skill_name/SKILL.md is fresh"
+        else
+          fail "$skill_name/SKILL.md needs regeneration (run: bash scripts/gen-skill-docs.sh)"
+          # Show generator output for debugging (template errors, stale diffs)
+          echo "$tmpl_output" | head -5 | sed 's/^/    /' >&2
+          tmpl_stale=$((tmpl_stale + 1))
+        fi
+      done
+      fail "${#tmpl_files[@]} template(s) checked, $tmpl_stale stale"
+    fi
   fi
 
   # ── Plugin Summary ───────────────────────────────────────────────

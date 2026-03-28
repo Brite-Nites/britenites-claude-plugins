@@ -98,11 +98,16 @@ def parse_placeholder(match_str):
 
 
 def resolve_block(block_content, params):
-    """Apply %PARAM% substitutions to block content."""
+    """Apply %PARAM% substitutions to block content.
+
+    Returns (resolved_content, list_of_unreplaced_params).
+    """
     result = block_content
     for key, value in params.items():
         result = result.replace(f"%{key}%", value)
-    return result
+    # Detect unreplaced %PARAM% tokens
+    unreplaced = re.findall(r"%([A-Z][A-Z0-9_]*)%", result)
+    return result, unreplaced
 
 
 def resolve_placeholders(body, blocks, tmpl_path):
@@ -121,7 +126,12 @@ def resolve_placeholders(body, blocks, tmpl_path):
         if block_name not in blocks:
             errors.append(f"  {tmpl_path}: unknown block '{block_name}' in {match.group(0)}")
             return match.group(0)
-        resolved = resolve_block(blocks[block_name], params)
+        resolved, unreplaced = resolve_block(blocks[block_name], params)
+        if unreplaced:
+            errors.append(
+                f"  {tmpl_path}: unreplaced params in block '{block_name}': "
+                + ", ".join(f"%{p}%" for p in unreplaced)
+            )
         # Strip trailing newline from block to avoid double-newline
         return resolved.rstrip("\n")
 
@@ -164,6 +174,9 @@ def main():
     templates = discover_templates(args.skill)
 
     if not templates:
+        if args.skill:
+            print(f"gen-skill-docs: no template found for skill '{args.skill}'")
+            return 1
         print(f"gen-skill-docs: 0 templates found")
         return 0
 
