@@ -3,7 +3,9 @@ set -euo pipefail
 
 # ── Behavioral Scorer (Tier 3 — LLM-as-Judge) ───────────────────────
 # Reads the latest behavioral test results and scores outputs using
-# an LLM judge (Haiku) for clarity, completeness, and actionability.
+# an LLM judge (Haiku). Uses per-skill rubric files from tests/rubrics/
+# when available (4 dimensions: clarity, completeness, actionability,
+# adherence). Falls back to hardcoded 3-dimension scoring otherwise.
 #
 # Usage:
 #   bash scripts/score-behavioral.sh                   # score latest results
@@ -18,6 +20,9 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 RESULTS_DIR="$REPO_ROOT/tests/evals"
 JUDGE_MODEL="${JUDGE_MODEL:-claude-haiku-4-5-20251001}"
+
+# ── Load rubric helpers ─────────────────────────────────────────────
+source "$REPO_ROOT/scripts/_lib/rubric-helpers.sh"
 
 # ── Counters & helpers ───────────────────────────────────────────────
 scored=0
@@ -86,7 +91,7 @@ echo "Model:    $model_used"
 echo ""
 
 # ── Score each result with a rubric ──────────────────────────────────
-scores_json="[]"
+score_entries=()
 
 for i in $(seq 0 $((result_count - 1))); do
   id=$(jq -r ".results[$i].id" "$RESULTS_FILE")
@@ -94,8 +99,19 @@ for i in $(seq 0 $((result_count - 1))); do
   has_rubric=$(jq ".results[$i].has_rubric" "$RESULTS_FILE")
   output=$(jq -r ".results[$i].output // \"\"" "$RESULTS_FILE")
 
-  # Skip entries without rubric or without output
-  if [[ "$has_rubric" != "true" ]] || [[ -z "$output" ]] || [[ "$output" == "null" ]]; then
+  # Try to resolve a rubric file early (before gate) so we can score
+  # tests that have a rubric file but no inline judge_rubric
+  rubric_skill=$(jq -r ".results[$i].rubric_file // .results[$i].expected_skill // \"\"" "$RESULTS_FILE")
+  has_rubric_file=false
+  if [[ -n "$rubric_skill" ]] && [[ "$rubric_skill" != "null" ]] && [[ -f "${RUBRIC_DIR}/${rubric_skill}.md" ]]; then
+    has_rubric_file=true
+  fi
+
+  # Skip entries without any rubric (inline or file) or without output
+  if [[ "$has_rubric" != "true" ]] && [[ "$has_rubric_file" != true ]]; then
+    continue
+  fi
+  if [[ -z "$output" ]] || [[ "$output" == "null" ]]; then
     continue
   fi
 
@@ -106,132 +122,134 @@ for i in $(seq 0 $((result_count - 1))); do
   section "$id: Scoring output quality"
   scored=$((scored + 1))
 
-  # Load thresholds from the results file (embedded by test-behavioral.sh)
-  threshold_clarity=$(jq -r ".results[$i].judge_rubric.clarity // 4" "$RESULTS_FILE")
-  threshold_completeness=$(jq -r ".results[$i].judge_rubric.completeness // 4" "$RESULTS_FILE")
-  threshold_actionability=$(jq -r ".results[$i].judge_rubric.actionability // 4" "$RESULTS_FILE")
   desc=$(jq -r ".results[$i].description // \"Test $id\"" "$RESULTS_FILE")
 
-  # Truncate output to avoid huge API calls (keep first 4000 chars)
-  truncated_output="${output:0:4000}"
-
-  # Build the judge prompt
-  judge_prompt="You are an expert evaluator scoring the quality of an AI agent's output.
-
-Task description: $desc
-
-Score the following output on three dimensions, each on a scale of 1-5:
-
-1. **Clarity** (1-5): Is the output well-organized, easy to follow, and free of confusion?
-2. **Completeness** (1-5): Does the output address all aspects of the task? Are there gaps?
-3. **Actionability** (1-5): Can the user take concrete next steps based on this output?
-
-Output to evaluate:
----
-$truncated_output
----
-
-Respond with ONLY a JSON object, no other text:
-{\"clarity\": N, \"completeness\": N, \"actionability\": N, \"reasoning\": \"one sentence\"}"
-
-  # Escape the prompt for JSON payload
-  escaped_prompt=$(printf '%s' "$judge_prompt" | python3 -c 'import sys,json; print(json.dumps(sys.stdin.read()))')
-
-  # Call Anthropic API
-  api_response=$(curl -s -w "\n%{http_code}" \
-    https://api.anthropic.com/v1/messages \
-    -H "content-type: application/json" \
-    -H "x-api-key: $ANTHROPIC_API_KEY" \
-    -H "anthropic-version: 2023-06-01" \
-    -d "{
-      \"model\": \"$JUDGE_MODEL\",
-      \"max_tokens\": 256,
-      \"messages\": [{\"role\": \"user\", \"content\": $escaped_prompt}]
-    }" 2>/dev/null) || true
-
-  # Split response body and HTTP status
-  http_code=$(echo "$api_response" | tail -1)
-  response_body=$(echo "$api_response" | sed '$d')
-
-  if [[ "$http_code" != "200" ]]; then
-    printf "  \033[33mAPI ERROR\033[0m HTTP %s\n" "$http_code"
-    fail "$id: API call failed (HTTP $http_code)"
-    continue
+  # Try to load a per-skill rubric file
+  use_rubric_file=false
+  if [[ "$has_rubric_file" == true ]] && load_rubric "$rubric_skill" 2>/dev/null; then
+    use_rubric_file=true
+    printf "  Rubric:        %s (%d dimensions)\n" "$rubric_skill" "$RUBRIC_DIM_COUNT"
   fi
 
-  # Extract the judge's text response
-  judge_text=$(echo "$response_body" | jq -r '.content[0].text // ""')
+  if [[ "$use_rubric_file" == true ]]; then
+    # ── Rubric-based scoring (per-skill rubric file) ──────────────
+    judge_prompt=$(build_judge_prompt "$desc" "$output")
 
-  if [[ -z "$judge_text" ]]; then
-    fail "$id: Judge returned empty response"
-    continue
+    if ! call_judge_api "$judge_prompt"; then
+      printf "  \033[33mAPI ERROR\033[0m HTTP %s\n" "$JUDGE_HTTP_CODE"
+      fail "$id: API call failed (HTTP $JUDGE_HTTP_CODE)"
+      continue
+    fi
+
+    judge_json=$(printf '%s' "$JUDGE_TEXT" | parse_judge_response)
+    reasoning=$(printf '%s' "$judge_json" | jq -r '.reasoning // "no reasoning"')
+
+    # Dynamic dimension checking — collect scores, build JSON once
+    all_pass=true
+    total_score=0
+    dim_args=(--arg id "$id" --arg reasoning "$reasoning")
+
+    for dim in $RUBRIC_DIM_NAMES; do
+      score_val=$(printf '%s' "$judge_json" | jq --arg d "$dim" '.[$d] // 0 | floor')
+      threshold_val=$(rubric_get_threshold "$dim")
+      printf "  %-16s %s/5 (threshold: %s)\n" "${dim}:" "$score_val" "$threshold_val"
+
+      if [[ "$score_val" -lt "$threshold_val" ]]; then
+        fail "$id: $dim $score_val < threshold $threshold_val"
+        all_pass=false
+      fi
+
+      total_score=$((total_score + score_val))
+      dim_args+=(--argjson "$dim" "$score_val")
+    done
+
+    printf "  Reasoning:     %s\n" "$reasoning"
+
+    # Check overall average against pass threshold
+    if [[ "$RUBRIC_DIM_COUNT" -gt 0 ]]; then
+      avg=$(awk "BEGIN { printf \"%.1f\", $total_score / $RUBRIC_DIM_COUNT }")
+      printf "  Average:       %s/5 (pass: >= %s)\n" "$avg" "$RUBRIC_PASS_THRESH"
+      if ! awk "BEGIN { exit ($avg >= $RUBRIC_PASS_THRESH) ? 0 : 1 }"; then
+        fail "$id: Average $avg < pass_threshold $RUBRIC_PASS_THRESH"
+        all_pass=false
+      fi
+    fi
+
+    if [[ "$all_pass" == true ]]; then
+      pass "$id: All dimensions meet thresholds"
+    fi
+
+    # Build score entry in one jq call
+    score_entry=$(jq -n "${dim_args[@]}" '$ARGS.named')
+  else
+    # ── Fallback: hardcoded 3-dimension scoring ───────────────────
+    threshold_clarity=$(jq -r ".results[$i].judge_rubric.clarity // 4" "$RESULTS_FILE")
+    threshold_completeness=$(jq -r ".results[$i].judge_rubric.completeness // 4" "$RESULTS_FILE")
+    threshold_actionability=$(jq -r ".results[$i].judge_rubric.actionability // 4" "$RESULTS_FILE")
+
+    judge_prompt=$(build_default_judge_prompt "$desc" "$output")
+
+    if ! call_judge_api "$judge_prompt"; then
+      printf "  \033[33mAPI ERROR\033[0m HTTP %s\n" "$JUDGE_HTTP_CODE"
+      fail "$id: API call failed (HTTP $JUDGE_HTTP_CODE)"
+      continue
+    fi
+
+    judge_json=$(printf '%s' "$JUDGE_TEXT" | parse_judge_response)
+
+    clarity=$(printf '%s' "$judge_json" | jq '.clarity // 0 | floor')
+    completeness=$(printf '%s' "$judge_json" | jq '.completeness // 0 | floor')
+    actionability=$(printf '%s' "$judge_json" | jq '.actionability // 0 | floor')
+    reasoning=$(printf '%s' "$judge_json" | jq -r '.reasoning // "no reasoning"')
+
+    printf "  Clarity:       %s/5 (threshold: %s)\n" "$clarity" "$threshold_clarity"
+    printf "  Completeness:  %s/5 (threshold: %s)\n" "$completeness" "$threshold_completeness"
+    printf "  Actionability: %s/5 (threshold: %s)\n" "$actionability" "$threshold_actionability"
+    printf "  Reasoning:     %s\n" "$reasoning"
+
+    all_pass=true
+    if [[ "$clarity" -lt "$threshold_clarity" ]]; then
+      fail "$id: Clarity $clarity < threshold $threshold_clarity"
+      all_pass=false
+    fi
+    if [[ "$completeness" -lt "$threshold_completeness" ]]; then
+      fail "$id: Completeness $completeness < threshold $threshold_completeness"
+      all_pass=false
+    fi
+    if [[ "$actionability" -lt "$threshold_actionability" ]]; then
+      fail "$id: Actionability $actionability < threshold $threshold_actionability"
+      all_pass=false
+    fi
+
+    if [[ "$all_pass" == true ]]; then
+      pass "$id: All dimensions meet thresholds"
+    fi
+
+    score_entry=$(jq -n \
+      --arg id "$id" \
+      --argjson clarity "$clarity" \
+      --argjson completeness "$completeness" \
+      --argjson actionability "$actionability" \
+      --arg reasoning "$reasoning" \
+      '{id: $id, clarity: $clarity, completeness: $completeness, actionability: $actionability, reasoning: $reasoning}')
   fi
 
-  # Parse scores from judge response (extract JSON from potentially wrapped text)
-  judge_json=$(echo "$judge_text" | python3 -c '
-import sys, json, re
-text = sys.stdin.read()
-# Try direct parse first
-try:
-    d = json.loads(text)
-    print(json.dumps(d))
-    sys.exit(0)
-except: pass
-# Try extracting JSON from markdown code block
-m = re.search(r"\{[^{}]+\}", text)
-if m:
-    try:
-        d = json.loads(m.group())
-        print(json.dumps(d))
-        sys.exit(0)
-    except: pass
-print("{}")
-' 2>/dev/null) || judge_json="{}"
-
-  clarity=$(echo "$judge_json" | jq '.clarity // 0 | floor')
-  completeness=$(echo "$judge_json" | jq '.completeness // 0 | floor')
-  actionability=$(echo "$judge_json" | jq '.actionability // 0 | floor')
-  reasoning=$(echo "$judge_json" | jq -r '.reasoning // "no reasoning"')
-
-  printf "  Clarity:       %s/5 (threshold: %s)\n" "$clarity" "$threshold_clarity"
-  printf "  Completeness:  %s/5 (threshold: %s)\n" "$completeness" "$threshold_completeness"
-  printf "  Actionability: %s/5 (threshold: %s)\n" "$actionability" "$threshold_actionability"
-  printf "  Reasoning:     %s\n" "$reasoning"
-
-  # Check thresholds
-  all_pass=true
-  if [[ "$clarity" -lt "$threshold_clarity" ]]; then
-    fail "$id: Clarity $clarity < threshold $threshold_clarity"
-    all_pass=false
-  fi
-  if [[ "$completeness" -lt "$threshold_completeness" ]]; then
-    fail "$id: Completeness $completeness < threshold $threshold_completeness"
-    all_pass=false
-  fi
-  if [[ "$actionability" -lt "$threshold_actionability" ]]; then
-    fail "$id: Actionability $actionability < threshold $threshold_actionability"
-    all_pass=false
-  fi
-
-  if [[ "$all_pass" == true ]]; then
-    pass "$id: All dimensions meet thresholds"
-  fi
-
-  # Accumulate scores (use jq -n for safe JSON construction)
-  score_entry=$(jq -n \
-    --arg id "$id" \
-    --argjson clarity "$clarity" \
-    --argjson completeness "$completeness" \
-    --argjson actionability "$actionability" \
-    --arg reasoning "$reasoning" \
-    '{id: $id, clarity: $clarity, completeness: $completeness, actionability: $actionability, reasoning: $reasoning}')
-  scores_json=$(echo "$scores_json" | jq --argjson s "$score_entry" '. += [$s]')
+  score_entries+=("$score_entry")
 done
+
+# Assemble scores array in one jq call
+if [[ ${#score_entries[@]} -gt 0 ]]; then
+  scores_json=$(printf '%s\n' "${score_entries[@]}" | jq -s '.')
+else
+  scores_json="[]"
+fi
 
 # ── Write scores back to results file ────────────────────────────────
 tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
 jq --argjson scores "$scores_json" --arg jm "$JUDGE_MODEL" '. + {scores: $scores, judge_model: $jm}' "$RESULTS_FILE" > "$tmp" \
   && mv "$tmp" "$RESULTS_FILE"
+trap - EXIT
 
 # ══════════════════════════════════════════════════════════════════════
 # Summary
@@ -244,17 +262,19 @@ if [[ "$scored" -eq 0 ]]; then
   exit 0
 fi
 
-# Compute averages
-avg_clarity=$(echo "$scores_json" | jq '[.[].clarity] | add / length | . * 10 | round / 10')
-avg_completeness=$(echo "$scores_json" | jq '[.[].completeness] | add / length | . * 10 | round / 10')
-avg_actionability=$(echo "$scores_json" | jq '[.[].actionability] | add / length | . * 10 | round / 10')
-
+# Compute averages for all dimensions present across scores
 echo "  Scored:         $scored"
 echo "  Passed:         $passed"
 echo "  Failed:         $failed"
-echo "  Avg Clarity:    $avg_clarity/5"
-echo "  Avg Complete:   $avg_completeness/5"
-echo "  Avg Action:     $avg_actionability/5"
+
+# Dynamically find all dimension keys (excluding id and reasoning)
+dim_keys=$(printf '%s' "$scores_json" | jq -r '[.[] | keys[] | select(. != "id" and . != "reasoning")] | unique | .[]')
+for dim_key in $dim_keys; do
+  avg=$(printf '%s' "$scores_json" | jq --arg k "$dim_key" \
+    '[.[] | .[$k] // empty] | if length > 0 then add / length | . * 10 | round / 10 else 0 end')
+  printf "  Avg %-12s %s/5\n" "${dim_key}:" "$avg"
+done
+
 echo "  Results:        $RESULTS_FILE"
 echo ""
 

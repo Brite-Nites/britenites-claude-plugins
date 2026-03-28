@@ -125,29 +125,37 @@ Results are written to `tests/evals/behavioral-{timestamp}.json`. CI uploads the
 
 ### Tier 3: LLM-as-Judge Scoring (~30s, ~$0.10-0.20)
 
-Scores Tier 2 outputs on three dimensions using Haiku as a judge model.
+Scores Tier 2 outputs using Haiku as a judge model. Uses **per-skill rubric files** when available (4 dimensions), with fallback to hardcoded 3-dimension scoring.
 
 ### Running
 
 ```bash
-# Score the latest results file
+# Pipeline scoring (reads behavioral test results)
 ANTHROPIC_API_KEY=sk-... bash scripts/score-behavioral.sh
-
-# Score a specific results file
 ANTHROPIC_API_KEY=sk-... bash scripts/score-behavioral.sh tests/evals/behavioral-20260327-120000.json
+
+# Ad-hoc scoring (score any skill output against its rubric)
+ANTHROPIC_API_KEY=sk-... bash scripts/score-skill-output.sh --skill brainstorming --input output.txt
+ANTHROPIC_API_KEY=sk-... bash scripts/score-skill-output.sh --skill writing-plans --input - --format json
+bash scripts/score-skill-output.sh --list  # list available rubrics
 ```
 
 ### Dimensions
 
-Each test case with a `judge_rubric` is scored on:
+Per-skill rubric files (`tests/rubrics/{skill-name}.md`) define 4 dimensions:
 
 | Dimension | Scale | What it measures |
 |-----------|-------|------------------|
 | Clarity | 1-5 | Well-organized, easy to follow, free of confusion |
 | Completeness | 1-5 | Addresses all aspects of the task, no gaps |
 | Actionability | 1-5 | User can take concrete next steps from the output |
+| Adherence | 1-5 | Follows the skill's defined protocol and conventions |
 
-Default threshold: 4/5 per dimension. Configurable per test case in `judge_rubric`.
+Each rubric includes skill-specific anchor tables and criteria checklists. Pass criteria: per-dimension threshold met AND weighted average >= `pass_threshold` (default 3.0/5.0).
+
+Test cases without a matching rubric file fall back to the original 3-dimension scoring (clarity, completeness, actionability) with thresholds from `judge_rubric` in the test registry.
+
+See `docs/skill-rubrics.md` for the full rubric system documentation.
 
 ### CI Integration
 

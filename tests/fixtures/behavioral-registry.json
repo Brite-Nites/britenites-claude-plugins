@@ -13,6 +13,7 @@
       "expected_markers": ["design document", "alternative"],
       "not_expected_markers": [],
       "not_expected_skills": [],
+      "rubric_file": "brainstorming",
       "judge_rubric": {
         "clarity": 4,
         "completeness": 4,
@@ -43,6 +44,7 @@
       "expected_markers": ["reproduce", "isolate"],
       "not_expected_markers": [],
       "not_expected_skills": ["brainstorming"],
+      "rubric_file": "systematic-debugging",
       "judge_rubric": {
         "clarity": 4,
         "completeness": 4,
@@ -146,6 +148,7 @@
       "expected_markers": ["design document"],
       "not_expected_markers": [],
       "not_expected_skills": [],
+      "rubric_file": "brainstorming",
       "judge_rubric": {
         "clarity": 4,
         "completeness": 4,
