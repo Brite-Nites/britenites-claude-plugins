@@ -40,6 +40,124 @@ Run these outside Claude, from a regular terminal or CI.
 
 ---
 
+## Tier 2+3: Behavioral Tests
+
+> **Naming note:** "Layer 0" above corresponds to "Tier 1" in the [research framework](../research/behavioral-testing-evaluation.md) — free, structural, offline tests. Tiers 2 and 3 below add runtime behavioral validation that requires Claude invocations and LLM-as-judge scoring.
+
+### Tier 2: Behavioral Tests (~15-25 min, ~$2-5)
+
+Runtime behavioral tests that validate skill activation and output quality via `claude -p` subprocess invocations. These cost money — guarded by `EVALS=1`.
+
+**Research:** `docs/research/behavioral-testing-evaluation.md` (BC-2458)
+
+### Running
+
+```bash
+# List all test cases
+EVALS=1 bash scripts/test-behavioral.sh --list
+
+# Dry run — parse fixtures, no Claude invocations
+EVALS=1 bash scripts/test-behavioral.sh --dry-run
+
+# Run a single test case
+EVALS=1 bash scripts/test-behavioral.sh --filter B01
+
+# Run all tests
+EVALS=1 bash scripts/test-behavioral.sh
+
+# Run with multiple trials for non-determinism
+EVALS=1 EVALS_TRIALS=5 bash scripts/test-behavioral.sh
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EVALS` | (none) | Must be `1` to run. Safety guard. |
+| `EVALS_MODEL` | `claude-sonnet-4-6` | Model for test invocations |
+| `EVALS_TRIALS` | `1` | Trials per test (use 5 for reliable results) |
+| `EVALS_TIMEOUT` | `120` | Timeout per invocation in seconds |
+
+### Test Cases
+
+10 seed test cases in `tests/fixtures/behavioral-registry.json`:
+
+| ID | Type | Tests |
+|----|------|-------|
+| B01 | Activation | Brainstorming triggers on multi-module redesign |
+| B02 | Non-activation | Brainstorming does NOT trigger on trivial change |
+| B03 | Activation | Systematic debugging triggers on bug report |
+| B04 | Activation | frontend-design triggers on build/create UI task |
+| B05 | Activation | ui-ux-pro-max triggers on design planning task |
+| B06 | Activation | web-design-guidelines triggers on review/audit task |
+| B07 | Precedence | Debugging beats brainstorming when bug is present |
+| B08 | Activation | code-quality triggers on linting setup |
+| B09 | Non-activation | No skill fires for irrelevant prompt |
+| B10 | Quality | Brainstorming output meets clarity/completeness threshold |
+
+### Adding Test Cases
+
+Add entries to `tests/fixtures/behavioral-registry.json`. Schema:
+
+```json
+{
+  "id": "B11",
+  "description": "Human-readable test purpose",
+  "tier": 2,
+  "prompt": "The exact prompt sent to claude -p",
+  "expected_skill": "skill-name or null",
+  "expected_markers": ["strings that MUST appear in output"],
+  "not_expected_markers": ["strings that must NOT appear"],
+  "not_expected_skills": ["skills that should NOT activate"],
+  "judge_rubric": { "clarity": 4, "completeness": 4, "actionability": 4 },
+  "estimated_cost": "$0.30",
+  "notes": "Why this test exists"
+}
+```
+
+Set `judge_rubric` to `null` if the test case doesn't need LLM-as-judge scoring.
+
+### Results
+
+Results are written to `tests/evals/behavioral-{timestamp}.json`. CI uploads these as artifacts for regression comparison.
+
+---
+
+### Tier 3: LLM-as-Judge Scoring (~30s, ~$0.10-0.20)
+
+Scores Tier 2 outputs on three dimensions using Haiku as a judge model.
+
+### Running
+
+```bash
+# Score the latest results file
+ANTHROPIC_API_KEY=sk-... bash scripts/score-behavioral.sh
+
+# Score a specific results file
+ANTHROPIC_API_KEY=sk-... bash scripts/score-behavioral.sh tests/evals/behavioral-20260327-120000.json
+```
+
+### Dimensions
+
+Each test case with a `judge_rubric` is scored on:
+
+| Dimension | Scale | What it measures |
+|-----------|-------|------------------|
+| Clarity | 1-5 | Well-organized, easy to follow, free of confusion |
+| Completeness | 1-5 | Addresses all aspects of the task, no gaps |
+| Actionability | 1-5 | User can take concrete next steps from the output |
+
+Default threshold: 4/5 per dimension. Configurable per test case in `judge_rubric`.
+
+### CI Integration
+
+Behavioral tests run via `.github/workflows/behavioral-tests.yml`:
+- **Schedule:** Mon + Thu at 6am UTC
+- **Manual:** `workflow_dispatch` with optional `filter` and `trials` inputs
+- **Budget:** ~$2-5 per run, ~$33-53/month at 2x/week cadence
+
+---
+
 ## Layer 1: Plugin Loading & Environment (~3 min)
 
 | Test | Steps | Expected |
@@ -282,8 +400,9 @@ Note: T2.3–T2.6 are sequential — they trigger as part of the inner loop flow
 | Skills (Browser) | 1 | Not directly tested (requires browser MCP) |
 | Agents | 26 | T6.1–T6.26 |
 | Hooks | 4 types | T5.1–T5.4, T0.2 |
-| Scripts | 5 | T0.1–T0.4, T0.6 |
+| Scripts | 5 + 2 | T0.1–T0.4, T0.6 + Tier 2 (test-behavioral.sh) + Tier 3 (score-behavioral.sh) |
 | Scenarios | 60 + 12 FP + 6 EM | T0.6 |
+| Behavioral tests | 10 seed cases | Tier 2 (B01–B10) |
 
 ---
 
@@ -296,6 +415,8 @@ Tester:     ____
 Environment: macOS / Linux / WSL
 
 Layer 0 (Automated):  __/6
+Tier 2 (Behavioral):  __/10
+Tier 3 (Scoring):     __/6 (cases with rubrics)
 Layer 1 (Loading):    __/3
 Layer 2 (Skills):     __/12
 Layer 3 (Commands):   __/41
@@ -303,6 +424,6 @@ Layer 4 (E2E):        __/4
 Layer 5 (Hooks):      __/4
 Layer 6 (Agents):     __/26
 
-Total:  __/96
+Total:  __/112
 Notes:  ____
 ```
