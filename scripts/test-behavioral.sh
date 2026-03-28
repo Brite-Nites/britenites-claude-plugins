@@ -278,6 +278,7 @@ for i in $(seq 0 $((test_count - 1))); do
   est_cost=$(jq -r ".test_cases[$i].estimated_cost" "$FIXTURE")
   has_rubric=$(jq ".test_cases[$i].judge_rubric != null" "$FIXTURE")
   judge_rubric=$(jq -c ".test_cases[$i].judge_rubric" "$FIXTURE")
+  rubric_file=$(jq -r ".test_cases[$i].rubric_file // \"\"" "$FIXTURE")
 
   # Apply filter
   if [[ -n "$FILTER" ]] && [[ "$id" != "$FILTER" ]]; then
@@ -393,9 +394,10 @@ for i in $(seq 0 $((test_count - 1))); do
     --argjson expected_skill "$(jq ".test_cases[$i].expected_skill" "$FIXTURE")" \
     --argjson has_rubric "$has_rubric" \
     --argjson judge_rubric "$judge_rubric" \
+    --arg rubric_file "$rubric_file" \
     --arg estimated_cost "$est_cost" \
     --argjson output "$escaped_output" \
-    '{id: $id, description: $desc, status: $status, trials: $trials, passes: $passes, pass_rate: $pass_rate, expected_skill: $expected_skill, has_rubric: $has_rubric, judge_rubric: $judge_rubric, estimated_cost: $estimated_cost, output: $output}')
+    '{id: $id, description: $desc, status: $status, trials: $trials, passes: $passes, pass_rate: $pass_rate, expected_skill: $expected_skill, has_rubric: $has_rubric, judge_rubric: $judge_rubric, rubric_file: $rubric_file, estimated_cost: $estimated_cost, output: $output}')
   collect_result "$result_json"
 done
 

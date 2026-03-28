@@ -91,7 +91,7 @@ echo "Model:    $model_used"
 echo ""
 
 # ── Score each result with a rubric ──────────────────────────────────
-scores_json="[]"
+score_entries=()
 
 for i in $(seq 0 $((result_count - 1))); do
   id=$(jq -r ".results[$i].id" "$RESULTS_FILE")
@@ -99,8 +99,19 @@ for i in $(seq 0 $((result_count - 1))); do
   has_rubric=$(jq ".results[$i].has_rubric" "$RESULTS_FILE")
   output=$(jq -r ".results[$i].output // \"\"" "$RESULTS_FILE")
 
-  # Skip entries without rubric or without output
-  if [[ "$has_rubric" != "true" ]] || [[ -z "$output" ]] || [[ "$output" == "null" ]]; then
+  # Try to resolve a rubric file early (before gate) so we can score
+  # tests that have a rubric file but no inline judge_rubric
+  rubric_skill=$(jq -r ".results[$i].rubric_file // .results[$i].expected_skill // \"\"" "$RESULTS_FILE")
+  has_rubric_file=false
+  if [[ -n "$rubric_skill" ]] && [[ "$rubric_skill" != "null" ]] && [[ -f "${RUBRIC_DIR}/${rubric_skill}.md" ]]; then
+    has_rubric_file=true
+  fi
+
+  # Skip entries without any rubric (inline or file) or without output
+  if [[ "$has_rubric" != "true" ]] && [[ "$has_rubric_file" != true ]]; then
+    continue
+  fi
+  if [[ -z "$output" ]] || [[ "$output" == "null" ]]; then
     continue
   fi
 
@@ -114,11 +125,8 @@ for i in $(seq 0 $((result_count - 1))); do
   desc=$(jq -r ".results[$i].description // \"Test $id\"" "$RESULTS_FILE")
 
   # Try to load a per-skill rubric file
-  # Priority: rubric_file field > expected_skill field > fallback to hardcoded
-  rubric_skill=$(jq -r ".results[$i].rubric_file // .results[$i].expected_skill // \"\"" "$RESULTS_FILE")
   use_rubric_file=false
-
-  if [[ -n "$rubric_skill" ]] && [[ "$rubric_skill" != "null" ]] && load_rubric "$rubric_skill" 2>/dev/null; then
+  if [[ "$has_rubric_file" == true ]] && load_rubric "$rubric_skill" 2>/dev/null; then
     use_rubric_file=true
     printf "  Rubric:        %s (%d dimensions)\n" "$rubric_skill" "$RUBRIC_DIM_COUNT"
   fi
@@ -136,10 +144,10 @@ for i in $(seq 0 $((result_count - 1))); do
     judge_json=$(printf '%s' "$JUDGE_TEXT" | parse_judge_response)
     reasoning=$(printf '%s' "$judge_json" | jq -r '.reasoning // "no reasoning"')
 
-    # Dynamic dimension checking
+    # Dynamic dimension checking — collect scores, build JSON once
     all_pass=true
     total_score=0
-    score_entry=$(jq -n --arg id "$id" --arg reasoning "$reasoning" '{id: $id, reasoning: $reasoning}')
+    dim_args=(--arg id "$id" --arg reasoning "$reasoning")
 
     for dim in $RUBRIC_DIM_NAMES; do
       score_val=$(printf '%s' "$judge_json" | jq --arg d "$dim" '.[$d] // 0 | floor')
@@ -152,7 +160,7 @@ for i in $(seq 0 $((result_count - 1))); do
       fi
 
       total_score=$((total_score + score_val))
-      score_entry=$(printf '%s' "$score_entry" | jq --arg d "$dim" --argjson v "$score_val" '. + {($d): $v}')
+      dim_args+=(--argjson "$dim" "$score_val")
     done
 
     printf "  Reasoning:     %s\n" "$reasoning"
@@ -170,6 +178,9 @@ for i in $(seq 0 $((result_count - 1))); do
     if [[ "$all_pass" == true ]]; then
       pass "$id: All dimensions meet thresholds"
     fi
+
+    # Build score entry in one jq call
+    score_entry=$(jq -n "${dim_args[@]}" '$ARGS.named')
   else
     # ── Fallback: hardcoded 3-dimension scoring ───────────────────
     threshold_clarity=$(jq -r ".results[$i].judge_rubric.clarity // 4" "$RESULTS_FILE")
@@ -223,13 +234,22 @@ for i in $(seq 0 $((result_count - 1))); do
       '{id: $id, clarity: $clarity, completeness: $completeness, actionability: $actionability, reasoning: $reasoning}')
   fi
 
-  scores_json=$(printf '%s' "$scores_json" | jq --argjson s "$score_entry" '. += [$s]')
+  score_entries+=("$score_entry")
 done
+
+# Assemble scores array in one jq call
+if [[ ${#score_entries[@]} -gt 0 ]]; then
+  scores_json=$(printf '%s\n' "${score_entries[@]}" | jq -s '.')
+else
+  scores_json="[]"
+fi
 
 # ── Write scores back to results file ────────────────────────────────
 tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
 jq --argjson scores "$scores_json" --arg jm "$JUDGE_MODEL" '. + {scores: $scores, judge_model: $jm}' "$RESULTS_FILE" > "$tmp" \
   && mv "$tmp" "$RESULTS_FILE"
+trap - EXIT
 
 # ══════════════════════════════════════════════════════════════════════
 # Summary

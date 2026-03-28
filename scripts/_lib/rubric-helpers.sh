@@ -16,11 +16,11 @@ RUBRIC_DIR="${RUBRIC_DIR:-$(cd "$_LIB_DIR/../.." && pwd)/tests/rubrics}"
 # ── load_rubric ─────────────────────────────────────────────────────
 # Parses tests/rubrics/<skill>.md and sets:
 #   RUBRIC_FOUND        — "true" or "false"
-#   RUBRIC_META_JSON    — JSON string of frontmatter (dimensions, thresholds, etc.)
 #   RUBRIC_BODY         — Markdown body (anchor tables, criteria)
 #   RUBRIC_PASS_THRESH  — Overall pass threshold (float)
 #   RUBRIC_DIM_COUNT    — Number of dimensions
 #   RUBRIC_DIM_NAMES    — Space-separated dimension names
+#   RUBRIC_THRESHOLDS   — Space-separated "name=threshold" pairs
 #
 # Returns 0 if rubric found, 1 if not.
 load_rubric() {
@@ -34,11 +34,11 @@ load_rubric() {
   local rubric_file="${RUBRIC_DIR}/${skill}.md"
 
   RUBRIC_FOUND="false"
-  RUBRIC_META_JSON=""
   RUBRIC_BODY=""
   RUBRIC_PASS_THRESH="3.0"
   RUBRIC_DIM_COUNT=0
   RUBRIC_DIM_NAMES=""
+  RUBRIC_THRESHOLDS=""
 
   if [[ ! -f "$rubric_file" ]]; then
     return 1
@@ -48,23 +48,36 @@ load_rubric() {
   full_json=$(python3 "$_LIB_DIR/parse_rubric.py" "$rubric_file" 2>/dev/null) || return 1
 
   RUBRIC_FOUND="true"
-  RUBRIC_META_JSON=$(printf '%s' "$full_json" | jq 'del(.body)')
+
+  # Extract all scalar values in one jq call (pass_threshold, dim_count, dim_names, thresholds)
+  local scalars
+  scalars=$(printf '%s' "$full_json" | jq -r \
+    '[(.pass_threshold // 3.0 | tostring),
+      (.dimensions | length | tostring),
+      ([.dimensions[].name] | join(" ")),
+      ([.dimensions[] | "\(.name)=\(.threshold // 3)"] | join(" "))] | join("\t")')
+  IFS=$'\t' read -r RUBRIC_PASS_THRESH RUBRIC_DIM_COUNT RUBRIC_DIM_NAMES RUBRIC_THRESHOLDS <<< "$scalars"
+
+  # Extract body separately (may contain tabs/newlines)
   RUBRIC_BODY=$(printf '%s' "$full_json" | jq -r '.body')
-  RUBRIC_PASS_THRESH=$(printf '%s' "$full_json" | jq -r '.pass_threshold // 3.0')
-  RUBRIC_DIM_COUNT=$(printf '%s' "$full_json" | jq '.dimensions | length')
-  RUBRIC_DIM_NAMES=$(printf '%s' "$full_json" | jq -r '.dimensions[].name' | tr '\n' ' ')
 
   return 0
 }
 
 # ── rubric_get_threshold ────────────────────────────────────────────
 # Get the threshold for a specific dimension from loaded rubric.
+# Uses RUBRIC_THRESHOLDS (set by load_rubric) — zero subprocesses.
 # Usage: rubric_get_threshold "clarity"
 rubric_get_threshold() {
   local dim_name="$1"
-  printf '%s' "$RUBRIC_META_JSON" | jq -r \
-    --arg name "$dim_name" \
-    '.dimensions[] | select(.name == $name) | .threshold // 3'
+  local entry
+  for entry in $RUBRIC_THRESHOLDS; do
+    if [[ "${entry%%=*}" == "$dim_name" ]]; then
+      printf '%s' "${entry#*=}"
+      return 0
+    fi
+  done
+  printf '3'
 }
 
 # ── build_judge_prompt ──────────────────────────────────────────────

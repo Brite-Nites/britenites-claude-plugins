@@ -127,7 +127,7 @@ reasoning=$(printf '%s' "$judge_json" | jq -r '.reasoning // "no reasoning"')
 total_score=0
 dim_count=0
 all_pass=true
-dimensions_json="[]"
+dim_entries=()
 
 for dim in $RUBRIC_DIM_NAMES; do
   score_val=$(printf '%s' "$judge_json" | jq --arg d "$dim" '.[$d] // 0 | floor')
@@ -142,21 +142,21 @@ for dim in $RUBRIC_DIM_NAMES; do
   total_score=$((total_score + score_val))
   dim_count=$((dim_count + 1))
 
-  dimensions_json=$(printf '%s' "$dimensions_json" | jq \
+  dim_entries+=("$(jq -n \
     --arg name "$dim" \
     --argjson score "$score_val" \
     --argjson threshold "$threshold_val" \
     --argjson pass "$dim_pass" \
-    '. += [{name: $name, score: $score, threshold: $threshold, pass: $pass}]')
+    '{name: $name, score: $score, threshold: $threshold, pass: $pass}')")
 done
 
-average=$(python3 -c "print(round($total_score / $dim_count, 1))" 2>/dev/null || echo "0")
-overall_pass="$all_pass"
+# Build dimensions_json in one call
+dimensions_json=$(printf '%s\n' "${dim_entries[@]}" | jq -s '.')
 
-# Check average against pass threshold
-if python3 -c "import sys; sys.exit(0 if $average >= $RUBRIC_PASS_THRESH else 1)" 2>/dev/null; then
-  : # average meets threshold
-else
+# Compute average and overall verdict with awk (no python subprocess)
+average=$(awk "BEGIN { printf \"%.1f\", $total_score / $dim_count }")
+overall_pass="$all_pass"
+if ! awk "BEGIN { exit ($average >= $RUBRIC_PASS_THRESH) ? 0 : 1 }"; then
   overall_pass=false
 fi
 
@@ -183,13 +183,17 @@ else
   printf "Judge:    %s\n" "$JUDGE_MODEL"
   printf "\n"
 
-  for dim in $RUBRIC_DIM_NAMES; do
-    score_val=$(printf '%s' "$judge_json" | jq --arg d "$dim" '.[$d] // 0 | floor')
-    threshold_val=$(rubric_get_threshold "$dim")
-    if [[ "$score_val" -ge "$threshold_val" ]]; then
-      printf "  \033[32mPASS\033[0m  %-20s %s/5 (threshold: %s)\n" "$dim" "$score_val" "$threshold_val"
+  # Read from dimensions_json instead of re-querying
+  local_dim_count=$(printf '%s' "$dimensions_json" | jq 'length')
+  for idx in $(seq 0 $((local_dim_count - 1))); do
+    dim_name=$(printf '%s' "$dimensions_json" | jq -r ".[$idx].name")
+    dim_score=$(printf '%s' "$dimensions_json" | jq ".[$idx].score")
+    dim_thresh=$(printf '%s' "$dimensions_json" | jq ".[$idx].threshold")
+    dim_passed=$(printf '%s' "$dimensions_json" | jq -r ".[$idx].pass")
+    if [[ "$dim_passed" == "true" ]]; then
+      printf "  \033[32mPASS\033[0m  %-20s %s/5 (threshold: %s)\n" "$dim_name" "$dim_score" "$dim_thresh"
     else
-      printf "  \033[31mFAIL\033[0m  %-20s %s/5 (threshold: %s)\n" "$dim" "$score_val" "$threshold_val"
+      printf "  \033[31mFAIL\033[0m  %-20s %s/5 (threshold: %s)\n" "$dim_name" "$dim_score" "$dim_thresh"
     fi
   done
 
