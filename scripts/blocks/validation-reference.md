@@ -1,0 +1,1 @@
+- Reference the validation pattern from `_shared/validation-pattern.md` for self-checking%SUFFIX%.

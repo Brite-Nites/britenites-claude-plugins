@@ -973,6 +973,32 @@ PYEOF
     fi
   fi
 
+  # ══════════════════════════════════════════════════════════════════════
+  # Section 14 — Template Freshness ($plugin_name)
+  # ══════════════════════════════════════════════════════════════════════
+  local tmpl_files=()
+  for tf in "$PLUGIN_ROOT"/skills/*/SKILL.md.tmpl; do
+    [ -f "$tf" ] && tmpl_files+=("$tf")
+  done
+
+  if [ "${#tmpl_files[@]}" -gt 0 ]; then
+    section "14. Template Freshness ($plugin_name)"
+    local tmpl_stale=0
+    for tmpl_file in "${tmpl_files[@]}"; do
+      local skill_dir
+      skill_dir="$(dirname "$tmpl_file")"
+      local skill_name
+      skill_name="$(basename "$skill_dir")"
+      if python3 "$REPO_ROOT/scripts/gen-skill-docs.py" --check --skill "$skill_name" > /dev/null 2>&1; then
+        pass "$skill_name/SKILL.md is fresh"
+      else
+        fail "$skill_name/SKILL.md is stale (regenerate with: bash scripts/gen-skill-docs.sh)"
+        tmpl_stale=$((tmpl_stale + 1))
+      fi
+    done
+    pass "${#tmpl_files[@]} template(s) checked, $tmpl_stale stale"
+  fi
+
   # ── Plugin Summary ───────────────────────────────────────────────
   local cmd_count=0
   for f in "$PLUGIN_ROOT"/commands/*.md; do [ -f "$f" ] && cmd_count=$((cmd_count + 1)); done

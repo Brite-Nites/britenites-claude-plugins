@@ -3,7 +3,6 @@ name: git-worktrees
 description: Creates an isolated git worktree for task execution. Activates when starting work on a planned issue — sets up a new branch with Linear issue ID, runs project setup, and verifies a clean test baseline before coding begins.
 user-invocable: false
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 
 # Git Worktrees
 
@@ -24,13 +23,7 @@ Before setting up the worktree, validate inputs exist:
 
 After preconditions pass, print the activation banner (see `_shared/observability.md`):
 
-```
----
-**Git Worktrees** activated
-Trigger: Plan approved, setting up isolated workspace
-Produces: isolated worktree, clean baseline verification
----
-```
+{{ACTIVATION_BANNER skill_title="Git Worktrees" trigger_hint="Plan approved, setting up isolated workspace" produces="isolated worktree, clean baseline verification"}}
 
 ## Setup Process
 

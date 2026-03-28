@@ -3,7 +3,6 @@ name: verification-before-completion
 description: Ensures tasks are genuinely resolved before marking them done. Activates at task checkpoints during plan execution — validates that fixes actually work, tests genuinely pass, and acceptance criteria are met. Prevents premature completion declarations.
 user-invocable: false
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 
 # Verification Before Completion
 
@@ -24,13 +23,7 @@ This skill is invoked directly by `executing-plans` at each task checkpoint. No 
 
 After being invoked, print the activation banner (see `_shared/observability.md`):
 
-```
----
-**Verification Before Completion** activated
-Trigger: Task checkpoint reached
-Produces: 4-level verification report
----
-```
+{{ACTIVATION_BANNER skill_title="Verification Before Completion" trigger_hint="Task checkpoint reached" produces="4-level verification report"}}
 
 ## Verification Protocol
 

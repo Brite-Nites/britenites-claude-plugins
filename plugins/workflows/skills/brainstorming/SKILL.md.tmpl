@@ -3,7 +3,6 @@ name: brainstorming
 description: Socratic discovery and design exploration before planning. Activates when objective complexity criteria are met (2+ modules, 4+ tasks, 2+ approaches, or new patterns/integrations) — asks clarifying questions, explores alternatives and tradeoffs, produces a design document for approval. Pulls context from Linear issue description, linked docs, and existing CLAUDE.md learnings.
 user-invocable: false
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 
 # Brainstorming
 
@@ -32,13 +31,7 @@ Before brainstorming, validate inputs exist:
 
 After preconditions pass, print the activation banner (see `_shared/observability.md`):
 
-```
----
-**Brainstorming** activated
-Trigger: [which objective criteria matched — e.g., "spans 3 modules" or "4+ tasks estimated"]
-Produces: design document
----
-```
+{{ACTIVATION_BANNER skill_title="Brainstorming" trigger_hint="[which objective criteria matched — e.g., \"spans 3 modules\" or \"4+ tasks estimated\"]" produces="design document"}}
 
 ## Phase 1: Context Gathering
 
@@ -161,7 +154,7 @@ Present the design document and ask:
 
 **If changes requested**: Iterate on the specific sections, then re-present.
 
-**If approval fails after 3 iterations**: Use error recovery (see `_shared/observability.md`). AskUserQuestion with options: "Approve as-is / Continue iterating / Stop brainstorming and proceed to planning with current state."
+**If approval fails after 3 iterations**: {{ERROR_RECOVERY opt1="Approve as-is" opt2="Continue iterating" opt3="Stop brainstorming and proceed to planning with current state"}}
 
 **If approved**: Derive a slug from the issue title — lowercase, replace `[^a-z0-9]+` with `-`, strip leading/trailing `-`, cap at 40 characters. Verify the result matches `^[a-z0-9-]+$` (strict ASCII). If not, strip non-matching characters and re-verify. If the slug is empty after stripping (e.g., all-non-ASCII title), lowercase the sanitized issue ID, replace `_` with `-`, and use that as the slug. Save the design document to `docs/designs/<sanitized-issue-id>-<slug>.md` (create the directory if needed). This document will be referenced during planning and execution.
 
@@ -188,4 +181,4 @@ Proceeding to → writing-plans
 - Ask questions that surface hidden complexity — the developer shouldn't discover surprises during coding.
 - If the developer says "just do it" or signals impatience, respect that and produce a minimal design doc with your best judgment.
 - Keep the design document concise. If it's over 40 lines, you're over-thinking it.
-- Reference the validation pattern from `_shared/validation-pattern.md` for self-checking.
+{{VALIDATION_REFERENCE suffix=""}}
