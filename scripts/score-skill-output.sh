@@ -59,10 +59,7 @@ while [[ $# -gt 0 ]]; do
     --input)  INPUT="$2"; shift 2 ;;
     --format) FORMAT="$2"; shift 2 ;;
     --list)
-      printf "Available rubrics:\n"
-      list_available_rubrics | while read -r name; do
-        printf "  %s\n" "$name"
-      done
+      print_available_rubrics
       exit 0
       ;;
     --help)   usage ;;
@@ -73,8 +70,7 @@ done
 # ── Guards ──────────────────────────────────────────────────────────
 if [[ -z "$SKILL" ]]; then
   printf "ERROR: --skill is required.\n\n"
-  printf "Available rubrics:\n"
-  list_available_rubrics | while read -r name; do printf "  %s\n" "$name"; done
+  print_available_rubrics
   exit 2
 fi
 
@@ -96,8 +92,7 @@ fi
 # ── Load rubric ─────────────────────────────────────────────────────
 if ! load_rubric "$SKILL"; then
   printf "ERROR: No rubric found for skill '%s'.\n\n" "$SKILL"
-  printf "Available rubrics:\n"
-  list_available_rubrics | while read -r name; do printf "  %s\n" "$name"; done
+  print_available_rubrics
   exit 2
 fi
 

@@ -145,7 +145,7 @@ try:
     d = json.loads(text)
     print(json.dumps(d))
     sys.exit(0)
-except: pass
+except (ValueError, json.JSONDecodeError): pass
 # Try extracting JSON from markdown code block or wrapped text
 m = re.search(r"\{[^{}]+\}", text)
 if m:
@@ -153,7 +153,7 @@ if m:
         d = json.loads(m.group())
         print(json.dumps(d))
         sys.exit(0)
-    except: pass
+    except (ValueError, json.JSONDecodeError): pass
 print("{}")
 ' 2>/dev/null || printf '{}'
 }
@@ -205,9 +205,17 @@ call_judge_api() {
 # Lists skill names that have rubric files.
 # Prints one skill name per line to stdout.
 list_available_rubrics() {
-  local rubric_dir="${RUBRIC_DIR:-$(cd "$_LIB_DIR/../.." && pwd)/tests/rubrics}"
-  for f in "$rubric_dir"/*.md; do
+  for f in "$RUBRIC_DIR"/*.md; do
     [[ -f "$f" ]] || continue
     basename "$f" .md
+  done
+}
+
+# ── print_available_rubrics ─────────────────────────────────────────
+# Prints a formatted list of available rubrics to stdout.
+print_available_rubrics() {
+  printf "Available rubrics:\n"
+  list_available_rubrics | while read -r name; do
+    printf "  %s\n" "$name"
   done
 }

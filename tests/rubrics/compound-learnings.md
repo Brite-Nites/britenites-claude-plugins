@@ -4,16 +4,12 @@ version: "1.0"
 pass_threshold: 3.0
 dimensions:
   - name: clarity
-    weight: 1.0
     threshold: 4
   - name: completeness
-    weight: 1.0
     threshold: 4
   - name: actionability
-    weight: 1.0
     threshold: 4
   - name: adherence
-    weight: 1.0
     threshold: 3
 ---
 

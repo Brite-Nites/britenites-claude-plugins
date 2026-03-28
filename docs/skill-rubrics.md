@@ -28,7 +28,7 @@ The first three dimensions come from [gstack's LLM-as-judge pattern](https://git
 Both conditions must be met for an overall PASS:
 
 1. **Per-dimension**: Each dimension score >= its threshold (defined in rubric YAML)
-2. **Overall average**: Weighted average of all dimension scores >= `pass_threshold` (default: 3.0)
+2. **Overall average**: Average of all dimension scores >= `pass_threshold` (default: 3.0)
 
 ## Rubric Files
 
@@ -43,16 +43,12 @@ version: "1.0"
 pass_threshold: 3.0
 dimensions:
   - name: clarity
-    weight: 1.0
     threshold: 4
   - name: completeness
-    weight: 1.0
     threshold: 4
   - name: actionability
-    weight: 1.0
     threshold: 4
   - name: adherence
-    weight: 1.0
     threshold: 3
 ---
 
