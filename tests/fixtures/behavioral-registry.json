@@ -1,0 +1,158 @@
+{
+  "version": "1.0.0",
+  "description": "Behavioral test registry for Brite plugin skills (BC-2462)",
+  "consumed_by": "scripts/test-behavioral.sh",
+  "research": "docs/research/behavioral-testing-evaluation.md",
+  "test_cases": [
+    {
+      "id": "B01",
+      "description": "Brainstorming activates for multi-module redesign",
+      "tier": 2,
+      "prompt": "I need to redesign the auth system. It currently spans the API routes, middleware, and database layer — three separate modules. There are at least two viable approaches: JWT-based stateless auth or session-based with Redis. What should we do?",
+      "expected_skill": "brainstorming",
+      "expected_markers": ["design document", "alternative"],
+      "not_expected_markers": [],
+      "not_expected_skills": [],
+      "judge_rubric": {
+        "clarity": 4,
+        "completeness": 4,
+        "actionability": 4
+      },
+      "estimated_cost": "$0.30",
+      "notes": "Core positive case — multi-module + multiple approaches should trigger brainstorming"
+    },
+    {
+      "id": "B02",
+      "description": "Brainstorming does NOT activate for trivial single-file change",
+      "tier": 2,
+      "prompt": "Rename the title in README.md from 'Project' to 'Brite Plugin Marketplace'.",
+      "expected_skill": null,
+      "expected_markers": [],
+      "not_expected_markers": ["design document", "brainstorming"],
+      "not_expected_skills": ["brainstorming"],
+      "judge_rubric": null,
+      "estimated_cost": "$0.15",
+      "notes": "Core negative case — trivial change should NOT trigger any skill"
+    },
+    {
+      "id": "B03",
+      "description": "Systematic debugging activates on bug report",
+      "tier": 2,
+      "prompt": "The login form submits successfully but the session cookie isn't being set. Users get logged out immediately after login. The auth endpoint returns 200 but the Set-Cookie header is missing from the response.",
+      "expected_skill": "systematic-debugging",
+      "expected_markers": ["reproduce", "isolate"],
+      "not_expected_markers": [],
+      "not_expected_skills": ["brainstorming"],
+      "judge_rubric": {
+        "clarity": 4,
+        "completeness": 4,
+        "actionability": 4
+      },
+      "estimated_cost": "$0.30",
+      "notes": "Bug report with symptoms — should trigger 4-phase debugging"
+    },
+    {
+      "id": "B04",
+      "description": "frontend-design activates for build/create UI task",
+      "tier": 2,
+      "prompt": "Build a login form component with email and password fields using React and Tailwind CSS. Include validation and a submit button.",
+      "expected_skill": "frontend-design",
+      "expected_markers": [],
+      "not_expected_markers": [],
+      "not_expected_skills": ["ui-ux-pro-max"],
+      "judge_rubric": {
+        "clarity": 4,
+        "completeness": 4,
+        "actionability": 4
+      },
+      "estimated_cost": "$0.30",
+      "notes": "Build/create keyword should route to frontend-design, NOT ui-ux-pro-max"
+    },
+    {
+      "id": "B05",
+      "description": "ui-ux-pro-max activates for design planning task",
+      "tier": 2,
+      "prompt": "Choose a color palette and font pairing for our SaaS analytics dashboard. We want a professional, data-heavy look that works well in dark mode.",
+      "expected_skill": "ui-ux-pro-max",
+      "expected_markers": [],
+      "not_expected_markers": [],
+      "not_expected_skills": ["frontend-design"],
+      "judge_rubric": {
+        "clarity": 4,
+        "completeness": 4,
+        "actionability": 4
+      },
+      "estimated_cost": "$0.30",
+      "notes": "Design planning (palette, fonts) should route to ui-ux-pro-max, NOT frontend-design"
+    },
+    {
+      "id": "B06",
+      "description": "web-design-guidelines activates for review/audit task",
+      "tier": 2,
+      "prompt": "Review the current UI for accessibility compliance. Audit the existing components against WCAG 2.1 guidelines and check for keyboard navigation issues.",
+      "expected_skill": "web-design-guidelines",
+      "expected_markers": [],
+      "not_expected_markers": [],
+      "not_expected_skills": ["frontend-design"],
+      "judge_rubric": null,
+      "estimated_cost": "$0.25",
+      "notes": "Review/audit keywords should route to web-design-guidelines, NOT frontend-design"
+    },
+    {
+      "id": "B07",
+      "description": "Precedence: debugging beats brainstorming when bug is present",
+      "tier": 2,
+      "prompt": "I want to explore alternatives for the payment service architecture, but there's also a production bug — Stripe webhook events are being dropped and customers aren't getting order confirmations. Error logs show a 429 rate limit from Stripe.",
+      "expected_skill": "systematic-debugging",
+      "expected_markers": ["reproduce"],
+      "not_expected_markers": [],
+      "not_expected_skills": ["brainstorming"],
+      "judge_rubric": null,
+      "estimated_cost": "$0.30",
+      "notes": "When both debugging and brainstorming could apply, debugging should win (production bug takes priority)"
+    },
+    {
+      "id": "B08",
+      "description": "code-quality activates for linting/formatting setup",
+      "tier": 2,
+      "prompt": "Set up ESLint and Prettier for this TypeScript monorepo. We need consistent formatting across all packages and strict type checking rules.",
+      "expected_skill": "code-quality",
+      "expected_markers": [],
+      "not_expected_markers": [],
+      "not_expected_skills": [],
+      "judge_rubric": null,
+      "estimated_cost": "$0.25",
+      "notes": "ESLint/Prettier setup should trigger code-quality skill"
+    },
+    {
+      "id": "B09",
+      "description": "No skill fires for irrelevant general-knowledge prompt",
+      "tier": 2,
+      "prompt": "What is the capital of France?",
+      "expected_skill": null,
+      "expected_markers": ["paris"],
+      "not_expected_markers": ["activated", "design document", "reproduce"],
+      "not_expected_skills": ["brainstorming", "systematic-debugging", "frontend-design"],
+      "judge_rubric": null,
+      "estimated_cost": "$0.10",
+      "notes": "General knowledge question — no skill should activate, just answer directly"
+    },
+    {
+      "id": "B10",
+      "description": "Output quality: brainstorming produces thorough design exploration",
+      "tier": 2,
+      "prompt": "We need to add real-time notifications to the app. It touches the API layer (new WebSocket endpoints), the data layer (notification storage and read/unread state), and the React frontend (notification bell, dropdown, real-time updates). There are multiple approaches: WebSockets, Server-Sent Events, or polling.",
+      "expected_skill": "brainstorming",
+      "expected_markers": ["design document"],
+      "not_expected_markers": [],
+      "not_expected_skills": [],
+      "judge_rubric": {
+        "clarity": 4,
+        "completeness": 4,
+        "actionability": 4
+      },
+      "estimated_cost": "$0.35",
+      "notes": "Quality test — brainstorming output should be high-clarity, explore alternatives thoroughly"
+    }
+  ]
+}
