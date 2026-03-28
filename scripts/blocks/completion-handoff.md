@@ -1,0 +1,13 @@
+## Handoff
+
+%HANDOFF_INTRO%
+
+%SAFETY_NOTE%
+
+```
+**%COMPLETION_TITLE%**
+Artifacts:
+%ARTIFACTS%
+%EXTRA_FIELDS%
+%NEXT_LINE%
+```

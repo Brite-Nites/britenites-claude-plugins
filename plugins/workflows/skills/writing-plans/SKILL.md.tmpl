@@ -3,7 +3,6 @@ name: writing-plans
 description: Breaks work into bite-sized tasks before coding. Activates when a multi-step task needs planning — creates tasks small enough for a junior developer to follow (2-5 minutes each), with exact file paths, complete implementation details, and verification steps. References Linear issue context and project-specific test commands from CLAUDE.md.
 user-invocable: false
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 
 # Writing Plans
 
@@ -24,13 +23,7 @@ Before planning, validate inputs exist:
 
 After preconditions pass, print the activation banner (see `_shared/observability.md`):
 
-```
----
-**Writing Plans** activated
-Trigger: [e.g., "Multi-step task after brainstorming approval" or "Direct planning for straightforward issue"]
-Produces: plan file
----
-```
+{{ACTIVATION_BANNER skill_title="Writing Plans" trigger_hint="[e.g., \"Multi-step task after brainstorming approval\" or \"Direct planning for straightforward issue\"]" produces="plan file"}}
 
 ## Context Loading
 
@@ -168,7 +161,7 @@ Narrate: `Step 3/3: Requesting plan approval...`
 2. Ask: "Does this plan look right? Any tasks to add, remove, or reorder?"
 3. **If approved**: Plan is ready for execution via the `executing-plans` skill
 4. **If changes requested**: Iterate the markdown plan, re-save to `docs/plans/<sanitized-issue-id>-plan.md` using the same sanitized issue ID, and re-present
-5. **If blocking issues persist after 3 iterations**: Use error recovery (see `_shared/observability.md`). AskUserQuestion with options: "Approve plan as-is / Continue iterating / Stop and revisit design."
+5. **If blocking issues persist after 3 iterations**: {{ERROR_RECOVERY opt1="Approve plan as-is" opt2="Continue iterating" opt3="Stop and revisit design"}}
 
 Narrate: `Step 3/3: Requesting plan approval... done`
 

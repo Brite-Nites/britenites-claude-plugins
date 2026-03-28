@@ -1,0 +1,1 @@
+Narrate: `%VOCAB% %NUM%/%TOTAL%: %DESC%...`

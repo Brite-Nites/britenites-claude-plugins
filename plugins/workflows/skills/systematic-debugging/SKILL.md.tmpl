@@ -3,7 +3,6 @@ name: systematic-debugging
 description: Four-phase root cause analysis for bug investigation. Activates when debugging unexpected behavior, failing tests, or production issues — follows reproduce, isolate, analyze, fix with defense-in-depth. Uses condition-based waiting instead of arbitrary delays. Available anytime, not tied to the inner loop sequence.
 user-invocable: true
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 
 # Systematic Debugging
 
@@ -21,13 +20,7 @@ You are investigating a bug using a structured four-phase process. The goal is t
 
 After activation, print the banner (see `_shared/observability.md`):
 
-```
----
-**Systematic Debugging** activated
-Trigger: [describe the symptom in your own words — e.g., "test failure in auth flow" or "unexpected 500 on endpoint"]
-Produces: root cause analysis, regression test, fix
----
-```
+{{ACTIVATION_BANNER skill_title="Systematic Debugging" trigger_hint="[describe the symptom in your own words — e.g., \"test failure in auth flow\" or \"unexpected 500 on endpoint\"]" produces="root cause analysis, regression test, fix"}}
 
 ## Phase 1: Reproduce
 

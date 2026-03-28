@@ -3,7 +3,6 @@ name: handbook-drift-check
 description: Detects handbook content that has drifted from project reality after shipping. Activates during the ship phase — compares the shipped diff against handbook files via GitHub API, identifies stale or missing handbook content, and optionally opens a PR to the handbook repo with proposed updates.
 user-invocable: false
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 
 # Handbook Drift Check
 
@@ -25,13 +24,7 @@ Before checking handbook drift, validate access:
 
 After preconditions pass, print the activation banner (see `_shared/observability.md`):
 
-```
----
-**Handbook Drift Check** activated
-Trigger: Ship phase — checking if handbook aligns with shipped changes
-Produces: drift findings, optional handbook PR
----
-```
+{{ACTIVATION_BANNER skill_title="Handbook Drift Check" trigger_hint="Ship phase — checking if handbook aligns with shipped changes" produces="drift findings, optional handbook PR"}}
 
 ## Phase 1/5: Read Project Diff
 

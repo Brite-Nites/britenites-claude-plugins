@@ -3,7 +3,6 @@ name: compound-learnings
 description: Captures durable knowledge after completing work so future sessions benefit. Activates during the ship phase — updates CLAUDE.md with architectural decisions and gotchas, writes session summary to auto-memory, updates docs if architecture or API changed. Only records genuinely durable facts, not session-specific noise.
 user-invocable: false
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 
 # Compound Learnings
 
@@ -24,13 +23,7 @@ Before compounding, validate inputs exist:
 
 After preconditions pass, print the activation banner (see `_shared/observability.md`):
 
-```
----
-**Compound Learnings** activated
-Trigger: Ship phase — capturing durable knowledge
-Produces: CLAUDE.md updates, session summary, optional doc updates
----
-```
+{{ACTIVATION_BANNER skill_title="Compound Learnings" trigger_hint="Ship phase — capturing durable knowledge" produces="CLAUDE.md updates, session summary, optional doc updates"}}
 
 ## Phase 1: Analyze What Was Learned
 
