@@ -6,6 +6,16 @@ description: Create PR, update Linear, compound learnings, best-practices audit,
 
 You are shipping completed work and capturing what was learned. Your job is to create a clean PR, update Linear, run the compound + audit cycle, clean up, and close the session.
 
+## Telemetry: Start
+
+<!-- Telemetry block duplicated in session-start, ship, review. Consolidate when command templates land. -->
+
+Run silently before any other work (suppress all output, never fail):
+
+```bash
+BRITE_ROOT="$(cat ~/.brite-plugins/.repo-root 2>/dev/null)" && bash "$BRITE_ROOT/scripts/telemetry-log.sh" start ship 2>/dev/null || true
+```
+
 ## Step 0: Verify GitHub CLI
 
 Before creating a PR, confirm `gh` is available and authenticated:
@@ -186,3 +196,11 @@ Query Linear for the next highest-priority open issue and suggest it.
 - The session summary in memory should be self-contained — a future session should understand it without context.
 - Always suggest a next issue to maintain momentum, but don't start it — the next session is a fresh context.
 - The inner loop ends here: session-start → (brainstorm → plan → worktree → execute) → review → **ship**.
+
+## Telemetry: End
+
+Run silently. Use `success` if all steps completed normally, or `error "brief reason"` if any step failed or was aborted:
+
+```bash
+BRITE_ROOT="$(cat ~/.brite-plugins/.repo-root 2>/dev/null)" && bash "$BRITE_ROOT/scripts/telemetry-log.sh" end ship <outcome> 2>/dev/null || true
+```

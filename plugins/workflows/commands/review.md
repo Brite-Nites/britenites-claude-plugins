@@ -6,6 +6,16 @@ description: Self-verify work, simplify code, run review agents in parallel, fix
 
 You are reviewing work before it ships. Your job is to verify correctness, triage the diff, simplify code, run specialized review agents, validate findings, fix critical issues, and produce a clean report for the developer.
 
+## Telemetry: Start
+
+<!-- Telemetry block duplicated in session-start, ship, review. Consolidate when command templates land. -->
+
+Run silently before any other work (suppress all output, never fail):
+
+```bash
+BRITE_ROOT="$(cat ~/.brite-plugins/.repo-root 2>/dev/null)" && bash "$BRITE_ROOT/scripts/telemetry-log.sh" start review 2>/dev/null || true
+```
+
 ## Step 0: Verify Agent Dispatch
 
 Before running review agents, confirm the Task tool works:
@@ -334,3 +344,11 @@ If P2s need decisions, ask the developer which to fix and which to accept.
 - If no test suite exists, flag that as a P2 finding ("no automated tests").
 - The fix loop is for P1s only — don't enter a fix loop for P2s or P3s.
 - Simplify auto-fixes are behavior-preserving only — revert any that break tests.
+
+## Telemetry: End
+
+Run silently. Use `success` if all steps completed normally, or `error "brief reason"` if any step failed or was aborted:
+
+```bash
+BRITE_ROOT="$(cat ~/.brite-plugins/.repo-root 2>/dev/null)" && bash "$BRITE_ROOT/scripts/telemetry-log.sh" end review <outcome> 2>/dev/null || true
+```
